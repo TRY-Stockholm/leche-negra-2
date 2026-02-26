@@ -1,11 +1,19 @@
+# Leche Negra
 
-  # Remake design from screenshot
+Restaurant website for Leche Negra, Stockholm. Time-of-day adaptive theming with four menus: breakfast, lunch, dinner, and drinks.
 
-  This is a code bundle for Remake design from screenshot. The original project is available at https://www.figma.com/design/ebsTzTKqcxb2dO3RFdyRQq/Remake-design-from-screenshot.
+Built with React, Framer Motion, and Tailwind CSS v4.
 
-  ## Running the code
+## Development
 
-  Run `npm i` to install the dependencies.
+```bash
+npm install
+npm run dev
+```
 
-  Run `npm run dev` to start the development server.
-  
+## Build
+
+```bash
+npm run build
+npm run preview
+```
