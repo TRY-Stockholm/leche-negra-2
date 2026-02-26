@@ -10,6 +10,7 @@ import {
 import { TAPES, SPEAKER_COLORS } from './types'
 import { useTapeDeck } from './TapeDeckContext'
 import { CassettePlayerSVG } from './CassettePlayerSVG'
+import { CassetteTapeSVG } from './CassetteTape'
 
 // ─── Sound Waves ───────────────────────────────────────────────
 
@@ -195,23 +196,22 @@ export function CassettePlayer({ className, style }: { className?: string; style
           )}
         </AnimatePresence>
 
-        {/* Loaded tape label in cassette window */}
+        {/* Loaded tape in cassette window */}
         <AnimatePresence>
           {activeTape && (
             <motion.div
-              className="absolute flex items-center justify-center pointer-events-none"
+              className="absolute flex items-center justify-center pointer-events-none overflow-hidden"
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
               style={{ left: '27%', top: '32%', width: '46%', height: '22%' }}
             >
-              <span
-                className="text-[0.45rem] md:text-[0.55rem] font-mono tracking-[0.12em] uppercase truncate px-1"
-                style={{ color: activeTape.accent, textShadow: `0 0 8px ${activeTape.glow}` }}
-              >
-                {activeTape.label}
-              </span>
+              <CassetteTapeSVG
+                tape={activeTape}
+                className="w-full h-full"
+                style={{ filter: `drop-shadow(0 0 4px ${activeTape.glow})` }}
+              />
             </motion.div>
           )}
         </AnimatePresence>

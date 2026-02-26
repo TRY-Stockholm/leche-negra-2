@@ -89,7 +89,7 @@ function PageContent() {
         </div>
 
         {/* Menu section — full-width bottom grid */}
-        <div className="col-span-12 row-start-2 self-end md:row-start-4 pb-4 lg:pb-8">
+        <div className="col-span-12  self-end row-start-4 pb-4 lg:pb-8">
           <div className="grid grid-cols-2 md:flex gap-x-4 lg:gap-12">
             {[
               {
