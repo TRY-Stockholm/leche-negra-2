@@ -9,7 +9,6 @@
     "start": "next start"
   },
   "dependencies": {
-    "matter-js": "^0.20.0",
     "motion": "12.23.24",
     "next": "^15",
     "react": "^19.2.4",
@@ -17,7 +16,6 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/matter-js": "^0.20.2",
     "@types/node": "^22",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

@@ -10,7 +10,6 @@ import {
 import { TAPES, SPEAKER_COLORS } from './types'
 import { useTapeDeck } from './TapeDeckContext'
 import { CassettePlayerSVG } from './CassettePlayerSVG'
-import { CassetteTapeSVG } from './CassetteTape'
 
 // ─── Sound Waves ───────────────────────────────────────────────
 
@@ -119,6 +118,31 @@ export function CassettePlayer({ className, style }: { className?: string; style
   }, [loadedTapeId, eject])
 
   const glowColor = activeTape?.glow ?? 'transparent'
+  const loaded = !!activeTape
+
+  // Overlay positions differ between open (no tape) and closed (tape loaded) SVGs
+  const pos = loaded ? {
+    // closed player (534.63 x 427.48)
+    buttons: [
+      { left: '24.7%', top: '71.6%', width: '15.5%', height: '27.9%' },  // Play
+      { left: '42.1%', top: '71.6%', width: '15.4%', height: '27.9%' },  // Stop
+      { left: '59.6%', top: '71.6%', width: '15.3%', height: '27.9%' },  // Rewind
+      { left: '77.0%', top: '71.7%', width: '15.5%', height: '27.8%' },  // Eject
+    ],
+    window: { left: '23%', top: '30%', width: '55%', height: '32%' },
+    reelLeft: { left: '30%', top: '38%', width: '10%', paddingBottom: '10%' },
+    reelRight: { right: '30%', top: '38%', width: '10%', paddingBottom: '10%' },
+  } : {
+    // open player (565.5 x 555.39)
+    buttons: [
+      { left: '24.8%', top: '76.9%', width: '15.4%', height: '23%' },    // Play
+      { left: '42.1%', top: '76.9%', width: '15.4%', height: '22.7%' },  // Stop
+      { left: '59.6%', top: '76.9%', width: '15.2%', height: '22.7%' },  // Eject
+    ],
+    window: { left: '27%', top: '32%', width: '46%', height: '22%' },
+    reelLeft: { left: '32%', top: '35%', width: '8%', paddingBottom: '8%' },
+    reelRight: { right: '32%', top: '35%', width: '8%', paddingBottom: '8%' },
+  }
 
   return (
     <motion.div
@@ -147,36 +171,33 @@ export function CassettePlayer({ className, style }: { className?: string; style
             transition: 'color 0.8s ease, filter 0.8s ease',
           }}
         >
-          <CassettePlayerSVG />
+          <CassettePlayerSVG loaded={loaded} />
           {/* Invisible HTML button overlays — positioned to match SVG button paths */}
-          <button
-            className="absolute bg-transparent hover:bg-white/15 cursor-pointer z-10 transition-colors duration-150"
-            style={{ left: '24.8%', top: '76.9%', width: '15.4%', height: '23%' }}
-            onPointerDown={e => e.stopPropagation()}
-            onClick={handlePlayPause}
-            aria-label="Play / Pause"
-          />
-          <button
-            className="absolute bg-transparent hover:bg-white/15 cursor-pointer z-10 transition-colors duration-150"
-            style={{ left: '42.1%', top: '76.9%', width: '15.4%', height: '22.7%' }}
-            onPointerDown={e => e.stopPropagation()}
-            onClick={handleStop}
-            aria-label="Stop"
-          />
-          <button
-            className="absolute bg-transparent hover:bg-white/15 cursor-pointer z-10 transition-colors duration-150"
-            style={{ left: '59.6%', top: '76.9%', width: '15.2%', height: '22.7%' }}
-            onPointerDown={e => e.stopPropagation()}
-            onClick={handleEject}
-            aria-label="Eject"
-          />
+          {pos.buttons.map((btn, i) => {
+            const handlers = loaded
+              ? [handlePlayPause, handleStop, handlePlayPause, handleEject]
+              : [handlePlayPause, handleStop, handleEject]
+            const labels = loaded
+              ? ['Play / Pause', 'Stop', 'Rewind', 'Eject']
+              : ['Play / Pause', 'Stop', 'Eject']
+            return (
+              <button
+                key={`${loaded ? 'c' : 'o'}-${i}`}
+                className="absolute bg-transparent hover:bg-white/15 cursor-pointer z-10 transition-colors duration-150"
+                style={btn}
+                onPointerDown={e => e.stopPropagation()}
+                onClick={handlers[i]}
+                aria-label={labels[i]}
+              />
+            )
+          })}
         </div>
 
         {/* Deck slot ref for proximity detection */}
         <div
           ref={setDeckSlotRef}
           className="absolute pointer-events-none"
-          style={{ left: '27%', top: '32%', width: '46%', height: '22%' }}
+          style={pos.window}
         />
 
         {/* Proximity glow when tape approaches */}
@@ -189,29 +210,30 @@ export function CassettePlayer({ className, style }: { className?: string; style
               exit={{ opacity: 0 }}
               transition={{ duration: 0.8, repeat: Infinity }}
               style={{
-                left: '27%', top: '32%', width: '46%', height: '22%',
+                ...pos.window,
                 boxShadow: `inset 0 0 16px ${nearTape.glow}, 0 0 12px ${nearTape.glow}`,
               }}
             />
           )}
         </AnimatePresence>
 
-        {/* Loaded tape in cassette window */}
+        {/* Loaded tape label */}
         <AnimatePresence>
           {activeTape && (
             <motion.div
-              className="absolute flex items-center justify-center pointer-events-none overflow-hidden"
+              className="absolute flex items-center justify-center pointer-events-none"
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-              style={{ left: '27%', top: '32%', width: '46%', height: '22%' }}
+              style={pos.window}
             >
-              <CassetteTapeSVG
-                tape={activeTape}
-                className="w-full h-full"
-                style={{ filter: `drop-shadow(0 0 4px ${activeTape.glow})` }}
-              />
+              <span
+                className="text-[0.45rem] md:text-[0.55rem] font-mono tracking-[0.12em] uppercase truncate px-1"
+                style={{ color: activeTape.accent, textShadow: `0 0 8px ${activeTape.glow}` }}
+              >
+                {activeTape.label}
+              </span>
             </motion.div>
           )}
         </AnimatePresence>
@@ -224,9 +246,8 @@ export function CassettePlayer({ className, style }: { className?: string; style
               animate={{ rotate: 360 }}
               transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
               style={{
-                left: '32%', top: '35%',
-                width: '8%', height: '0',
-                paddingBottom: '8%',
+                ...pos.reelLeft,
+                height: '0',
                 borderColor: activeTape.reelColor,
                 opacity: 0.5,
                 boxShadow: `0 0 6px ${activeTape.glow}`,
@@ -237,9 +258,8 @@ export function CassettePlayer({ className, style }: { className?: string; style
               animate={{ rotate: 360 }}
               transition={{ duration: 2.2, repeat: Infinity, ease: 'linear' }}
               style={{
-                right: '32%', top: '35%',
-                width: '8%', height: '0',
-                paddingBottom: '8%',
+                ...pos.reelRight,
+                height: '0',
                 borderColor: activeTape.reelColor,
                 opacity: 0.5,
                 boxShadow: `0 0 6px ${activeTape.glow}`,
@@ -255,7 +275,7 @@ export function CassettePlayer({ className, style }: { className?: string; style
             animate={{ opacity: [0.05, 0.2, 0.05] }}
             transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
             style={{
-              left: '27%', top: '32%', width: '46%', height: '22%',
+              ...pos.window,
               background: `radial-gradient(ellipse at center, ${activeTape.glow} 0%, transparent 70%)`,
             }}
           />

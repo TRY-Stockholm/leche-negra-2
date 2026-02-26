@@ -14,6 +14,7 @@ import {
   CassetteTape,
 } from "./components/tape-deck";
 import { Ticker } from "./components/Ticker";
+import { Footer } from "./components/footer";
 
 const TAPE_THEME_MAP: Record<string, Theme> = {
   morning: "morning",
@@ -70,8 +71,12 @@ function PageContent() {
 
   return (
     <div
-      className={`min-h-screen overflow-x-hidden bg-background text-foreground font-body ${activeTheme ? `theme-${activeTheme}` : ""}`}
+      className={`overflow-x-hidden bg-background text-foreground font-body ${activeTheme ? `theme-${activeTheme}` : ""}`}
     >
+      <div
+        className="relative z-10 min-h-screen bg-background"
+        style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}
+      >
       <NavBar weather={weather} />
 
       {/* Main Content — 12-column grid */}
@@ -177,6 +182,9 @@ function PageContent() {
       </div>
 
       {/* <Ticker /> */}
+      </div>
+
+      <Footer />
     </div>
   );
 }
