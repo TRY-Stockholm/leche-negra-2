@@ -110,8 +110,8 @@ export function CassettePlayer({ className, style }: { className?: string; style
   }, [loadedTapeId, playing, play, pause])
 
   const handleStop = useCallback(() => {
-    if (loadedTapeId) pause()
-  }, [loadedTapeId, pause])
+    if (loadedTapeId) eject()
+  }, [loadedTapeId, eject])
 
   const handleEject = useCallback(() => {
     if (loadedTapeId) eject()
@@ -139,13 +139,36 @@ export function CassettePlayer({ className, style }: { className?: string; style
         <SoundWaves playing={playing} color={colors.speaker + '60'} side="right" />
 
         <div
+          className="relative"
           style={{
             color: playing && activeTape ? activeTape.accent : 'var(--muted-foreground)',
             filter: playing && activeTape ? `drop-shadow(0 0 20px ${glowColor})` : 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))',
             transition: 'color 0.8s ease, filter 0.8s ease',
           }}
         >
-          <CassettePlayerSVG onPlay={handlePlayPause} onStop={handleStop} onEject={handleEject} />
+          <CassettePlayerSVG />
+          {/* Invisible HTML button overlays — positioned to match SVG button paths */}
+          <button
+            className="absolute bg-transparent hover:bg-white/15 cursor-pointer z-10 transition-colors duration-150"
+            style={{ left: '24.8%', top: '76.9%', width: '15.4%', height: '23%' }}
+            onPointerDown={e => e.stopPropagation()}
+            onClick={handlePlayPause}
+            aria-label="Play / Pause"
+          />
+          <button
+            className="absolute bg-transparent hover:bg-white/15 cursor-pointer z-10 transition-colors duration-150"
+            style={{ left: '42.1%', top: '76.9%', width: '15.4%', height: '22.7%' }}
+            onPointerDown={e => e.stopPropagation()}
+            onClick={handleStop}
+            aria-label="Stop"
+          />
+          <button
+            className="absolute bg-transparent hover:bg-white/15 cursor-pointer z-10 transition-colors duration-150"
+            style={{ left: '59.6%', top: '76.9%', width: '15.2%', height: '22.7%' }}
+            onPointerDown={e => e.stopPropagation()}
+            onClick={handleEject}
+            aria-label="Eject"
+          />
         </div>
 
         {/* Deck slot ref for proximity detection */}
