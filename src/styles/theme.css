@@ -563,6 +563,155 @@
   }
 }
 
+.custom-cursor svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* ── Zippo lighter cursor ── */
+.zippo-lighter {
+  z-index: 60;
+  will-change: transform;
+}
+
+.zippo-lighter svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.zippo-lighter svg path,
+.zippo-lighter svg polygon,
+.zippo-lighter svg circle,
+.zippo-lighter svg rect,
+.zippo-lighter svg line {
+  stroke: var(--foreground, #e43122);
+  fill: var(--foreground, #e43122);
+}
+
+.zippo-lighter #FIRE {
+  transform-origin: center bottom;
+  animation: fire-dance 0.4s ease-in-out infinite alternate,
+    fire-flicker 0.15s linear infinite;
+}
+
+.zippo-lighter #FIRE path {
+  fill: #ff6b00 !important;
+  stroke: none !important;
+  animation: fire-glow 0.3s ease-in-out infinite alternate;
+}
+
+.zippo-lighter #FIRE path:nth-child(odd) {
+  fill: #ffaa00 !important;
+  animation-delay: -0.1s;
+}
+
+.zippo-lighter #FIRE path:nth-child(3n) {
+  fill: #ff4500 !important;
+  animation-delay: -0.2s;
+}
+
+@keyframes fire-dance {
+  0% {
+    transform: scaleX(1) scaleY(1);
+  }
+  100% {
+    transform: scaleX(0.92) scaleY(1.06);
+  }
+}
+
+@keyframes fire-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 0.85;
+  }
+  60% {
+    opacity: 0.95;
+  }
+  80% {
+    opacity: 0.88;
+  }
+}
+
+@keyframes fire-glow {
+  0% {
+    filter: brightness(1);
+  }
+  100% {
+    filter: brightness(1.3) drop-shadow(0 0 4px #ff6b00);
+  }
+}
+
+/* ── Candle cursor (moth & flame scene) ── */
+.candle-cursor {
+  z-index: 60;
+  will-change: transform;
+  filter: drop-shadow(0 0 24px rgba(255, 160, 60, 0.5))
+    drop-shadow(0 0 60px rgba(255, 120, 20, 0.25));
+}
+
+.candle-cursor svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.candle-cursor svg ellipse,
+.candle-cursor svg rect,
+.candle-cursor svg line,
+.candle-cursor svg circle {
+  /* Warm monochrome: cream body, brass base */
+}
+
+/* Flame glow pulse */
+.candle-cursor {
+  animation: candle-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes candle-glow {
+  0% {
+    filter: drop-shadow(0 0 20px rgba(255, 160, 60, 0.45))
+      drop-shadow(0 0 50px rgba(255, 120, 20, 0.2));
+  }
+  100% {
+    filter: drop-shadow(0 0 30px rgba(255, 170, 70, 0.6))
+      drop-shadow(0 0 80px rgba(255, 130, 30, 0.35));
+  }
+}
+
+/* ── Incense cursor (smoke portrait scene) ── */
+.incense-cursor {
+  z-index: 60;
+  will-change: transform;
+  filter: drop-shadow(0 0 6px rgba(180, 180, 200, 0.2));
+}
+
+.incense-cursor svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Subtle ember pulse at the tip */
+.incense-cursor {
+  animation: incense-ember 3s ease-in-out infinite alternate;
+}
+
+@keyframes incense-ember {
+  0% {
+    filter: drop-shadow(0 0 4px rgba(180, 180, 200, 0.15))
+      drop-shadow(0 -8px 12px rgba(200, 200, 220, 0.08));
+  }
+  100% {
+    filter: drop-shadow(0 0 8px rgba(200, 180, 180, 0.25))
+      drop-shadow(0 -12px 20px rgba(200, 200, 220, 0.12));
+  }
+}
+
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .neon-logo {
@@ -572,6 +721,16 @@
     animation: none;
   }
   .ticker-track {
+    animation: none;
+  }
+  .zippo-lighter #FIRE,
+  .zippo-lighter #FIRE path {
+    animation: none;
+  }
+  .candle-cursor {
+    animation: none;
+  }
+  .incense-cursor {
     animation: none;
   }
 }

@@ -24,11 +24,20 @@ function parseSvg(text: string): { viewBox: string; paths: NeonPath[] } {
   return { viewBox, paths };
 }
 
-export function NeonLogo({ isOff }: { isOff: boolean }) {
+export function NeonLogo({
+  isOff,
+  onLongPressComplete,
+  onLongPressEnd,
+}: {
+  isOff: boolean;
+  onLongPressComplete?: () => void;
+  onLongPressEnd?: () => void;
+}) {
   const [data, setData] = useState(cached);
   const [pressed, setPressed] = useState(false);
   const [intensity, setIntensity] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const triggeredRef = useRef(false);
 
   useEffect(() => {
     if (cached) return;
@@ -42,13 +51,18 @@ export function NeonLogo({ isOff }: { isOff: boolean }) {
 
   const startHold = useCallback(() => {
     setPressed(true);
+    triggeredRef.current = false;
     const start = Date.now();
     intervalRef.current = setInterval(() => {
       const elapsed = Date.now() - start;
       const t = Math.min(elapsed / 2500, 1);
       setIntensity(t);
+      if (t >= 1 && !triggeredRef.current) {
+        triggeredRef.current = true;
+        onLongPressComplete?.();
+      }
     }, 30);
-  }, []);
+  }, [onLongPressComplete]);
 
   const endHold = useCallback(() => {
     setPressed(false);
@@ -57,7 +71,10 @@ export function NeonLogo({ isOff }: { isOff: boolean }) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-  }, []);
+    if (triggeredRef.current) {
+      onLongPressEnd?.();
+    }
+  }, [onLongPressEnd]);
 
   useEffect(() => {
     return () => {

@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import type { Theme, MenuKey } from "@/lib/types";
 import { menuThemeMap, isLightTheme } from "@/lib/constants";
 import { NeonLogo } from "./components/NeonLogo";
+import { EasterEggScene } from "./components/EasterEggScene";
+import { pickScene, type SceneConfig } from "./components/scenes";
 import { useWeather } from "@/hooks/useWeather";
 import { MenuPanel } from "./components/MenuPanel";
 import { NavBar } from "./components/NavBar";
@@ -35,6 +37,9 @@ function PageContent() {
   const { loadedTapeId } = useTapeDeck();
   const [hoverTheme, setHoverTheme] = useState<Theme | null>(null);
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
+  const [easterEgg, setEasterEgg] = useState(false);
+  const [scene, setScene] = useState<SceneConfig | null>(null);
+  const lastSceneIdRef = useRef<string | undefined>(undefined);
 
   // When a tape is loaded, override the theme
   useEffect(() => {
@@ -79,7 +84,15 @@ function PageContent() {
         {/* Logo */}
         <div className="col-span-12 row-start-1 self-start pt-8 md:col-span-5 md:pt-16">
           <div className="relative">
-            <NeonLogo isOff={isLightTheme(activeTheme)} />
+            <NeonLogo
+              isOff={isLightTheme(activeTheme)}
+              onLongPressComplete={() => {
+                const picked = pickScene(lastSceneIdRef.current);
+                lastSceneIdRef.current = picked.id;
+                setScene(picked);
+                setEasterEgg(true);
+              }}
+            />
             <img
               src="/touch-me.gif"
               alt="Touch me"
@@ -177,6 +190,14 @@ function PageContent() {
       </div>
 
       {/* <Ticker /> */}
+
+      {scene && (
+        <EasterEggScene
+          scene={scene}
+          active={easterEgg}
+          onDismiss={() => setEasterEgg(false)}
+        />
+      )}
     </div>
   );
 }
