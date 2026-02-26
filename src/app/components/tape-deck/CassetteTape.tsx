@@ -3,6 +3,7 @@ import { motion } from 'motion/react'
 import { TAPES } from './types'
 import type { TapeConfig } from './types'
 import { useTapeDeck } from './TapeDeckContext'
+import { useCanHover } from '@/hooks/useCanHover'
 
 // ─── Cassette Tape SVG ─────────────────────────────────────────
 
@@ -51,6 +52,7 @@ export function CassetteTape({
 }) {
   const tape = TAPES[id]
   const { loadedTapeId, nearDeckId, handleTapeDrag, handleTapeDragEnd } = useTapeDeck()
+  const canHover = useCanHover()
 
   const isLoaded = loadedTapeId === id
   const isNearDeck = nearDeckId === id
@@ -78,7 +80,7 @@ export function CassetteTape({
         onDrag={onDrag}
         onDragEnd={onDragEnd}
         whileDrag={{ scale: 1.08, zIndex: 50 }}
-        whileHover={{ scale: 1.04 }}
+        whileHover={canHover ? { scale: 1.04 } : undefined}
         className="cursor-grab active:cursor-grabbing touch-none relative"
         style={{ zIndex: 12 }}
       >

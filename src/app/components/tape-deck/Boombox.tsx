@@ -9,6 +9,7 @@ import {
 } from 'motion/react'
 import { TAPES, SPEAKER_COLORS } from './types'
 import { useTapeDeck } from './TapeDeckContext'
+import { useCanHover } from '@/hooks/useCanHover'
 
 // ─── EQ Bars ───────────────────────────────────────────────────
 
@@ -214,6 +215,7 @@ export function Boombox({
   brandSubtitle?: string
 }) {
   const { loadedTapeId, playing, nearDeckId, registerDeckRef, play, pause, eject } = useTapeDeck()
+  const canHover = useCanHover()
 
   const activeTape = loadedTapeId ? TAPES[loadedTapeId] : null
   const colors = activeTape ? SPEAKER_COLORS[activeTape.id] : SPEAKER_COLORS.morning
@@ -287,7 +289,7 @@ export function Boombox({
       dragMomentum={false}
       onDragEnd={handleBoomboxDragEnd}
       whileDrag={{ scale: 1.03 }}
-      whileHover={{ scale: 1.01 }}
+      whileHover={canHover ? { scale: 1.01 } : undefined}
       className={`cursor-grab active:cursor-grabbing touch-none w-[85%] max-w-[280px] md:w-[55%] md:max-w-[380px] ${className ?? ''}`}
       style={{
         x: dragSpringX, y: dragSpringY, rotate: dragRotate,
@@ -356,7 +358,7 @@ export function Boombox({
           <motion.button
             onClick={handlePlayPause}
             className="flex-1 h-full flex items-center justify-center cursor-pointer"
-            whileHover={{ backgroundColor: 'rgba(255,255,255,0.04)' }}
+            whileHover={canHover ? { backgroundColor: 'rgba(255,255,255,0.04)' } : undefined}
             whileTap={{ scale: 0.92 }}
             style={{ borderRight: '1px solid #333' }}
             disabled={!loadedTapeId}
@@ -375,7 +377,7 @@ export function Boombox({
           <motion.button
             onClick={loadedTapeId ? pause : undefined}
             className="flex-1 h-full flex items-center justify-center cursor-pointer"
-            whileHover={{ backgroundColor: 'rgba(255,255,255,0.04)' }}
+            whileHover={canHover ? { backgroundColor: 'rgba(255,255,255,0.04)' } : undefined}
             whileTap={{ scale: 0.92 }}
             style={{ borderRight: '1px solid #333' }}
             disabled={!loadedTapeId}
@@ -387,7 +389,7 @@ export function Boombox({
           <motion.button
             onClick={loadedTapeId ? eject : undefined}
             className="flex-1 h-full flex items-center justify-center cursor-pointer"
-            whileHover={{ backgroundColor: 'rgba(255,255,255,0.04)' }}
+            whileHover={canHover ? { backgroundColor: 'rgba(255,255,255,0.04)' } : undefined}
             whileTap={{ scale: 0.92 }}
             disabled={!loadedTapeId}
           >

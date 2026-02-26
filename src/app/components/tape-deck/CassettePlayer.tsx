@@ -10,6 +10,7 @@ import {
 import { TAPES, SPEAKER_COLORS } from './types'
 import { useTapeDeck } from './TapeDeckContext'
 import { CassettePlayerSVG } from './CassettePlayerSVG'
+import { useCanHover } from '@/hooks/useCanHover'
 
 // ─── Sound Waves ───────────────────────────────────────────────
 
@@ -44,6 +45,7 @@ function SoundWaves({ playing, color, side }: { playing: boolean; color: string;
 
 export function CassettePlayer({ className, style }: { className?: string; style?: React.CSSProperties }) {
   const { loadedTapeId, playing, nearDeckId, registerDeckRef, play, pause, eject } = useTapeDeck()
+  const canHover = useCanHover()
 
   const activeTape = loadedTapeId ? TAPES[loadedTapeId] : null
   const nearTape = nearDeckId ? TAPES[nearDeckId] : null
@@ -151,8 +153,8 @@ export function CassettePlayer({ className, style }: { className?: string; style
       dragMomentum={false}
       onDragEnd={handleDragEnd}
       whileDrag={{ scale: 1.03 }}
-      whileHover={{ scale: 1.01 }}
-      className={`cursor-grab active:cursor-grabbing touch-none w-[56%] max-w-[192px] md:w-[40%] md:max-w-[256px] ${className ?? ''}`}
+      whileHover={canHover ? { scale: 1.01 } : undefined}
+      className={`cursor-grab active:cursor-grabbing touch-none w-[46%] max-w-[168px] md:w-[40%] md:max-w-[256px] ${className ?? ''}`}
       style={{
         x: dragSpringX, y: dragSpringY, rotate: dragRotate,
         ...style,
@@ -214,27 +216,6 @@ export function CassettePlayer({ className, style }: { className?: string; style
                 boxShadow: `inset 0 0 16px ${nearTape.glow}, 0 0 12px ${nearTape.glow}`,
               }}
             />
-          )}
-        </AnimatePresence>
-
-        {/* Loaded tape label */}
-        <AnimatePresence>
-          {activeTape && (
-            <motion.div
-              className="absolute flex items-center justify-center pointer-events-none"
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-              style={pos.window}
-            >
-              <span
-                className="text-[0.45rem] md:text-[0.55rem] font-mono tracking-[0.12em] uppercase truncate px-1"
-                style={{ color: activeTape.accent, textShadow: `0 0 8px ${activeTape.glow}` }}
-              >
-                {activeTape.label}
-              </span>
-            </motion.div>
           )}
         </AnimatePresence>
 
