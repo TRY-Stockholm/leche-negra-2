@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "@/styles/index.css";
+import { CustomCursor } from "./components/CustomCursor";
 
 export const metadata: Metadata = {
   title: "Leche Negra",
@@ -14,7 +15,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="overflow-x-hidden">{children}</body>
+      <body className="overflow-x-hidden">
+        <CustomCursor />
+        {children}
+      </body>
     </html>
   );
 }
