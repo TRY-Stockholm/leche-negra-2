@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "motion/react";
+import { useCanHover } from "@/hooks/useCanHover";
 
 interface NeonPath {
   d: string;
@@ -38,6 +39,7 @@ export function NeonLogo({
   const [intensity, setIntensity] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const triggeredRef = useRef(false);
+  const canHover = useCanHover();
 
   useEffect(() => {
     if (cached) return;
@@ -99,7 +101,7 @@ export function NeonLogo({
         "--vibrate-dur": `${vibrateDuration}s`,
         "--char-flicker-dur": `${2 - intensity * 1.6}s`,
       } as React.CSSProperties}
-      whileHover={{ scale: 1.03 }}
+      whileHover={canHover ? { scale: 1.03 } : undefined}
       whileTap={{ scale: 1.08 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       onTapStart={startHold}

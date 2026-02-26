@@ -1,34 +1,41 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useState, useEffect } from 'react'
 import { motion } from 'motion/react'
 import { TAPES } from './types'
 import type { TapeConfig } from './types'
 import { useTapeDeck } from './TapeDeckContext'
+import { useCanHover } from '@/hooks/useCanHover'
 
 // ─── Cassette Tape SVG ─────────────────────────────────────────
 
-function CassetteTapeSVG({ tape }: { tape: TapeConfig }) {
+let tapeContentCache: string | null = null
+
+export function CassetteTapeSVG({ tape, className, style }: { tape: TapeConfig; className?: string; style?: React.CSSProperties }) {
+  const [svgContent, setSvgContent] = useState(tapeContentCache)
+
+  useEffect(() => {
+    if (tapeContentCache) { setSvgContent(tapeContentCache); return }
+    fetch('/cassete-non-angled.svg')
+      .then(r => r.text())
+      .then(text => {
+        const match = text.match(/<svg[^>]*>([\s\S]*)<\/svg>/)
+        if (match) {
+          tapeContentCache = match[1]
+          setSvgContent(match[1])
+        }
+      })
+  }, [])
+
+  // Replace #fff with the tape's accent color
+  const colored = svgContent?.replaceAll('fill="#fff"', `fill="${tape.accent}"`) ?? null
+
   return (
-    <svg viewBox="0 0 130 82" className="w-full max-w-[130px]" style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.6))' }}>
-      <rect x="2" y="2" width="126" height="78" rx="5" fill={tape.shell} stroke={tape.accent} strokeWidth="0.8" opacity="0.9" />
-      <rect x="6" y="6" width="118" height="70" rx="3" fill={tape.shell} stroke={tape.accent} strokeWidth="0.3" opacity="0.5" />
-      <rect x="14" y="8" width="102" height="28" rx="2" fill="#faf0e6" opacity="0.9" />
-      <text x="65" y="20" textAnchor="middle" fontSize="5.5" fill="#1a0a0f" fontFamily="Georgia, serif" letterSpacing="1.5">{tape.label}</text>
-      <text x="65" y="28" textAnchor="middle" fontSize="3" fill="#666" fontFamily="monospace" letterSpacing="0.8">{tape.sublabel}</text>
-      <line x1="20" y1="32" x2="110" y2="32" stroke={tape.accent} strokeWidth="0.3" opacity="0.5" />
-      <rect x="22" y="40" width="86" height="28" rx="3" fill="#0a0508" stroke="#333" strokeWidth="0.5" />
-      <circle cx="44" cy="54" r="10" fill="none" stroke={tape.reelColor} strokeWidth="0.6" opacity="0.5" />
-      <circle cx="44" cy="54" r="4" fill={tape.reelColor} opacity="0.2" />
-      <circle cx="44" cy="54" r="2" fill="#0a0508" />
-      <circle cx="86" cy="54" r="10" fill="none" stroke={tape.reelColor} strokeWidth="0.6" opacity="0.5" />
-      <circle cx="86" cy="54" r="4" fill={tape.reelColor} opacity="0.2" />
-      <circle cx="86" cy="54" r="2" fill="#0a0508" />
-      <path d="M54 54 L76 54" fill="none" stroke={tape.reelColor} strokeWidth="0.4" opacity="0.3" />
-      <circle cx="12" cy="72" r="2" fill="#0a0508" stroke="#333" strokeWidth="0.3" />
-      <circle cx="118" cy="72" r="2" fill="#0a0508" stroke="#333" strokeWidth="0.3" />
-      <rect x="38" y="72" width="8" height="6" rx="1" fill="#0a0508" stroke="#333" strokeWidth="0.3" />
-      <rect x="84" y="72" width="8" height="6" rx="1" fill="#0a0508" stroke="#333" strokeWidth="0.3" />
-      <rect x="58" y="72" width="14" height="6" rx="1" fill="#0a0508" stroke="#333" strokeWidth="0.3" />
-    </svg>
+    <svg
+      viewBox="0 0 316.19 190.17"
+      className={className ?? 'w-full max-w-[130px]'}
+      fill={tape.shell}
+      style={style ?? { filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.6))' }}
+      dangerouslySetInnerHTML={colored ? { __html: colored } : undefined}
+    />
   )
 }
 
@@ -45,6 +52,7 @@ export function CassetteTape({
 }) {
   const tape = TAPES[id]
   const { loadedTapeId, nearDeckId, handleTapeDrag, handleTapeDragEnd } = useTapeDeck()
+  const canHover = useCanHover()
 
   const isLoaded = loadedTapeId === id
   const isNearDeck = nearDeckId === id
@@ -72,7 +80,7 @@ export function CassetteTape({
         onDrag={onDrag}
         onDragEnd={onDragEnd}
         whileDrag={{ scale: 1.08, zIndex: 50 }}
-        whileHover={{ scale: 1.04 }}
+        whileHover={canHover ? { scale: 1.04 } : undefined}
         className="cursor-grab active:cursor-grabbing touch-none relative"
         style={{ zIndex: 12 }}
       >
