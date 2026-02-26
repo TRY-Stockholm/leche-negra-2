@@ -33,31 +33,43 @@ export function NavBar({ weather }: NavBarProps) {
   const countdown = useNightCountdown();
 
   return (
-    <nav
-      className="flex items-center justify-between px-5 md:px-10 py-3 border-b border-border text-xs tracking-[0.08em] uppercase font-medium"
-    >
-      <div className="flex items-center gap-2">
+    <nav className="squiggly-border-b flex items-center justify-between px-5 md:px-10 py-3 md:py-6 text-xs tracking-[0.08em] uppercase font-medium">
+      <div className="flex items-center gap-3 sm:gap-4 text-[0.6875rem] tracking-[0.04em]">
         <a
-          href="https://www.google.com/maps/place/Engelbrektsgatan+3,+114+32+Stockholm"
+          href="#book"
+          className="nav-bracket text-muted-foreground hover:text-accent transition-colors duration-200"
+        >
+          Book a Table
+        </a>
+        <a
+          href="#menus"
+          className="nav-bracket text-muted-foreground hover:text-accent transition-colors duration-200"
+        >
+          Menus
+        </a>
+        <a
+          href="/press"
+          className="nav-bracket text-muted-foreground hover:text-accent transition-colors duration-200"
+        >
+          Press
+        </a>
+        <a
+          href="https://maps.google.com/?q=Engelbrektsgatan+3,+Stockholm"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-muted-foreground hover:text-accent transition-colors duration-200 text-[0.6875rem] tracking-[0.04em]"
+          className="nav-bracket text-muted-foreground hover:text-accent transition-colors duration-200"
         >
-          <span className="hidden sm:inline">Engelbrektsgatan 3, 114 32 Stockholm</span>
-          <span className="sm:hidden">Engelbrektsg. 3, Sthlm</span>
+          Find Us
         </a>
       </div>
       <div className="flex items-center gap-2 sm:gap-3 text-accent">
         {weather && (
           <span className="hidden sm:inline font-display italic text-[0.6875rem] tracking-[0.02em] normal-case">
-            {weather.temp}&deg; &mdash; {weatherPoem(weather.code, weather.temp)}
+            {weather.temp}&deg; &mdash;{" "}
+            {weatherPoem(weather.code, weather.temp)}
           </span>
         )}
-        {weather && (
-          <span className="sm:hidden">
-            {weather.temp}&deg;
-          </span>
-        )}
+        {weather && <span className="sm:hidden">{weather.temp}&deg;</span>}
         <span className="text-muted-foreground">|</span>
         {countdown && <span>{countdown}</span>}
       </div>

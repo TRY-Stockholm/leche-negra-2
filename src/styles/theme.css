@@ -20,7 +20,7 @@
   --accent-foreground: #840019;
   --destructive: #9b3b3b;
   --destructive-foreground: #f45a5f;
-  --border: #6b0015;
+  --border: #e43122;
   --input: #a3002a;
   --input-background: #6b0015;
   --switch-background: #a3002a;
@@ -53,25 +53,25 @@
 
 /* Morning — 06:00–10:00 */
 .theme-morning {
-  --background: #f5f0e8;
+  --background: #fff5d1;
   --foreground: #2d2a26;
-  --card: #fdfcfa;
+  --card: #fff9e5;
   --card-foreground: #2d2a26;
-  --popover: #fdfcfa;
+  --popover: #fff9e5;
   --popover-foreground: #2d2a26;
   --primary: #2d2a26;
-  --primary-foreground: #f5f0e8;
-  --secondary: #fdfcfa;
+  --primary-foreground: #fff5d1;
+  --secondary: #fff9e5;
   --secondary-foreground: #2d2a26;
-  --muted: #ede6d8;
-  --muted-foreground: #6b635a;
-  --accent: #8b6914;
-  --accent-foreground: #f5f0e8;
+  --muted: #f5ecc0;
+  --muted-foreground: #7a7068;
+  --accent: #c9a96e;
+  --accent-foreground: #1a1210;
   --destructive: #9b3b3b;
-  --destructive-foreground: #fdfcfa;
-  --border: #d4c9bc;
+  --destructive-foreground: #fff5d1;
+  --border: #e8ddb0;
   --input: transparent;
-  --ring: #8b6914;
+  --ring: #c9a96e;
 }
 
 /* Lunch — 10:00–15:00 */
@@ -123,23 +123,23 @@
 /* Night — 20:00–06:00 */
 .theme-night {
   --background: #0f0a08;
-  --foreground: #8b2236;
+  --foreground: #f0ebe3;
   --card: #1a1210;
-  --card-foreground: #8b2236;
+  --card-foreground: #f0ebe3;
   --popover: #1a1210;
-  --popover-foreground: #8b2236;
-  --primary: #8b2236;
+  --popover-foreground: #f0ebe3;
+  --primary: #f0ebe3;
   --primary-foreground: #0f0a08;
   --secondary: #1a1210;
-  --secondary-foreground: #6b1d2a;
+  --secondary-foreground: #f0ebe3;
   --muted: #1a1210;
-  --muted-foreground: #5c3040;
+  --muted-foreground: #a89a8c;
   --accent: #c9a96e;
   --accent-foreground: #0f0a08;
   --destructive: #9b3b3b;
   --destructive-foreground: #f0ebe3;
-  --border: #2d1a1e;
-  --input: #2d1a1e;
+  --border: #241a14;
+  --input: #241a14;
   --ring: #c9a96e;
 }
 
@@ -219,6 +219,9 @@
     @apply bg-background text-foreground;
     font-family: "General Sans", "Helvetica Neue", "Arial", sans-serif;
     position: relative;
+    /* The 'font-rendering' property is not a valid CSS property.
+       If you want accurate geometry, use 'text-rendering: geometricPrecision;' */
+    text-rendering: geometricPrecision;
   }
 
   body::after {
@@ -241,7 +244,7 @@
     font-size: 4.5rem;
     font-weight: 400;
     line-height: 1.05;
-    letter-spacing: -0.02em;
+    /* letter-spacing: -0.02em; */
     font-optical-sizing: auto;
   }
 
@@ -250,7 +253,7 @@
     font-size: 3rem;
     font-weight: 400;
     line-height: 1.1;
-    letter-spacing: -0.015em;
+    /* letter-spacing: -0.015em; */
     font-optical-sizing: auto;
   }
 
@@ -259,7 +262,7 @@
     font-size: 2.25rem;
     font-weight: 400;
     line-height: 1.2;
-    letter-spacing: -0.01em;
+    /* letter-spacing: -0.01em; */
     font-optical-sizing: auto;
   }
 
@@ -316,6 +319,43 @@
   }
 }
 
+/* ── Squiggly border ── */
+.squiggly-border-b {
+  position: relative;
+}
+
+.squiggly-border-b::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: var(--border);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='4' viewBox='0 0 20 4'%3E%3Cpath d='M0 2 Q5 0 10 2 Q15 4 20 2' fill='none' stroke='white' stroke-width='1.5'/%3E%3C/svg%3E");
+  mask-repeat: repeat-x;
+  mask-size: 20px 4px;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='4' viewBox='0 0 20 4'%3E%3Cpath d='M0 2 Q5 0 10 2 Q15 4 20 2' fill='none' stroke='white' stroke-width='1.5'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: repeat-x;
+  -webkit-mask-size: 20px 4px;
+}
+
+/* ── Nav bracket links ── */
+.nav-bracket {
+  position: relative;
+  font-size: 0.8125rem;
+}
+
+.nav-bracket::before {
+  content: "[  ";
+  white-space: pre;
+}
+
+.nav-bracket::after {
+  content: "  ]";
+  white-space: pre;
+}
+
 /* ── Neon logo glow ── */
 .neon-logo {
   filter: drop-shadow(0 0 8px var(--accent)) drop-shadow(0 0 20px var(--accent))
@@ -348,6 +388,111 @@
 
 .neon-logo--off .neon-char {
   animation: none;
+}
+
+/* Excited state (pressed) — vibrate + aggressive flicker, speeds driven by JS vars */
+.neon-logo--excited {
+  animation:
+    neon-vibrate var(--vibrate-dur, 0.05s) linear infinite,
+    neon-flicker-fast var(--flicker-dur, 0.6s) ease-in-out infinite;
+  filter: drop-shadow(0 0 14px var(--accent))
+    drop-shadow(0 0 35px var(--accent)) drop-shadow(0 0 90px var(--accent));
+}
+
+.neon-logo--excited .neon-char {
+  animation: char-flicker-fast var(--char-flicker-dur, 2s) linear infinite;
+  animation-delay: calc(var(--char-i) * -0.3s);
+}
+
+@keyframes neon-vibrate {
+  0% {
+    translate: 0 0;
+  }
+  25% {
+    translate: -1.5px 1px;
+  }
+  50% {
+    translate: 1.5px -1px;
+  }
+  75% {
+    translate: -1px -1.5px;
+  }
+  100% {
+    translate: 1px 1.5px;
+  }
+}
+
+@keyframes neon-flicker-fast {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  10% {
+    opacity: 0.85;
+  }
+  20% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 0.9;
+  }
+  40% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  60% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.88;
+  }
+  80% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 0.85;
+  }
+}
+
+@keyframes char-flicker-fast {
+  0% {
+    opacity: 1;
+  }
+  10% {
+    opacity: 0.4;
+  }
+  12% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 1;
+  }
+  32% {
+    opacity: 0.3;
+  }
+  34% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+  }
+  61% {
+    opacity: 0.5;
+  }
+  63% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  81% {
+    opacity: 0.35;
+  }
+  83% {
+    opacity: 1;
+  }
 }
 
 /* Subtle whole-logo flicker */
@@ -404,12 +549,29 @@
   }
 }
 
+/* ── Ticker marquee ── */
+.ticker-track {
+  animation: ticker-scroll 20s linear infinite;
+}
+
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-100% / 3));
+  }
+}
+
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .neon-logo {
     animation: none;
   }
   .neon-char {
+    animation: none;
+  }
+  .ticker-track {
     animation: none;
   }
 }

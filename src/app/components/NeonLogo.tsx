@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { motion } from "motion/react";
 
 interface NeonPath {
   d: string;
@@ -25,6 +26,9 @@ function parseSvg(text: string): { viewBox: string; paths: NeonPath[] } {
 
 export function NeonLogo({ isOff }: { isOff: boolean }) {
   const [data, setData] = useState(cached);
+  const [pressed, setPressed] = useState(false);
+  const [intensity, setIntensity] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (cached) return;
@@ -36,15 +40,54 @@ export function NeonLogo({ isOff }: { isOff: boolean }) {
       });
   }, []);
 
+  const startHold = useCallback(() => {
+    setPressed(true);
+    const start = Date.now();
+    intervalRef.current = setInterval(() => {
+      const elapsed = Date.now() - start;
+      const t = Math.min(elapsed / 2500, 1);
+      setIntensity(t);
+    }, 30);
+  }, []);
+
+  const endHold = useCallback(() => {
+    setPressed(false);
+    setIntensity(0);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
+
   if (!data) return null;
 
+  const flickerDuration = 0.6 - intensity * 0.52;
+  const vibrateDuration = 0.05 - intensity * 0.03;
+
   return (
-    <svg
+    <motion.svg
       viewBox={data.viewBox}
       xmlns="http://www.w3.org/2000/svg"
-      className={`neon-logo w-full max-w-[560px] h-auto ${isOff ? "neon-logo--off" : ""}`}
+      className={`neon-logo w-full h-auto ${isOff ? "neon-logo--off" : ""} ${pressed ? "neon-logo--excited cursor-grabbing" : "cursor-grab"}`}
       aria-label="Leche Negra"
       role="img"
+      style={{
+        "--flicker-dur": `${flickerDuration}s`,
+        "--vibrate-dur": `${vibrateDuration}s`,
+        "--char-flicker-dur": `${2 - intensity * 1.6}s`,
+      } as React.CSSProperties}
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 1.08 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      onTapStart={startHold}
+      onTap={endHold}
+      onTapCancel={endHold}
     >
       {data.paths.map((p) => (
         <path
@@ -54,6 +97,6 @@ export function NeonLogo({ isOff }: { isOff: boolean }) {
           style={{ "--char-i": p.index } as React.CSSProperties}
         />
       ))}
-    </svg>
+    </motion.svg>
   );
 }

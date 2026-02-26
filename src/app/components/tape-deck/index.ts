@@ -1,5 +1,6 @@
 export { TapeDeckProvider, useTapeDeck } from './TapeDeckContext'
 export { Boombox } from './Boombox'
+export { CassettePlayer } from './CassettePlayer'
 export { CassetteTape } from './CassetteTape'
 export { NowPlaying } from './NowPlaying'
 export { TAPES, PERIODS, SPEAKER_COLORS } from './types'
