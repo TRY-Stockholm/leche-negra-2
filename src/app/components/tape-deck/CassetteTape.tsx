@@ -81,18 +81,18 @@ export function CassetteTape({
         onDragEnd={onDragEnd}
         whileDrag={{ scale: 1.08, zIndex: 50 }}
         whileHover={canHover ? { scale: 1.04 } : undefined}
-        className="cursor-grab active:cursor-grabbing touch-none relative"
+        className="cursor-grab active:cursor-grabbing touch-none relative w-fit"
         style={{ zIndex: 12 }}
       >
         <div className="absolute -inset-4" />
         {isNearDeck && tape && (
           <motion.div
-            className="absolute -inset-3 rounded pointer-events-none"
+            className="absolute -inset-1 rounded pointer-events-none"
             animate={{ opacity: [0.3, 0.6, 0.3] }}
             transition={{ duration: 0.8, repeat: Infinity }}
             style={{
               border: `1px solid ${tape.accent}`,
-              boxShadow: `0 0 15px ${tape.glow}`,
+              boxShadow: `0 0 8px ${tape.glow}`,
             }}
           />
         )}
