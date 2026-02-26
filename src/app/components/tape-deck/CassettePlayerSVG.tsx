@@ -39,7 +39,22 @@ export function CassettePlayerSVG({ className, style, onPlay, onStop, onEject }:
             #PlayButton, #StopButton, #LoadButton { transition: opacity 0.15s ease; }
             #PlayButton:hover, #StopButton:hover, #LoadButton:hover { opacity: 0.7; }
           </style>`
-          const content = hoverStyles + match[1].replaceAll('fill="#fff"', 'fill="var(--background)"')
+          let inner = match[1].replaceAll('fill="#fff"', 'fill="var(--background)"')
+
+          // Move button paths to end of SVG so they render on top of all
+          // decorative/shading elements that would otherwise intercept clicks
+          const buttonIds = ['PlayButton', 'StopButton', 'LoadButton']
+          const extracted: string[] = []
+          for (const id of buttonIds) {
+            const re = new RegExp(`<path\\s[^>]*id="${id}"[^/]*/?>`, 'i')
+            const m = inner.match(re)
+            if (m) {
+              extracted.push(m[0])
+              inner = inner.replace(m[0], '')
+            }
+          }
+
+          const content = hoverStyles + inner + extracted.join('\n')
           svgContentCache = content
           setSvgContent(content)
         }
@@ -66,12 +81,17 @@ export function CassettePlayerSVG({ className, style, onPlay, onStop, onEject }:
       el.style.cursor = 'pointer'
       el.style.pointerEvents = 'auto'
 
-      const handler = (e: Event) => {
+      // Stop pointerdown from bubbling so Motion's drag doesn't capture it
+      const onPointerDown = (e: Event) => { e.stopPropagation() }
+      el.addEventListener('pointerdown', onPointerDown)
+      cleanups.push(() => el.removeEventListener('pointerdown', onPointerDown))
+
+      const onClick = (e: Event) => {
         e.stopPropagation()
         ref.current?.()
       }
-      el.addEventListener('click', handler)
-      cleanups.push(() => el.removeEventListener('click', handler))
+      el.addEventListener('click', onClick)
+      cleanups.push(() => el.removeEventListener('click', onClick))
     }
 
     return () => cleanups.forEach(fn => fn())
