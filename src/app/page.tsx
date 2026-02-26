@@ -71,7 +71,7 @@ function PageContent() {
 
   return (
     <div
-      className={`overflow-x-hidden bg-background text-foreground font-body ${activeTheme ? `theme-${activeTheme}` : ""}`}
+      className={`bg-background text-foreground font-body ${activeTheme ? `theme-${activeTheme}` : ""}`}
     >
       <div
         className="relative z-10 min-h-screen bg-background"
@@ -94,8 +94,8 @@ function PageContent() {
           </div>
 
           {/* Menu section — full-width bottom grid */}
-          <div className="col-span-12  self-end row-start-4 pb-4 lg:pb-8">
-            <div className="grid grid-cols-2 md:flex gap-y-6 gap-x-3 lg:gap-x-4 lg:gap-12">
+          <div className="col-span-12 self-end row-start-4 pb-4 lg:pb-8">
+            <div className="grid grid-cols-2 md:flex gap-y-6 gap-x-3 lg:gap-12">
               {[
                 {
                   key: "breakfast" as MenuKey,

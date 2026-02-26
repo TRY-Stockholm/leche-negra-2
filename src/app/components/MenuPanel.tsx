@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import type { MenuKey } from "@/lib/types";
 import { menus } from "@/data/menus";
@@ -12,6 +13,8 @@ export function MenuPanel({
   activeMenu: MenuKey | null;
   onClose: () => void;
 }) {
+  const panelEndRef = useRef<HTMLDivElement>(null);
+
   return (
     <AnimatePresence mode="wait">
       {activeMenu && (
@@ -23,6 +26,17 @@ export function MenuPanel({
           transition={{
             height: { duration: 0.6, ease: EASE_OUT_EXPO },
             opacity: { duration: 0.4, ease: "easeInOut" },
+          }}
+          onAnimationComplete={(definition) => {
+            if (
+              (definition as { height?: string }).height === "auto" &&
+              window.innerWidth < 1024
+            ) {
+              panelEndRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "end",
+              });
+            }
           }}
           className="overflow-hidden"
         >
@@ -65,11 +79,12 @@ export function MenuPanel({
               </a>
               <a
                 href="#"
-                className="inline-flex items-center justify-center border border-muted-foreground/40 px-8 py-4 font-display text-[clamp(0.875rem,1.5vw,1.0625rem)] font-medium tracking-[0.04em] uppercase text-muted-foreground hover:border-foreground hover:text-foreground transition-colors duration-300"
+                className="inline-flex items-center justify-center border border-muted-foreground/40 px-8 py-4 font-display text-[clamp(0.875rem,1.5vw,1.0625rem)] font-medium tracking-[0.04em] uppercase hover:border-foreground transition-colors duration-300"
               >
                 See Menu
               </a>
             </motion.div>
+            <div ref={panelEndRef} />
           </div>
         </motion.div>
       )}
