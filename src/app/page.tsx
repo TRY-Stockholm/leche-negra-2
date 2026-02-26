@@ -78,27 +78,6 @@ function PageContent() {
     <div
       className={`bg-background text-foreground font-body ${activeTheme ? `theme-${activeTheme}` : ""}`}
     >
-      <NavBar weather={weather} />
-
-      {/* Main Content — 12-column grid */}
-      <div className="grid grid-cols-12 grid-rows-[auto_1fr_auto] gap-x-4 px-5 md:px-10 min-h-[calc(100vh-65px)]">
-        {/* Logo */}
-        <div className="col-span-12 row-start-1 self-start pt-8 md:col-span-5 md:pt-16">
-          <div className="relative">
-            <NeonLogo
-              isOff={isLightTheme(activeTheme)}
-              onLongPressComplete={() => {
-                const picked = pickScene(lastSceneIdRef.current);
-                lastSceneIdRef.current = picked.id;
-                setScene(picked);
-                setEasterEgg(true);
-              }}
-            />
-            <img
-              src="/touch-me.gif"
-              alt="Touch me"
-              className="absolute -top-4 -left-4 w-[50px] pointer-events-none select-none"
-            />
       <div
         className="relative z-10 min-h-screen bg-background"
         style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}
@@ -110,7 +89,15 @@ function PageContent() {
           {/* Logo */}
           <div className="col-span-12 row-start-1 self-start pt-8 md:col-span-5 md:pt-16">
             <div className="relative">
-              <NeonLogo isOff={isLightTheme(activeTheme)} />
+              <NeonLogo
+                isOff={isLightTheme(activeTheme)}
+                onLongPressComplete={() => {
+                  const picked = pickScene(lastSceneIdRef.current);
+                  lastSceneIdRef.current = picked.id;
+                  setScene(picked);
+                  setEasterEgg(true);
+                }}
+              />
               <img
                 src="/touch-me.gif"
                 alt="Touch me"
