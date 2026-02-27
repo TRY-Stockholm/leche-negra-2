@@ -223,16 +223,16 @@ export function EasterEggScene({
     setDragging(false);
     setNearPainting(false);
     if (!lighterRef.current) return;
-    const dist = getDistance(lighterRef.current);
+    const el = lighterRef.current;
+    const dist = getDistance(el);
     if (dist <= SNAP_DISTANCE) {
       const pr = paintingRef.current?.getBoundingClientRect();
-      const lr = lighterRef.current.getBoundingClientRect();
-      if (pr && lighterRef.current) {
+      const lr = el.getBoundingClientRect();
+      if (pr) {
         const targetX = pr.left + pr.width / 2 - lr.width / 2;
         const targetY = pr.top + pr.height / 2 - lr.height / 2;
         const currentX = lr.left;
         const currentY = lr.top;
-        const el = lighterRef.current;
         el.style.position = 'fixed';
         el.style.left = `${currentX}px`;
         el.style.top = `${currentY}px`;
@@ -249,6 +249,9 @@ export function EasterEggScene({
           },
         });
       }
+    } else {
+      // Spring back to rest position
+      animate(el, { x: 0, y: 0 }, { type: "spring", stiffness: 150, damping: 18 });
     }
   }, [getDistance, ignite]);
 
