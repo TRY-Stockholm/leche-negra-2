@@ -146,7 +146,7 @@ export function useSpeakeasyDrag({
     // After the footer flies up + glow fills screen, navigate
     safeTimeout(() => {
       router.push("/speakeasy");
-    }, prefersReducedMotion ? 100 : 600);
+    }, prefersReducedMotion ? 100 : 1600);
   }, [router, prefersReducedMotion, safeTimeout]);
 
   const snapBack = useCallback((e?: React.PointerEvent) => {
