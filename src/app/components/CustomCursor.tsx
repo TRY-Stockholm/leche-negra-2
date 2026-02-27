@@ -58,6 +58,22 @@ function fetchSvg(
 }
 
 export function CustomCursor() {
+  const [isHoverDevice, setIsHoverDevice] = useState(true);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: hover)");
+    setIsHoverDevice(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsHoverDevice(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  if (!isHoverDevice) return null;
+
+  return <CustomCursorInner />;
+}
+
+function CustomCursorInner() {
   const [svgHtml, setSvgHtml] = useState<string | null>(svgCache);
   const [hoverSvgHtml, setHoverSvgHtml] = useState<string | null>(null);
   const [grabSvgHtml, setGrabSvgHtml] = useState<string | null>(null);
@@ -137,10 +153,15 @@ export function CustomCursor() {
   // Re-color all cursors when theme changes
   useEffect(() => {
     const recolor = () => {
-      if (svgCache) setSvgHtml(colorSvg(svgCache));
-      if (hoverSvgCache) setHoverSvgHtml(colorSvg(hoverSvgCache));
-      if (grabSvgCache) setGrabSvgHtml(colorSvg(grabSvgCache));
-      if (rudeSvgCache) setRudeSvgHtml(colorSvg(rudeSvgCache));
+      const fg = getComputedStyle(document.documentElement)
+        .getPropertyValue("--foreground")
+        .trim();
+      const colorWithFg = (raw: string) =>
+        raw.replace('<g id="OpenNoTape">', `<g id="OpenNoTape" fill="${fg}">`);
+      if (svgCache) setSvgHtml(colorWithFg(svgCache));
+      if (hoverSvgCache) setHoverSvgHtml(colorWithFg(hoverSvgCache));
+      if (grabSvgCache) setGrabSvgHtml(colorWithFg(grabSvgCache));
+      if (rudeSvgCache) setRudeSvgHtml(colorWithFg(rudeSvgCache));
     };
 
     const observer = new MutationObserver(recolor);
@@ -152,7 +173,7 @@ export function CustomCursor() {
       });
     }
     return () => observer.disconnect();
-  }, [colorSvg]);
+  }, []);
 
   // Hide system cursor
   useEffect(() => {
