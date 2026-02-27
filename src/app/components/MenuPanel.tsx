@@ -93,12 +93,12 @@ export const MenuPanel = memo(function MenuPanel({
                 transition={{ delay: 0.3, duration: 0.5, ease: EASE_OUT_EXPO }}
                 className="flex flex-col sm:flex-row gap-3"
               >
-                <a
-                  href={bookingUrl ?? "#"}
-                  className="inline-flex items-center justify-center border border-foreground px-8 py-4 font-display text-[clamp(0.875rem,1.5vw,1.0625rem)] font-medium tracking-[0.04em] uppercase hover:bg-foreground hover:text-background transition-colors duration-300"
+                <button
+                  className="waiteraid-widget inline-flex items-center justify-center border border-foreground px-8 py-4 font-display text-[clamp(0.875rem,1.5vw,1.0625rem)] font-medium tracking-[0.04em] uppercase hover:bg-foreground hover:text-background transition-colors duration-300 cursor-pointer"
+                  data-hash="dd34bd1ef6c76ba44556cd74fbb9fd3"
                 >
                   Book a Table
-                </a>
+                </button>
                 {cmsMenu?.pdfUrl && (
                   <a
                     href={cmsMenu.pdfUrl}

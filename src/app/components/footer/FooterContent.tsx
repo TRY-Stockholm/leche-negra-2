@@ -110,15 +110,25 @@ export function FooterContent({
 
         <div className="flex flex-col md:flex-row items-start md:items-end gap-3 md:gap-6">
           <nav className="flex gap-4 pointer-events-auto">
-            {["Book a Table", "Menus", "Press", "Find Us"].map((link) => (
-              <a
-                key={link}
-                href="#"
-                className="text-[0.6875rem] font-body font-medium tracking-[0.06em] uppercase text-foreground/50 hover:text-foreground transition-colors duration-300"
-              >
-                {link}
-              </a>
-            ))}
+            {["Book a Table", "Menus", "Press", "Find Us"].map((link) =>
+              link === "Book a Table" ? (
+                <button
+                  key={link}
+                  className="waiteraid-widget text-[0.6875rem] font-body font-medium tracking-[0.06em] uppercase text-foreground/50 hover:text-foreground transition-colors duration-300 cursor-pointer"
+                  data-hash="dd34bd1ef6c76ba44556cd74fbb9fd3"
+                >
+                  {link}
+                </button>
+              ) : (
+                <a
+                  key={link}
+                  href="#"
+                  className="text-[0.6875rem] font-body font-medium tracking-[0.06em] uppercase text-foreground/50 hover:text-foreground transition-colors duration-300"
+                >
+                  {link}
+                </a>
+              ),
+            )}
           </nav>
           <span className="text-[0.625rem] font-body tracking-[0.06em] uppercase text-foreground/30">
             &copy; {new Date().getFullYear()} Leche Negra
