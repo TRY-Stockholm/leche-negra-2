@@ -8,8 +8,8 @@ export function SpeakeasyGlow() {
         height: 500,
         zIndex: -1,
         background: "#0a0604",
-        opacity: "var(--speakeasy-progress, 0)" as unknown as number,
-      }}
+        opacity: "var(--speakeasy-progress, 0)",
+      } as React.CSSProperties}
     >
       {/* Warm candlelight radial glow */}
       <div

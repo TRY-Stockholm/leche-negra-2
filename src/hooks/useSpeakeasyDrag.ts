@@ -40,24 +40,45 @@ export function useSpeakeasyDrag({
   const currentOffsetRef = useRef(0);
   const rafRef = useRef<number>(0);
   const containerRef = useRef<HTMLElement | null>(null);
+  const timeoutRefs = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  // Mirror boolean state in refs for reliable reads inside pointer handlers
+  const isDraggingRef = useRef(false);
+  const isTransitioningRef = useRef(false);
+
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, []);
+
+  /** Helper to track timeouts for cleanup */
+  const safeTimeout = useCallback((fn: () => void, ms: number) => {
+    const id = setTimeout(fn, ms);
+    timeoutRefs.current.push(id);
+    return id;
+  }, []);
 
   /** Apply resistance curve: raw pixels → dampened pixels */
   const applyResistance = useCallback(
     (rawDelta: number) => {
       const normalized = Math.min(rawDelta / maxDrag, 1);
-      const thresholdNorm = threshold;
 
       // Before threshold: heavy resistance (power curve with high exponent)
       // Past threshold: lighter resistance (latch releasing feel)
-      if (normalized <= thresholdNorm) {
-        const dampened = Math.pow(normalized / thresholdNorm, resistance) * thresholdNorm;
+      if (normalized <= threshold) {
+        const dampened = Math.pow(normalized / threshold, resistance) * threshold;
         return dampened * maxDrag;
       } else {
-        // Past threshold — lower resistance exponent (feels like it gave way)
-        const base = Math.pow(1, resistance) * thresholdNorm;
-        const extra = normalized - thresholdNorm;
+        // Continuous at threshold boundary (base = threshold when normalized = threshold)
+        const base = threshold;
+        const extra = normalized - threshold;
         const lighterResistance = 0.85;
-        const dampened = base + Math.pow(extra / (1 - thresholdNorm), lighterResistance) * (1 - thresholdNorm);
+        const dampened = base + Math.pow(extra / (1 - threshold), lighterResistance) * (1 - threshold);
         return dampened * maxDrag;
       }
     },
@@ -66,19 +87,20 @@ export function useSpeakeasyDrag({
 
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
-      if (state.isTransitioning) return;
+      if (isTransitioningRef.current) return;
       e.preventDefault();
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
       startYRef.current = e.clientY;
       currentOffsetRef.current = 0;
+      isDraggingRef.current = true;
       setState((s) => ({ ...s, isDragging: true }));
     },
-    [state.isTransitioning],
+    [],
   );
 
   const onPointerMove = useCallback(
     (e: React.PointerEvent) => {
-      if (!state.isDragging || state.isTransitioning) return;
+      if (!isDraggingRef.current || isTransitioningRef.current) return;
 
       const rawDelta = startYRef.current - e.clientY;
       // Only allow upward drag
@@ -110,50 +132,70 @@ export function useSpeakeasyDrag({
         }));
       });
     },
-    [state.isDragging, state.isTransitioning, applyResistance, maxDrag, threshold],
+    [applyResistance, maxDrag, threshold],
   );
 
-  const prefersReducedMotion =
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
   const triggerTransition = useCallback(() => {
+    isDraggingRef.current = false;
+    isTransitioningRef.current = true;
     setState((s) => ({ ...s, isTransitioning: true, isDragging: false }));
     if (containerRef.current) {
       containerRef.current.style.setProperty("--speakeasy-progress", "1");
     }
 
     // After the footer flies up + glow fills screen, navigate
-    setTimeout(() => {
+    safeTimeout(() => {
       router.push("/speakeasy");
     }, prefersReducedMotion ? 100 : 600);
-  }, [router, prefersReducedMotion]);
+  }, [router, prefersReducedMotion, safeTimeout]);
 
-  const onPointerUp = useCallback(() => {
-    if (!state.isDragging) return;
-
-    const progress = currentOffsetRef.current / maxDrag;
-
-    if (progress >= threshold) {
-      // Past threshold — trigger exit
-      triggerTransition();
-    } else {
-      // Snap back — rubber band
-      if (containerRef.current) {
-        containerRef.current.style.setProperty("--speakeasy-progress", "0");
-      }
-      setState({
-        offsetY: 0,
-        progress: 0,
-        isDragging: false,
-        isTransitioning: false,
-      });
+  const snapBack = useCallback((e?: React.PointerEvent) => {
+    if (e) {
+      try { (e.target as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
     }
-  }, [state.isDragging, maxDrag, threshold, triggerTransition]);
+    isDraggingRef.current = false;
+    if (containerRef.current) {
+      containerRef.current.style.setProperty("--speakeasy-progress", "0");
+    }
+    setState({
+      offsetY: 0,
+      progress: 0,
+      isDragging: false,
+      isTransitioning: false,
+    });
+  }, []);
 
-  // Cleanup rAF on unmount
+  const onPointerUp = useCallback(
+    (e: React.PointerEvent) => {
+      if (!isDraggingRef.current) return;
+
+      const progress = currentOffsetRef.current / maxDrag;
+
+      if (progress >= threshold) {
+        // Past threshold — trigger exit
+        try { (e.target as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
+        triggerTransition();
+      } else {
+        snapBack(e);
+      }
+    },
+    [maxDrag, threshold, triggerTransition, snapBack],
+  );
+
+  const onPointerCancel = useCallback(
+    (e: React.PointerEvent) => {
+      if (!isDraggingRef.current) return;
+      snapBack(e);
+    },
+    [snapBack],
+  );
+
+  // Cleanup rAF and timeouts on unmount
   useEffect(() => {
-    return () => cancelAnimationFrame(rafRef.current);
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      timeoutRefs.current.forEach(clearTimeout);
+    };
   }, []);
 
   return {
@@ -163,17 +205,18 @@ export function useSpeakeasyDrag({
       onPointerDown,
       onPointerMove,
       onPointerUp,
+      onPointerCancel,
     },
-    /** Call from the trigger button to hint the footer is loose */
+    /** Call from the trigger text to hint the footer is loose */
     nudge: useCallback(() => {
-      if (state.isTransitioning) return;
+      if (isTransitioningRef.current || isDraggingRef.current) return;
       setState((s) => ({ ...s, offsetY: 6, progress: 0 }));
-      setTimeout(() => {
+      safeTimeout(() => {
         setState((s) => {
-          if (s.isDragging) return s;
+          if (isDraggingRef.current) return s;
           return { ...s, offsetY: 0, progress: 0 };
         });
       }, 400);
-    }, [state.isTransitioning]),
+    }, [safeTimeout]),
   };
 }
