@@ -208,11 +208,20 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+
+  body,
+  nav,
+  footer,
+  .bg-background,
+  .text-foreground,
+  .text-muted-foreground,
+  .text-accent,
+  .border-border {
     transition:
       background-color 0.8s ease,
       color 0.8s ease,
-      border-color 0.8s ease,
-      filter 0.8s ease;
+      border-color 0.8s ease;
   }
 
   body {
