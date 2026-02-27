@@ -30,6 +30,8 @@ export default function RootLayout({
       <body className="overflow-x-hidden">
         <CustomCursor />
         {children}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script src="https://www.bokabord.se/widget.min.js" />
       </body>
     </html>
   );
