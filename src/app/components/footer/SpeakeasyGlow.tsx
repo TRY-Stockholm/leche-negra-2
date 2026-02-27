@@ -3,20 +3,19 @@
 export function SpeakeasyGlow() {
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 pointer-events-none"
+      className="fixed inset-0 pointer-events-none"
       style={{
-        height: 500,
         zIndex: -1,
         background: "#0a0604",
         opacity: "var(--speakeasy-progress, 0)",
       } as React.CSSProperties}
     >
-      {/* Warm candlelight radial glow */}
+      {/* Warm candlelight radial glow — centered near bottom */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 60% 50% at 50% 60%, rgba(201,169,110,0.25) 0%, rgba(201,169,110,0.08) 40%, transparent 70%)",
+            "radial-gradient(ellipse 60% 40% at 50% 85%, rgba(201,169,110,0.3) 0%, rgba(201,169,110,0.1) 35%, transparent 65%)",
         }}
       />
       {/* Noise texture overlay */}
