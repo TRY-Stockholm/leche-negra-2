@@ -11,7 +11,10 @@ import { SpeakeasyBotanicals } from "./SpeakeasyBotanicals";
 import { SpeakeasyDetails } from "./SpeakeasyDetails";
 import { SpeakeasyLightPool } from "./SpeakeasyLightPool";
 import { SpeakeasySmoke } from "./SpeakeasySmoke";
+import { SpeakeasyWhispers } from "./SpeakeasyWhispers";
 import { SpeakeasyReveal } from "./SpeakeasyReveal";
+import { useMousePosition } from "@/hooks/useMousePosition";
+import { useCanHover } from "@/hooks/useCanHover";
 import type { SiteSettings } from "@/lib/types";
 
 interface SpeakeasySceneProps {
@@ -34,6 +37,8 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings }: SpeakeasySceneProps
   const [isExiting, setIsExiting] = useState(false);
   const [phase, setPhase] = useState(prefersReducedMotion ? 3 : 0);
   const timerRefs = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const { x: mouseX, y: mouseY } = useMousePosition();
+  const canHover = useCanHover();
 
   useEffect(() => {
     if (prefersReducedMotion) return;
@@ -58,9 +63,10 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings }: SpeakeasySceneProps
       style={{ isolation: "isolate" }}
     >
       <SpeakeasyBackground phase={phase} />
-      <SpeakeasyBotanicals />
+      <SpeakeasyBotanicals mouseX={canHover ? mouseX : undefined} mouseY={canHover ? mouseY : undefined} />
       {phase >= 1 && <SpeakeasyLightPool />}
       {phase >= 2 && <SpeakeasySmoke />}
+      {phase >= 3 && <SpeakeasyWhispers mouseX={mouseX} mouseY={mouseY} />}
 
       {/* Exit fade overlay */}
       <motion.div
