@@ -53,9 +53,13 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings }: SpeakeasySceneProps
 
         {/* Main Content — 12-column grid mirroring homepage */}
         <div className="grid grid-cols-12 lg:grid-rows-[auto_1fr_auto] gap-x-4 px-5 md:px-10 min-h-[calc(100vh-65px)]">
-          {/* Logo — same position as homepage */}
+          {/* 411 Logo — same position as homepage logo, neon glow effect */}
           <div className="col-span-12 row-start-1 self-start pt-8 md:col-span-5 md:pt-16">
-            <NeonLogo isOff={false} />
+            <NeonLogo
+              isOff={false}
+              src="/411-logo-neon.svg"
+              label="411"
+            />
           </div>
 
           {/* 411 section — bottom, mirroring menu section */}

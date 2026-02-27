@@ -9,7 +9,8 @@ interface NeonPath {
   index: number;
 }
 
-let cached: { viewBox: string; paths: NeonPath[] } | null = null;
+const cache = new Map<string, { viewBox: string; paths: NeonPath[] }>();
+const DEFAULT_SRC = "/leche-negra-logo-neon.svg";
 
 function parseSvg(text: string): { viewBox: string; paths: NeonPath[] } {
   const doc = new DOMParser().parseFromString(text, "image/svg+xml");
@@ -27,14 +28,18 @@ function parseSvg(text: string): { viewBox: string; paths: NeonPath[] } {
 
 export const NeonLogo = memo(function NeonLogo({
   isOff,
+  src = DEFAULT_SRC,
+  label = "Leche Negra",
   onLongPressComplete,
   onLongPressEnd,
 }: {
   isOff: boolean;
+  src?: string;
+  label?: string;
   onLongPressComplete?: () => void;
   onLongPressEnd?: () => void;
 }) {
-  const [data, setData] = useState(cached);
+  const [data, setData] = useState(cache.get(src) ?? null);
   const [pressed, setPressed] = useState(false);
   const intensityRef = useRef(0);
   const rafRef = useRef<number | null>(null);
@@ -43,14 +48,15 @@ export const NeonLogo = memo(function NeonLogo({
   const canHover = useCanHover();
 
   useEffect(() => {
-    if (cached) return;
-    fetch("/leche-negra-logo-neon.svg")
+    if (cache.has(src)) return;
+    fetch(src)
       .then((r) => r.text())
       .then((text) => {
-        cached = parseSvg(text);
-        setData(cached);
+        const parsed = parseSvg(text);
+        cache.set(src, parsed);
+        setData(parsed);
       });
-  }, []);
+  }, [src]);
 
   const startHold = useCallback(() => {
     setPressed(true);
@@ -110,7 +116,7 @@ export const NeonLogo = memo(function NeonLogo({
       viewBox={data.viewBox}
       xmlns="http://www.w3.org/2000/svg"
       className={`neon-logo w-full h-auto ${isOff ? "neon-logo--off" : ""} ${pressed ? "neon-logo--excited cursor-grabbing" : "cursor-grab"}`}
-      aria-label="Leche Negra"
+      aria-label={label}
       role="img"
       whileHover={canHover ? { scale: 1.03 } : undefined}
       whileTap={{ scale: 1.08 }}
