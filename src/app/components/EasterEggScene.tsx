@@ -249,6 +249,9 @@ export function EasterEggScene({
           },
         });
       }
+    } else {
+      // Spring back to rest position
+      animate(el, { x: 0, y: 0 }, { type: "spring", stiffness: 150, damping: 18 });
     }
   }, [getDistance, ignite]);
 
@@ -414,7 +417,6 @@ export function EasterEggScene({
                         bottom: REST_INSET,
                       }}
                       drag
-                      dragConstraints={{ top: 0, left: 0, right: 0, bottom: 0 }}
                       dragElastic={0.08}
                       dragMomentum={false}
                       onDragStart={onDragStart}
