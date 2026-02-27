@@ -143,19 +143,23 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
               : { type: "spring", stiffness: 200, damping: 25 }
         }
       >
-        <NavBar
-          weather={weather}
-          bookingUrl={siteSettings?.bookingUrl}
-          onMenuClick={handleNavMenuClick}
-        />
-        <MenuModal
-          open={menuModalOpen}
-          onClose={() => setMenuModalOpen(false)}
-          cmsMenus={menus}
-        />
+        <div
+          className="relative z-10 min-h-screen bg-background"
+          style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}
+        >
+          <NavBar
+            weather={weather}
+            bookingUrl={siteSettings?.bookingUrl}
+            onMenuClick={handleNavMenuClick}
+          />
+          <MenuModal
+            open={menuModalOpen}
+            onClose={() => setMenuModalOpen(false)}
+            cmsMenus={menus}
+          />
 
-        {/* Main Content — 12-column grid */}
-        <div className="grid grid-cols-12 lg:grid-rows-[auto_1fr_auto] gap-x-4 px-5 md:px-10 min-h-[calc(100svh-48px)] lg:min-h-[calc(100vh-65px)]">
+          {/* Main Content — 12-column grid */}
+          <div className="grid grid-cols-12 lg:grid-rows-[auto_1fr_auto] gap-x-4 px-5 md:px-10 min-h-[calc(100svh-48px)] lg:min-h-[calc(100vh-65px)]">
           {/* Logo */}
           <div className="col-span-12 row-start-1 self-start pt-8 md:col-span-5 md:pt-16">
             <div className="relative">
@@ -266,13 +270,14 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
 
         {/* <Ticker /> */}
 
-        {scene && (
-          <EasterEggScene
-            scene={scene}
-            active={easterEgg}
-            onDismiss={() => setEasterEgg(false)}
-          />
-        )}
+          {scene && (
+            <EasterEggScene
+              scene={scene}
+              active={easterEgg}
+              onDismiss={() => setEasterEgg(false)}
+            />
+          )}
+        </div>
 
         <Footer
           siteSettings={siteSettings}
