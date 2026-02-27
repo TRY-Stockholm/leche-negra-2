@@ -1,25 +1,20 @@
-import fs from "fs";
-import path from "path";
 import Link from "next/link";
+import { client } from "@/sanity/lib/client";
 import { PressGallery } from "./PressGallery";
 
-const PRESS_DIR = path.join(process.cwd(), "public", "press");
-const EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif"]);
+const PRESS_QUERY = `*[_type == "pressImage"] | order(order asc, _createdAt asc) {
+  _id,
+  title,
+  image {
+    asset->{ _id, url, metadata { lqip, dimensions { width, height } } },
+    alt,
+    hotspot,
+    crop
+  }
+}`;
 
-function getPressImages() {
-  if (!fs.existsSync(PRESS_DIR)) return [];
-  return fs
-    .readdirSync(PRESS_DIR)
-    .filter((f) => EXTENSIONS.has(path.extname(f).toLowerCase()))
-    .sort()
-    .map((f) => ({
-      src: `/press/${f}`,
-      alt: f.replace(/\.[^.]+$/, "").replace(/[-_]/g, " "),
-    }));
-}
-
-export default function PressPage() {
-  const images = getPressImages();
+export default async function PressPage() {
+  const images = await client.fetch(PRESS_QUERY);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -36,8 +31,11 @@ export default function PressPage() {
       <div className="px-5 md:px-10 py-10">
         {images.length === 0 ? (
           <p className="text-muted-foreground font-body text-sm">
-            Drop images into <code className="text-accent">public/press/</code>{" "}
-            and they will appear here.
+            No press images yet. Add them in the{" "}
+            <Link href="/studio" className="text-accent underline">
+              Studio
+            </Link>
+            .
           </p>
         ) : (
           <PressGallery images={images} />

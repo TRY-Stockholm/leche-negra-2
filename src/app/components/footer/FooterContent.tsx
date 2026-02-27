@@ -70,10 +70,15 @@ export function FooterContent({
       {/* Bottom row */}
       <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
         <div className="flex flex-col gap-2 text-foreground/60">
-          <div className="flex items-center gap-2 text-[0.75rem] tracking-[0.06em] uppercase font-body">
+          <a
+            href="https://maps.google.com/?q=Engelbrektsgatan+3,+Stockholm"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-[0.75rem] tracking-[0.06em] uppercase font-body pointer-events-auto hover:text-foreground transition-colors duration-300"
+          >
             <MapPinIcon />
             <span>Engelbrektsgatan 3, Stockholm</span>
-          </div>
+          </a>
           <div className="flex items-center gap-2 text-[0.75rem] tracking-[0.06em] uppercase font-body">
             <MailIcon />
             <span>hola@lechenegra.se</span>
