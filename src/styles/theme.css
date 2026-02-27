@@ -367,6 +367,7 @@
 
 /* ── Neon logo glow ── */
 .neon-logo {
+  will-change: filter, opacity;
   filter: drop-shadow(0 0 8px var(--accent)) drop-shadow(0 0 20px var(--accent))
     drop-shadow(0 0 60px var(--accent));
   transition:

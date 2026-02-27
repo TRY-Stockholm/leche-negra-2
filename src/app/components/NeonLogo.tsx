@@ -36,8 +36,9 @@ export function NeonLogo({
 }) {
   const [data, setData] = useState(cached);
   const [pressed, setPressed] = useState(false);
-  const [intensity, setIntensity] = useState(0);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const intensityRef = useRef(0);
+  const rafRef = useRef<number | null>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
   const triggeredRef = useRef(false);
   const canHover = useCanHover();
 
@@ -54,24 +55,41 @@ export function NeonLogo({
   const startHold = useCallback(() => {
     setPressed(true);
     triggeredRef.current = false;
-    const start = Date.now();
-    intervalRef.current = setInterval(() => {
-      const elapsed = Date.now() - start;
+    intensityRef.current = 0;
+    const start = performance.now();
+    const tick = () => {
+      const elapsed = performance.now() - start;
       const t = Math.min(elapsed / 2500, 1);
-      setIntensity(t);
+      intensityRef.current = t;
+      const el = svgRef.current;
+      if (el) {
+        el.style.setProperty("--flicker-dur", `${0.6 - t * 0.52}s`);
+        el.style.setProperty("--vibrate-dur", `${0.05 - t * 0.03}s`);
+        el.style.setProperty("--char-flicker-dur", `${2 - t * 1.6}s`);
+      }
       if (t >= 1 && !triggeredRef.current) {
         triggeredRef.current = true;
         onLongPressComplete?.();
       }
-    }, 30);
+      if (t < 1) {
+        rafRef.current = requestAnimationFrame(tick);
+      }
+    };
+    rafRef.current = requestAnimationFrame(tick);
   }, [onLongPressComplete]);
 
   const endHold = useCallback(() => {
     setPressed(false);
-    setIntensity(0);
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
+    intensityRef.current = 0;
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    const el = svgRef.current;
+    if (el) {
+      el.style.removeProperty("--flicker-dur");
+      el.style.removeProperty("--vibrate-dur");
+      el.style.removeProperty("--char-flicker-dur");
     }
     if (triggeredRef.current) {
       onLongPressEnd?.();
@@ -80,27 +98,20 @@ export function NeonLogo({
 
   useEffect(() => {
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, []);
 
   if (!data) return null;
 
-  const flickerDuration = 0.6 - intensity * 0.52;
-  const vibrateDuration = 0.05 - intensity * 0.03;
-
   return (
     <motion.svg
+      ref={svgRef}
       viewBox={data.viewBox}
       xmlns="http://www.w3.org/2000/svg"
       className={`neon-logo w-full h-auto ${isOff ? "neon-logo--off" : ""} ${pressed ? "neon-logo--excited cursor-grabbing" : "cursor-grab"}`}
       aria-label="Leche Negra"
       role="img"
-      style={{
-        "--flicker-dur": `${flickerDuration}s`,
-        "--vibrate-dur": `${vibrateDuration}s`,
-        "--char-flicker-dur": `${2 - intensity * 1.6}s`,
-      } as React.CSSProperties}
       whileHover={canHover ? { scale: 1.03 } : undefined}
       whileTap={{ scale: 1.08 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
