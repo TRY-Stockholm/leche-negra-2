@@ -146,12 +146,12 @@
 /* 411 Speakeasy — scoped dark romanticism palette */
 [data-scene="speakeasy"] {
   --background: #0a0604;
-  --foreground: #8b2236;
-  --accent: #8b2236;
-  --muted-foreground: #6b1d2a;
-  --muted: #1a0a0d;
-  --border: #3d1520;
-  --card: #120608;
+  --foreground: #d44444;
+  --accent: #d44444;
+  --muted-foreground: #a05555;
+  --muted: #1a0a0a;
+  --border: #4a2525;
+  --card: #120808;
 }
 
 @theme inline {

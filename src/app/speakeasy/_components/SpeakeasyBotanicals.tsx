@@ -82,12 +82,12 @@ function PlaceholderBotanical({ rotate }: { rotate: number }) {
       {/* Organic vine/thorn placeholder shape */}
       <path
         d="M100 10 C120 40, 160 50, 140 90 C120 130, 160 150, 130 180 C110 190, 90 190, 70 180 C40 150, 80 130, 60 90 C40 50, 80 40, 100 10Z"
-        fill="#8b2236"
+        fill="#d44444"
         opacity="0.6"
       />
       <path
         d="M85 60 C90 45, 110 45, 115 60 C120 75, 110 85, 100 90 C90 85, 80 75, 85 60Z"
-        fill="#6b1d2a"
+        fill="#a05555"
         opacity="0.4"
       />
     </svg>

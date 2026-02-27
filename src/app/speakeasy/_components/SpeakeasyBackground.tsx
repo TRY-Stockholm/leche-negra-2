@@ -4,14 +4,14 @@ export function SpeakeasyBackground() {
   return (
     <div className="pointer-events-none fixed inset-0" aria-hidden="true">
       {/* Deep black base */}
-      <div className="absolute inset-0" style={{ backgroundColor: "#0a0604" }} />
+      <div className="absolute inset-0 bg-background" />
 
-      {/* Burgundy radial glow from below — distant candlelight */}
+      {/* Crimson radial glow from below — distant candlelight */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 60% 40% at 50% 85%, rgba(107,29,42,0.15) 0%, transparent 70%)",
+            "radial-gradient(ellipse 60% 40% at 50% 85%, rgba(212,68,68,0.1) 0%, transparent 70%)",
           animation: "speakeasy-glow-pulse 8s ease-in-out infinite",
         }}
       />
