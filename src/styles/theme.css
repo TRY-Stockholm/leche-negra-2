@@ -145,7 +145,7 @@
 
 @theme inline {
   /* Fonts */
-  --font-display: "Playfair Display", "Georgia", "Times New Roman", serif;
+  --font-display: var(--font-display-next, "Playfair Display"), "Georgia", "Times New Roman", serif;
   --font-body: "General Sans", "Helvetica Neue", "Arial", sans-serif;
 
   /* Semantic colors */

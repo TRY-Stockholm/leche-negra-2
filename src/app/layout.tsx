@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@/styles/index.css";
 import { CustomCursor } from "./components/CustomCursor";
+import { playfairDisplay } from "./fonts";
 
 export const metadata: Metadata = {
   title: "Leche Negra",
@@ -14,7 +15,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={playfairDisplay.variable}>
+      <head>
+        <link
+          rel="preconnect"
+          href="https://api.fontshare.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className="overflow-x-hidden">
         <CustomCursor />
         {children}
