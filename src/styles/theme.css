@@ -794,6 +794,27 @@
   50%, 100% { opacity: 0; }
 }
 
+@keyframes speakeasy-smoke-0 {
+  0% { transform: translateX(-30%) translateY(0); opacity: 0; }
+  10% { opacity: 0.5; }
+  90% { opacity: 0.5; }
+  100% { transform: translateX(130%) translateY(-5vh); opacity: 0; }
+}
+
+@keyframes speakeasy-smoke-1 {
+  0% { transform: translateX(-40%) translateY(0); opacity: 0; }
+  10% { opacity: 0.4; }
+  90% { opacity: 0.4; }
+  100% { transform: translateX(140%) translateY(8vh); opacity: 0; }
+}
+
+@keyframes speakeasy-smoke-2 {
+  0% { transform: translateX(-25%) translateY(0); opacity: 0; }
+  10% { opacity: 0.35; }
+  90% { opacity: 0.35; }
+  100% { transform: translateX(125%) translateY(-3vh); opacity: 0; }
+}
+
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .neon-logo {

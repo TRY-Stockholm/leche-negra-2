@@ -9,6 +9,8 @@ import { useWeather } from "@/hooks/useWeather";
 import { SpeakeasyBackground } from "./SpeakeasyBackground";
 import { SpeakeasyBotanicals } from "./SpeakeasyBotanicals";
 import { SpeakeasyDetails } from "./SpeakeasyDetails";
+import { SpeakeasyLightPool } from "./SpeakeasyLightPool";
+import { SpeakeasySmoke } from "./SpeakeasySmoke";
 import { SpeakeasyReveal } from "./SpeakeasyReveal";
 import type { SiteSettings } from "@/lib/types";
 
@@ -57,6 +59,8 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings }: SpeakeasySceneProps
     >
       <SpeakeasyBackground phase={phase} />
       <SpeakeasyBotanicals />
+      {phase >= 1 && <SpeakeasyLightPool />}
+      {phase >= 2 && <SpeakeasySmoke />}
 
       {/* Exit fade overlay */}
       <motion.div
