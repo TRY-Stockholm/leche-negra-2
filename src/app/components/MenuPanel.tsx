@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, memo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import type { MenuKey, CMSMenu } from "@/lib/types";
 import { menus } from "@/data/menus";
@@ -20,7 +20,7 @@ interface MenuPanelProps {
   bookingUrl?: string | null;
 }
 
-export function MenuPanel({
+export const MenuPanel = memo(function MenuPanel({
   activeMenu,
   onClose,
   cmsMenus,
@@ -117,4 +117,4 @@ export function MenuPanel({
       )}
     </AnimatePresence>
   );
-}
+});

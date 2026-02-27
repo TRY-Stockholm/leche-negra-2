@@ -80,6 +80,13 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
     if (!loadedTapeId) setHoverTheme(null);
   }, [loadedTapeId]);
 
+  const handleLongPressComplete = useCallback(() => {
+    const picked = pickScene(lastSceneIdRef.current);
+    lastSceneIdRef.current = picked.id;
+    setScene(picked);
+    setEasterEgg(true);
+  }, []);
+
   return (
     <div
       className={`bg-background text-foreground font-body ${activeTheme ? `theme-${activeTheme}` : ""}`}
@@ -97,12 +104,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
             <div className="relative">
               <NeonLogo
                 isOff={isLightTheme(activeTheme)}
-                onLongPressComplete={() => {
-                  const picked = pickScene(lastSceneIdRef.current);
-                  lastSceneIdRef.current = picked.id;
-                  setScene(picked);
-                  setEasterEgg(true);
-                }}
+                onLongPressComplete={handleLongPressComplete}
               />
               <img
                 src="/touch-me.gif"

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, useEffect } from 'react'
+import { useCallback, useRef, useState, useEffect, memo } from 'react'
 import { motion } from 'motion/react'
 import { TAPES } from './types'
 import type { TapeConfig } from './types'
@@ -9,7 +9,7 @@ import { useCanHover } from '@/hooks/useCanHover'
 
 let tapeContentCache: string | null = null
 
-export function CassetteTapeSVG({ tape, className, style }: { tape: TapeConfig; className?: string; style?: React.CSSProperties }) {
+export const CassetteTapeSVG = memo(function CassetteTapeSVG({ tape, className, style }: { tape: TapeConfig; className?: string; style?: React.CSSProperties }) {
   const [svgContent, setSvgContent] = useState(tapeContentCache)
 
   useEffect(() => {
@@ -37,11 +37,11 @@ export function CassetteTapeSVG({ tape, className, style }: { tape: TapeConfig; 
       dangerouslySetInnerHTML={colored ? { __html: colored } : undefined}
     />
   )
-}
+})
 
 // ─── CassetteTape Component ────────────────────────────────────
 
-export function CassetteTape({
+export const CassetteTape = memo(function CassetteTape({
   id,
   className,
   style,
@@ -100,4 +100,4 @@ export function CassetteTape({
       </motion.div>
     </div>
   )
-}
+})

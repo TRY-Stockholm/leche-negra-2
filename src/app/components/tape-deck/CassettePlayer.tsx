@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback } from 'react'
+import { useRef, useEffect, useCallback, memo } from 'react'
 import {
   motion,
   AnimatePresence,
@@ -43,7 +43,7 @@ function SoundWaves({ playing, color, side }: { playing: boolean; color: string;
 
 // ─── Cassette Player Component ─────────────────────────────────
 
-export function CassettePlayer({ className, style }: { className?: string; style?: React.CSSProperties }) {
+export const CassettePlayer = memo(function CassettePlayer({ className, style }: { className?: string; style?: React.CSSProperties }) {
   const { loadedTapeId, playing, nearDeckId, registerDeckRef, play, pause, eject } = useTapeDeck()
   const canHover = useCanHover()
 
@@ -265,4 +265,4 @@ export function CassettePlayer({ className, style }: { className?: string; style
       </motion.div>
     </motion.div>
   )
-}
+})

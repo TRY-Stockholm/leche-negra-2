@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import { Tentacle } from "./Tentacle";
 import { FooterContent } from "./FooterContent";
 import type { SiteSettings, SocialLink } from "@/lib/types";
@@ -13,7 +13,7 @@ interface FooterProps {
   socialLinks?: SocialLink[];
 }
 
-export function Footer({ siteSettings, socialLinks }: FooterProps) {
+export const Footer = memo(function Footer({ siteSettings, socialLinks }: FooterProps) {
   const [height, setHeight] = useState(FOOTER_HEIGHT);
   const [showTentacle, setShowTentacle] = useState(false);
 
@@ -39,4 +39,4 @@ export function Footer({ siteSettings, socialLinks }: FooterProps) {
       </footer>
     </>
   );
-}
+});

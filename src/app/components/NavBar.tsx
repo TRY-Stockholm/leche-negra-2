@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { weatherPoem } from "@/lib/constants";
 
@@ -41,7 +41,7 @@ const NAV_LINKS = [
   },
 ] as const;
 
-export function NavBar({ weather, bookingUrl }: NavBarProps) {
+export const NavBar = memo(function NavBar({ weather, bookingUrl }: NavBarProps) {
   const countdown = useNightCountdown();
   const [open, setOpen] = useState(false);
 
@@ -217,4 +217,4 @@ export function NavBar({ weather, bookingUrl }: NavBarProps) {
       </AnimatePresence>
     </>
   );
-}
+});

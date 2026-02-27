@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, memo } from "react";
 import { motion } from "motion/react";
 import { useCanHover } from "@/hooks/useCanHover";
 
@@ -25,7 +25,7 @@ function parseSvg(text: string): { viewBox: string; paths: NeonPath[] } {
   return { viewBox, paths };
 }
 
-export function NeonLogo({
+export const NeonLogo = memo(function NeonLogo({
   isOff,
   onLongPressComplete,
   onLongPressEnd,
@@ -129,4 +129,4 @@ export function NeonLogo({
       ))}
     </motion.svg>
   );
-}
+});
