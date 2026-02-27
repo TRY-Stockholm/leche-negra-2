@@ -209,51 +209,57 @@ export function EasterEggScene({
     [],
   );
 
+  const ignitedRef = useRef(false);
+
+  const snapAndIgnite = useCallback((el: HTMLDivElement) => {
+    if (ignitedRef.current) return;
+    ignitedRef.current = true;
+    const pr = paintingRef.current?.getBoundingClientRect();
+    const lr = el.getBoundingClientRect();
+    if (pr) {
+      const targetX = pr.left + pr.width / 2 - lr.width / 2;
+      const targetY = pr.top + pr.height / 2 - lr.height / 2;
+      el.style.position = 'fixed';
+      el.style.left = `${lr.left}px`;
+      el.style.top = `${lr.top}px`;
+      el.style.transform = 'none';
+      animate(el, {
+        left: targetX,
+        top: targetY,
+        opacity: 0,
+      }, {
+        duration: 0.3,
+        ease: [0.2, 0, 0, 1],
+        onComplete: () => {
+          ignite();
+        },
+      });
+    }
+  }, [ignite]);
+
   const onDrag = useCallback(() => {
-    if (!lighterRef.current) return;
-    const dist = getDistance(lighterRef.current);
-    setNearPainting(dist <= SNAP_DISTANCE);
-  }, [getDistance]);
+    if (!lighterRef.current || ignitedRef.current) return;
+    const el = lighterRef.current;
+    const dist = getDistance(el);
+    const isNear = dist <= SNAP_DISTANCE;
+    setNearPainting(isNear);
+    if (isNear) {
+      snapAndIgnite(el);
+    }
+  }, [getDistance, snapAndIgnite]);
 
   const onDragStart = useCallback(() => {
     setDragging(true);
+    ignitedRef.current = false;
   }, []);
 
   const onDragEnd = useCallback(() => {
     setDragging(false);
     setNearPainting(false);
-    if (!lighterRef.current) return;
-    const el = lighterRef.current;
-    const dist = getDistance(el);
-    if (dist <= SNAP_DISTANCE) {
-      const pr = paintingRef.current?.getBoundingClientRect();
-      const lr = el.getBoundingClientRect();
-      if (pr) {
-        const targetX = pr.left + pr.width / 2 - lr.width / 2;
-        const targetY = pr.top + pr.height / 2 - lr.height / 2;
-        const currentX = lr.left;
-        const currentY = lr.top;
-        el.style.position = 'fixed';
-        el.style.left = `${currentX}px`;
-        el.style.top = `${currentY}px`;
-        el.style.transform = 'none';
-        animate(el, {
-          left: targetX,
-          top: targetY,
-          opacity: 0,
-        }, {
-          duration: 0.3,
-          ease: [0.2, 0, 0, 1],
-          onComplete: () => {
-            ignite();
-          },
-        });
-      }
-    } else {
-      // Spring back to rest position
-      animate(el, { x: 0, y: 0 }, { type: "spring", stiffness: 150, damping: 18 });
-    }
-  }, [getDistance, ignite]);
+    if (!lighterRef.current || ignitedRef.current) return;
+    // Spring back to rest position
+    animate(lighterRef.current, { x: 0, y: 0 }, { type: "spring", stiffness: 150, damping: 18 });
+  }, []);
 
   // Cleanup on deactivate
   useEffect(() => {
