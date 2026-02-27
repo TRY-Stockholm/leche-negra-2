@@ -78,10 +78,8 @@ export const CassetteTape = memo(function CassetteTape({
       <motion.div
         ref={elRef}
         drag
-        dragConstraints={{ top: 0, left: 0, right: 0, bottom: 0 }}
-        dragElastic={1}
+        dragElastic={0.08}
         dragMomentum={false}
-        dragSnapToOrigin
         onDrag={onDrag}
         onDragEnd={onDragEnd}
         whileDrag={{ scale: 1.08, zIndex: 50 }}
