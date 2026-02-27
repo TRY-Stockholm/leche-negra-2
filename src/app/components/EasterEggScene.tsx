@@ -214,27 +214,11 @@ export function EasterEggScene({
   const snapAndIgnite = useCallback((el: HTMLDivElement) => {
     if (ignitedRef.current) return;
     ignitedRef.current = true;
-    const pr = paintingRef.current?.getBoundingClientRect();
-    const lr = el.getBoundingClientRect();
-    if (pr) {
-      const targetX = pr.left + pr.width / 2 - lr.width / 2;
-      const targetY = pr.top + pr.height / 2 - lr.height / 2;
-      el.style.position = 'fixed';
-      el.style.left = `${lr.left}px`;
-      el.style.top = `${lr.top}px`;
-      el.style.transform = 'none';
-      animate(el, {
-        left: targetX,
-        top: targetY,
-        opacity: 0,
-      }, {
-        duration: 0.3,
-        ease: [0.2, 0, 0, 1],
-        onComplete: () => {
-          ignite();
-        },
-      });
-    }
+    animate(el, { opacity: 0 }, {
+      duration: 0.3,
+      ease: "easeOut",
+    });
+    ignite();
   }, [ignite]);
 
   const onDrag = useCallback(() => {
