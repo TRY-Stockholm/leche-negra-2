@@ -353,6 +353,23 @@ export function EasterEggScene({
                       preload="auto"
                     />
 
+                    {/* Proximity glow when lighter is near */}
+                    <AnimatePresence>
+                      {nearPainting && (
+                        <motion.div
+                          className="absolute -inset-2 pointer-events-none rounded"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: [0.2, 0.5, 0.2] }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.8, repeat: Infinity }}
+                          style={{
+                            boxShadow:
+                              "inset 0 0 20px rgba(255,107,0,0.6), 0 0 15px rgba(255,68,0,0.4)",
+                          }}
+                        />
+                      )}
+                    </AnimatePresence>
+
                     {scene.presentation === "framed" && <ArtDecoFrame />}
                     {scene.presentation === "vignette" && <VignetteOverlay />}
                   </div>
