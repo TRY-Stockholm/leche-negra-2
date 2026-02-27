@@ -88,8 +88,20 @@ function CustomCursorInner() {
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  const x = useSpring(mouseX, SPRING);
-  const y = useSpring(mouseY, SPRING);
+  const draggingRef = useRef(false);
+  const springX = useSpring(mouseX, SPRING);
+  const springY = useSpring(mouseY, SPRING);
+
+  // Bypass spring during drag — snap cursor to exact pointer position
+  useEffect(() => {
+    const unsub = mouseX.on("change", (v) => {
+      if (draggingRef.current) springX.jump(v);
+    });
+    const unsub2 = mouseY.on("change", (v) => {
+      if (draggingRef.current) springY.jump(v);
+    });
+    return () => { unsub(); unsub2(); };
+  }, [mouseX, mouseY, springX, springY]);
 
   // Color an SVG that uses the OpenNoTape group
   const colorSvg = useCallback((raw: string) => {
@@ -228,8 +240,8 @@ function CustomCursorInner() {
 
   // Swap to grab cursor while dragging
   useEffect(() => {
-    const handleDown = () => setDragging(true);
-    const handleUp = () => setDragging(false);
+    const handleDown = () => { draggingRef.current = true; setDragging(true); };
+    const handleUp = () => { draggingRef.current = false; setDragging(false); };
 
     window.addEventListener("pointerdown", handleDown);
     window.addEventListener("pointerup", handleUp);
@@ -306,8 +318,8 @@ function CustomCursorInner() {
       style={{
         width: activeSize,
         height: activeSize,
-        x,
-        y,
+        x: springX,
+        y: springY,
         marginLeft: -activeHotspot.x,
         marginTop: -activeHotspot.y,
         opacity: visible ? 1 : 0,
