@@ -36,6 +36,7 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings }: SpeakeasySceneProps
   const prefersReducedMotion = useReducedMotion();
   const [isExiting, setIsExiting] = useState(false);
   const [phase, setPhase] = useState(prefersReducedMotion ? 3 : 0);
+  const [showPatience, setShowPatience] = useState(false);
   const timerRefs = useRef<ReturnType<typeof setTimeout>[]>([]);
   const { x: mouseX, y: mouseY } = useMousePosition();
   const canHover = useCanHover();
@@ -47,6 +48,13 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings }: SpeakeasySceneProps
     const t3 = setTimeout(() => setPhase(3), 4200);   // content reveals
     timerRefs.current = [t1, t2, t3];
     return () => timerRefs.current.forEach(clearTimeout);
+  }, [prefersReducedMotion]);
+
+  // Patience reward: "you're still here. good." after 60s
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    const t = setTimeout(() => setShowPatience(true), 60000);
+    return () => clearTimeout(t);
   }, [prefersReducedMotion]);
 
   const handleExit = useCallback(() => {
@@ -133,6 +141,14 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings }: SpeakeasySceneProps
                   what the walls remember
                 </p>
               </SpeakeasyReveal>
+
+              {showPatience && (
+                <SpeakeasyReveal delay={0} duration={3}>
+                  <p className="font-display italic text-[clamp(0.875rem,2vw,1.125rem)] text-muted-foreground mb-6" style={{ opacity: 0.6 }}>
+                    you&apos;re still here. good.
+                  </p>
+                </SpeakeasyReveal>
+              )}
 
               <SpeakeasyDetails menuPdfUrl={menuPdfUrl} />
             </div>
