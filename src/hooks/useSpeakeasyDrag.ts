@@ -39,17 +39,29 @@ export function useSpeakeasyDrag({
   const startYRef = useRef(0);
   const currentOffsetRef = useRef(0);
   const rafRef = useRef<number>(0);
-  const footerRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLElement | null>(null);
 
   /** Apply resistance curve: raw pixels → dampened pixels */
   const applyResistance = useCallback(
     (rawDelta: number) => {
       const normalized = Math.min(rawDelta / maxDrag, 1);
-      // Power curve creates heavy-then-lighter feel
-      const dampened = Math.pow(normalized, resistance);
-      return dampened * maxDrag;
+      const thresholdNorm = threshold;
+
+      // Before threshold: heavy resistance (power curve with high exponent)
+      // Past threshold: lighter resistance (latch releasing feel)
+      if (normalized <= thresholdNorm) {
+        const dampened = Math.pow(normalized / thresholdNorm, resistance) * thresholdNorm;
+        return dampened * maxDrag;
+      } else {
+        // Past threshold — lower resistance exponent (feels like it gave way)
+        const base = Math.pow(1, resistance) * thresholdNorm;
+        const extra = normalized - thresholdNorm;
+        const lighterResistance = 0.85;
+        const dampened = base + Math.pow(extra / (1 - thresholdNorm), lighterResistance) * (1 - thresholdNorm);
+        return dampened * maxDrag;
+      }
     },
-    [maxDrag, resistance],
+    [maxDrag, resistance, threshold],
   );
 
   const onPointerDown = useCallback(
@@ -72,6 +84,9 @@ export function useSpeakeasyDrag({
       // Only allow upward drag
       if (rawDelta <= 0) {
         currentOffsetRef.current = 0;
+        if (containerRef.current) {
+          containerRef.current.style.setProperty("--speakeasy-progress", "0");
+        }
         setState((s) => ({ ...s, offsetY: 0, progress: 0 }));
         return;
       }
@@ -79,29 +94,40 @@ export function useSpeakeasyDrag({
       const dampened = applyResistance(rawDelta);
       currentOffsetRef.current = dampened;
 
-      // Past threshold: reduce resistance (latch releasing feel)
       const progress = dampened / maxDrag;
+      const glowProgress = Math.min(progress / threshold, 1);
 
       cancelAnimationFrame(rafRef.current);
       rafRef.current = requestAnimationFrame(() => {
+        // Update CSS custom property on container for glow (avoids React re-renders)
+        if (containerRef.current) {
+          containerRef.current.style.setProperty("--speakeasy-progress", String(glowProgress));
+        }
         setState((s) => ({
           ...s,
           offsetY: dampened,
-          progress: Math.min(progress / threshold, 1),
+          progress: glowProgress,
         }));
       });
     },
     [state.isDragging, state.isTransitioning, applyResistance, maxDrag, threshold],
   );
 
+  const prefersReducedMotion =
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
   const triggerTransition = useCallback(() => {
     setState((s) => ({ ...s, isTransitioning: true, isDragging: false }));
+    if (containerRef.current) {
+      containerRef.current.style.setProperty("--speakeasy-progress", "1");
+    }
 
     // After the footer flies up + glow fills screen, navigate
     setTimeout(() => {
       router.push("/speakeasy");
-    }, 600);
-  }, [router]);
+    }, prefersReducedMotion ? 100 : 600);
+  }, [router, prefersReducedMotion]);
 
   const onPointerUp = useCallback(() => {
     if (!state.isDragging) return;
@@ -113,6 +139,9 @@ export function useSpeakeasyDrag({
       triggerTransition();
     } else {
       // Snap back — rubber band
+      if (containerRef.current) {
+        containerRef.current.style.setProperty("--speakeasy-progress", "0");
+      }
       setState({
         offsetY: 0,
         progress: 0,
@@ -129,7 +158,7 @@ export function useSpeakeasyDrag({
 
   return {
     state,
-    footerRef,
+    containerRef,
     handlers: {
       onPointerDown,
       onPointerMove,

@@ -31,18 +31,18 @@ export const Footer = memo(function Footer({
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  const { state, handlers, nudge } = useSpeakeasyDrag({
+  const { state, containerRef, handlers, nudge } = useSpeakeasyDrag({
     maxDrag: height * 0.6,
     threshold: 0.4,
     resistance: 0.55,
   });
 
   return (
-    <>
+    <div ref={containerRef as React.RefObject<HTMLDivElement>}>
       <div style={{ height }} />
 
       {/* Glow layer — behind footer */}
-      <SpeakeasyGlow progress={state.progress} />
+      <SpeakeasyGlow />
 
       <motion.footer
         className="theme-night fixed bottom-0 left-0 right-0 bg-background border-t border-border/30 touch-none"
@@ -78,6 +78,6 @@ export const Footer = memo(function Footer({
 
       {/* Blackout during transition */}
       <BlackoutOverlay active={state.isTransitioning} />
-    </>
+    </div>
   );
 });
