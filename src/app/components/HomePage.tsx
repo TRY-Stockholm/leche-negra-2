@@ -101,28 +101,26 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
     <div
       ref={containerRef as React.RefObject<HTMLDivElement>}
       className={`bg-background text-foreground font-body ${activeTheme ? `theme-${activeTheme}` : ""}`}
+      style={{ isolation: "isolate" }}
     >
       {/* Glow layer — full viewport, behind everything */}
       <SpeakeasyGlow />
 
       {/* The "panel" — entire page moves as one rigid piece */}
       <motion.div
-        style={{
-          y: dragState.isTransitioning ? undefined : -dragState.offsetY,
+        animate={{
+          y: dragState.isTransitioning
+            ? -window.innerHeight - 200
+            : dragState.isDragging
+              ? -dragState.offsetY
+              : 0,
         }}
-        animate={
-          dragState.isTransitioning
-            ? { y: "-100vh" }
-            : !dragState.isDragging
-              ? { y: 0 }
-              : undefined
-        }
         transition={
           dragState.isTransitioning
             ? { duration: 0.5, ease: [0.16, 1, 0.3, 1] }
-            : !dragState.isDragging
-              ? { type: "spring", stiffness: 200, damping: 25 }
-              : undefined
+            : dragState.isDragging
+              ? { duration: 0 }
+              : { type: "spring", stiffness: 200, damping: 25 }
         }
       >
         <div
