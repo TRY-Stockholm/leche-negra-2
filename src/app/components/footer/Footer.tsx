@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, memo } from "react";
-import { Tentacle } from "./Tentacle";
 import { FooterContent } from "./FooterContent";
 import type { SiteSettings, SocialLink } from "@/lib/types";
 
@@ -11,11 +10,22 @@ const FOOTER_HEIGHT_MOBILE = 420;
 interface FooterProps {
   siteSettings?: SiteSettings | null;
   socialLinks?: SocialLink[];
+  /** Pointer handlers from the drag hook — spread onto the footer element */
+  dragHandlers?: Record<string, (e: React.PointerEvent) => void>;
+  /** Whether the user is actively dragging */
+  isDragging?: boolean;
+  /** Nudge hint callback for the trigger text */
+  onDragHint?: () => void;
 }
 
-export const Footer = memo(function Footer({ siteSettings, socialLinks }: FooterProps) {
+export const Footer = memo(function Footer({
+  siteSettings,
+  socialLinks,
+  dragHandlers,
+  isDragging,
+  onDragHint,
+}: FooterProps) {
   const [height, setHeight] = useState(FOOTER_HEIGHT);
-  const [showTentacle, setShowTentacle] = useState(false);
 
   useEffect(() => {
     const update = () => {
@@ -31,11 +41,20 @@ export const Footer = memo(function Footer({ siteSettings, socialLinks }: Footer
       <div style={{ height }} />
 
       <footer
-        className="theme-night fixed bottom-0 left-0 right-0 bg-background border-t border-border/30"
-        style={{ height, zIndex: 0 }}
+        className="theme-night fixed bottom-0 left-0 right-0 bg-background border-t border-border/30 touch-none"
+        style={{
+          height,
+          zIndex: 0,
+          cursor: isDragging ? "grabbing" : undefined,
+        }}
+        {...dragHandlers}
       >
-        <Tentacle show={showTentacle} />
-        <FooterContent onTentacleHover={setShowTentacle} siteSettings={siteSettings} socialLinks={socialLinks} />
+        <FooterContent
+          onDragHint={onDragHint ?? (() => {})}
+          siteSettings={siteSettings}
+          socialLinks={socialLinks}
+          isDragging={isDragging}
+        />
       </footer>
     </>
   );
