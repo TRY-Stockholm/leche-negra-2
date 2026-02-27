@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
+import { motion } from "motion/react";
 import type { Theme, MenuKey, SiteSettings, SocialLink, CMSMenu } from "@/lib/types";
 import { menuThemeMap, isLightTheme } from "@/lib/constants";
 import { NeonLogo } from "./NeonLogo";
@@ -25,6 +26,13 @@ const TAPE_THEME_MAP: Record<string, Theme> = {
   evening: "dinner",
   night: "night",
 };
+
+const MENU_ITEMS: readonly { key: MenuKey; time: string; label: string; desktopSize: string }[] = [
+  { key: "breakfast", time: "07:00 – 11:00", label: "Breakfast", desktopSize: "text-[clamp(2.5rem,5vw,5.5rem)]" },
+  { key: "lunch", time: "11:30 – 14:30", label: "Lunch", desktopSize: "text-[clamp(2.5rem,6vw,5.5rem)]" },
+  { key: "dinner", time: "17:00 – 22:00", label: "Dinner", desktopSize: "text-[clamp(2.5rem,5vw,5.5rem)]" },
+  { key: "drinks", time: "All Day", label: "Drinks", desktopSize: "text-[clamp(2.5rem,5vw,5.5rem)]" },
+];
 
 interface HomePageProps {
   siteSettings: SiteSettings | null;
@@ -127,38 +135,17 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
 
           {/* Menu section — full-width bottom grid */}
           <div className="col-span-12 self-end row-start-4 pb-4 lg:pb-8">
-            <div className="grid grid-cols-2 md:flex gap-y-6 gap-x-3 lg:gap-12">
-              {[
-                {
-                  key: "breakfast" as MenuKey,
-                  time: "07:00 – 11:00",
-                  label: "Breakfast",
-                  size: "text-[clamp(2.5rem,5vw,5.5rem)]",
-                },
-                {
-                  key: "lunch" as MenuKey,
-                  time: "11:30 – 14:30",
-                  label: "Lunch",
-                  size: "text-[clamp(2.5rem,6vw,5.5rem)]",
-                },
-                {
-                  key: "dinner" as MenuKey,
-                  time: "17:00 – 22:00",
-                  label: "Dinner",
-                  size: "text-[clamp(2.5rem,5vw,5.5rem)]",
-                },
-                {
-                  key: "drinks" as MenuKey,
-                  time: "All Day",
-                  label: "Drinks",
-                  size: "text-[clamp(2.5rem,5vw,5.5rem)]",
-                },
-              ].map((item) => {
+            <div className="grid grid-cols-1 gap-y-4 md:flex md:gap-y-6 md:gap-x-3 lg:gap-12">
+              {MENU_ITEMS.map((item) => {
                 const active = openMenu === item.key;
+                const timeClasses = `font-body text-[0.6875rem] font-medium tracking-[0.04em] uppercase ${
+                  item.key === "drinks" ? "text-accent" : "text-muted-foreground"
+                }`;
                 return (
-                  <button
+                  <motion.button
                     key={item.key}
                     className="cursor-pointer text-left capitalize"
+                    whileTap={{ scale: 0.97 }}
                     onClick={() => handleMenuClick(item.key)}
                     style={{
                       textShadow: active
@@ -167,17 +154,27 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
                       transition: "text-shadow 0.5s ease",
                     }}
                   >
-                    <span
-                      className={`block mb-2 font-body text-[0.6875rem] font-medium tracking-[0.04em] uppercase ${item.key === "drinks" ? "text-accent" : "text-muted-foreground"}`}
-                    >
-                      {item.time}
-                    </span>
-                    <span
-                      className={`font-display ${item.size} font-medium leading-[0.95] italic`}
-                    >
-                      {item.label}
-                    </span>
-                  </button>
+                    {/* Mobile layout: name left, time right */}
+                    <div className="flex items-baseline justify-between md:hidden">
+                      <span className="font-display text-[clamp(1.75rem,4vw,2.5rem)] font-medium leading-[0.95] italic">
+                        {item.label}
+                      </span>
+                      <span className={timeClasses}>
+                        {item.time}
+                      </span>
+                    </div>
+                    {/* Desktop layout: time above, name below (unchanged) */}
+                    <div className="hidden md:block">
+                      <span className={`block mb-2 ${timeClasses}`}>
+                        {item.time}
+                      </span>
+                      <span
+                        className={`font-display ${item.desktopSize} font-medium leading-[0.95] italic`}
+                      >
+                        {item.label}
+                      </span>
+                    </div>
+                  </motion.button>
                 );
               })}
             </div>
