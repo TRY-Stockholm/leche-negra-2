@@ -41,16 +41,16 @@ export function MenuPanel({
       {activeMenu && (
         <motion.div
           key={activeMenu}
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: "auto", opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
+          initial={{ gridTemplateRows: "0fr", opacity: 0 }}
+          animate={{ gridTemplateRows: "1fr", opacity: 1 }}
+          exit={{ gridTemplateRows: "0fr", opacity: 0 }}
           transition={{
-            height: { duration: 0.6, ease: EASE_OUT_EXPO },
+            gridTemplateRows: { duration: 0.6, ease: EASE_OUT_EXPO },
             opacity: { duration: 0.4, ease: "easeInOut" },
           }}
           onAnimationComplete={(definition) => {
             if (
-              (definition as { height?: string }).height === "auto" &&
+              (definition as { opacity?: number }).opacity === 1 &&
               window.innerWidth < 1024
             ) {
               panelEndRef.current?.scrollIntoView({
@@ -59,57 +59,59 @@ export function MenuPanel({
               });
             }
           }}
-          className="overflow-hidden"
+          className="grid"
         >
-          <div className="border-t border-border pt-8 pb-4 mt-6">
-            {/* Header */}
-            <div className="flex items-baseline justify-between mb-6">
-              <span className="font-body text-[0.6875rem] font-medium tracking-[0.06em] uppercase text-muted-foreground">
-                {cmsMenu?.hours ?? menus[activeMenu].hours}
-              </span>
-              <button
-                onClick={onClose}
-                className="text-muted-foreground hover:text-accent cursor-pointer font-body text-[0.6875rem] font-medium tracking-[0.06em] uppercase"
-              >
-                Close
-              </button>
-            </div>
-
-            {/* Intro text */}
-            <motion.p
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-muted-foreground mb-8 font-display italic text-[clamp(0.875rem,2vw,1.0625rem)] leading-[1.6] max-w-[520px]"
-            >
-              {cmsMenu?.intro ?? menus[activeMenu].intro}
-            </motion.p>
-
-            {/* CTA buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.5, ease: EASE_OUT_EXPO }}
-              className="flex flex-col sm:flex-row gap-3"
-            >
-              <a
-                href={bookingUrl ?? "#"}
-                className="inline-flex items-center justify-center border border-foreground px-8 py-4 font-display text-[clamp(0.875rem,1.5vw,1.0625rem)] font-medium tracking-[0.04em] uppercase hover:bg-foreground hover:text-background transition-colors duration-300"
-              >
-                Book a Table
-              </a>
-              {cmsMenu?.pdfUrl && (
-                <a
-                  href={cmsMenu.pdfUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center border border-muted-foreground/40 px-8 py-4 font-display text-[clamp(0.875rem,1.5vw,1.0625rem)] font-medium tracking-[0.04em] uppercase hover:border-foreground transition-colors duration-300"
+          <div className="overflow-hidden">
+            <div className="border-t border-border pt-8 pb-4 mt-6">
+              {/* Header */}
+              <div className="flex items-baseline justify-between mb-6">
+                <span className="font-body text-[0.6875rem] font-medium tracking-[0.06em] uppercase text-muted-foreground">
+                  {cmsMenu?.hours ?? menus[activeMenu].hours}
+                </span>
+                <button
+                  onClick={onClose}
+                  className="text-muted-foreground hover:text-accent cursor-pointer font-body text-[0.6875rem] font-medium tracking-[0.06em] uppercase"
                 >
-                  See Menu
+                  Close
+                </button>
+              </div>
+
+              {/* Intro text */}
+              <motion.p
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="text-muted-foreground mb-8 font-display italic text-[clamp(0.875rem,2vw,1.0625rem)] leading-[1.6] max-w-[520px]"
+              >
+                {cmsMenu?.intro ?? menus[activeMenu].intro}
+              </motion.p>
+
+              {/* CTA buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.5, ease: EASE_OUT_EXPO }}
+                className="flex flex-col sm:flex-row gap-3"
+              >
+                <a
+                  href={bookingUrl ?? "#"}
+                  className="inline-flex items-center justify-center border border-foreground px-8 py-4 font-display text-[clamp(0.875rem,1.5vw,1.0625rem)] font-medium tracking-[0.04em] uppercase hover:bg-foreground hover:text-background transition-colors duration-300"
+                >
+                  Book a Table
                 </a>
-              )}
-            </motion.div>
-            <div ref={panelEndRef} />
+                {cmsMenu?.pdfUrl && (
+                  <a
+                    href={cmsMenu.pdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center border border-muted-foreground/40 px-8 py-4 font-display text-[clamp(0.875rem,1.5vw,1.0625rem)] font-medium tracking-[0.04em] uppercase hover:border-foreground transition-colors duration-300"
+                  >
+                    See Menu
+                  </a>
+                )}
+              </motion.div>
+              <div ref={panelEndRef} />
+            </div>
           </div>
         </motion.div>
       )}
