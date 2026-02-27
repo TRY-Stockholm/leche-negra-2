@@ -10,7 +10,7 @@ import {
 import type { SceneConfig, Presentation } from "./scenes";
 
 /** How long the cursor must stay still before the video ignites */
-const DWELL_MS = 1000;
+const DWELL_MS = 200;
 /** Movement beyond this resets the dwell timer */
 const MOVE_THRESHOLD = 8;
 /** Minimum time the preloader stays visible */
@@ -235,10 +235,6 @@ export function EasterEggScene({
     vid.addEventListener("ended", handleEnded);
   }, []);
 
-  const extinguish = useCallback(() => {
-    setShowVideo(false);
-  }, []);
-
   const isOverPainting = useCallback(
     (x: number, y: number) => {
       const el = paintingRef.current;
@@ -277,13 +273,15 @@ export function EasterEggScene({
 
       const overPainting = isOverPainting(x, y);
 
+      // Once ignited, keep burning regardless of movement
+      if (showVideo) return;
+
       const anchor = anchorRef.current;
       if (anchor) {
         const dx = x - anchor.x;
         const dy = y - anchor.y;
         if (Math.sqrt(dx * dx + dy * dy) > MOVE_THRESHOLD) {
           clearDwell();
-          extinguish();
           anchorRef.current = { x, y };
           if (overPainting) {
             dwellTimerRef.current = setTimeout(ignite, DWELL_MS);
@@ -298,19 +296,18 @@ export function EasterEggScene({
 
       if (!overPainting) {
         clearDwell();
-        extinguish();
         anchorRef.current = { x, y };
       }
     },
     [
       holding,
+      showVideo,
       cursorX,
       cursorY,
       offsetX,
       offsetY,
       clearDwell,
       ignite,
-      extinguish,
       isOverPainting,
     ],
   );

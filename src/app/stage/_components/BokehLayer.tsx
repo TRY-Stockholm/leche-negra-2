@@ -41,7 +41,7 @@ export function BokehLayer({ activeCount }: BokehLayerProps) {
             width: `${b.size}px`,
             height: `${b.size}px`,
             opacity: b.opacity,
-            background: "radial-gradient(circle, rgba(212,175,55,0.4) 0%, rgba(212,175,55,0.1) 40%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(228,49,34,0.4) 0%, rgba(228,49,34,0.1) 40%, transparent 70%)",
             animation: `bokeh-float ${b.duration}s ease-in-out infinite`,
             animationDelay: `${b.delay}s`,
           }}

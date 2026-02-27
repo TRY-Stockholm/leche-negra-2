@@ -22,7 +22,7 @@ export function InstrumentToolbar({
       <div
         className="pointer-events-none absolute inset-0"
         style={{
-          background: "linear-gradient(0deg, rgba(10,6,5,0.85) 0%, transparent 100%)",
+          background: "linear-gradient(0deg, rgba(70,11,8,0.85) 0%, transparent 100%)",
         }}
         aria-hidden="true"
       />

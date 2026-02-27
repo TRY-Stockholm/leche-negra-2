@@ -20,7 +20,7 @@ export function VolumeControl({ volume, onVolumeChange, onMuteAll }: VolumeContr
     <div
       className="fixed bottom-6 right-6 z-40 flex items-center gap-3 rounded-[2px] px-4 py-3"
       style={{
-        backgroundColor: "rgba(26, 18, 16, 0.85)",
+        backgroundColor: "rgba(70, 11, 8, 0.85)",
         border: "1px solid rgba(61, 47, 40, 0.5)",
         backdropFilter: "blur(8px)",
       }}
@@ -42,13 +42,13 @@ export function VolumeControl({ volume, onVolumeChange, onMuteAll }: VolumeContr
         onChange={handleChange}
         className="h-1 w-20 cursor-pointer appearance-none rounded-full"
         style={{
-          background: `linear-gradient(to right, #c9a96e 0%, #c9a96e ${volume * 100}%, #3D2F28 ${volume * 100}%, #3D2F28 100%)`,
+          background: `linear-gradient(to right, #e43122 0%, #e43122 ${volume * 100}%, #3D2F28 ${volume * 100}%, #3D2F28 100%)`,
         }}
         aria-label="Master volume"
       />
       <button
         onClick={onMuteAll}
-        className="min-h-8 rounded-[2px] px-2 py-1 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors duration-300 hover:bg-[rgba(201,169,110,0.1)]"
+        className="min-h-8 rounded-[2px] px-2 py-1 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors duration-300 hover:bg-[rgba(228,49,34,0.1)]"
         style={{
           color: "#A89A8C",
           border: "1px solid rgba(61, 47, 40, 0.5)",

@@ -27,7 +27,7 @@ export function HazeLayer({ activeCount }: HazeLayerProps) {
         style={{
           left: "15%", top: "20%", width: "45vw", height: "50vh",
           borderRadius: "50%",
-          background: "radial-gradient(ellipse, rgba(201,169,110,0.06) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse, rgba(228,49,34,0.06) 0%, transparent 70%)",
           animation: "haze-drift-1 35s ease-in-out infinite",
         }}
       />
@@ -36,7 +36,7 @@ export function HazeLayer({ activeCount }: HazeLayerProps) {
         style={{
           left: "40%", top: "10%", width: "50vw", height: "60vh",
           borderRadius: "50%",
-          background: "radial-gradient(ellipse, rgba(212,175,55,0.05) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse, rgba(228,49,34,0.05) 0%, transparent 70%)",
           animation: "haze-drift-2 45s ease-in-out infinite",
         }}
       />
@@ -45,7 +45,7 @@ export function HazeLayer({ activeCount }: HazeLayerProps) {
         style={{
           left: "55%", top: "25%", width: "40vw", height: "45vh",
           borderRadius: "50%",
-          background: "radial-gradient(ellipse, rgba(201,169,110,0.07) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse, rgba(228,49,34,0.07) 0%, transparent 70%)",
           animation: "haze-drift-3 55s ease-in-out infinite",
         }}
       />
@@ -54,7 +54,7 @@ export function HazeLayer({ activeCount }: HazeLayerProps) {
         style={{
           left: "25%", top: "40%", width: "55vw", height: "40vh",
           borderRadius: "50%",
-          background: "radial-gradient(ellipse, rgba(212,175,55,0.04) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse, rgba(228,49,34,0.04) 0%, transparent 70%)",
           animation: "haze-drift-1 60s ease-in-out infinite reverse",
         }}
       />

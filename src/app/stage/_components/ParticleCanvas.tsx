@@ -95,7 +95,7 @@ export function ParticleCanvas({ activeCount }: ParticleCanvasProps) {
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(212, 175, 55, ${p.alpha})`;
+        ctx.fillStyle = `rgba(228, 49, 34, ${p.alpha})`;
         ctx.fill();
       }
 

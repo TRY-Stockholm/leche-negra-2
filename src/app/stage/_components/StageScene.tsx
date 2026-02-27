@@ -29,25 +29,21 @@ export function StageScene() {
 
   const [activeInstruments, setActiveInstruments] = useState<Set<string>>(new Set());
   const [isAudioUnlocked, setIsAudioUnlocked] = useState(false);
-  const [phase, setPhase] = useState<"preloader" | "ready" | "scene">("preloader");
+  const [phase, setPhase] = useState<"preloader" | "scene">("preloader");
   const [volume, setVolume] = useState(0.8);
 
-  // Initialize audio engine
+  // Initialize audio engine, reveal scene after loading (audio unlocks on first interaction)
   useEffect(() => {
     const engine = new StageAudioEngine();
     engineRef.current = engine;
 
     const minTimer = new Promise((r) => setTimeout(r, PRELOADER_MIN_MS));
 
-    engine
-      .init(instruments)
-      .then(() => {
-        minTimer.then(() => setPhase("ready"));
-      })
-      .catch(() => {
-        // Audio failed to load — still allow entry with degraded experience
-        minTimer.then(() => setPhase("ready"));
-      });
+    Promise.all([engine.init(instruments).catch(() => {}), minTimer]).then(
+      () => {
+        setPhase("scene");
+      },
+    );
 
     return () => {
       engine.dispose();
@@ -80,19 +76,16 @@ export function StageScene() {
     return () => cancelAnimationFrame(rafRef.current);
   }, [isAudioUnlocked]);
 
-  const handleUnlock = useCallback(async () => {
-    const engine = engineRef.current;
-    if (!engine) return;
-
-    await engine.unlock();
-    setIsAudioUnlocked(true);
-    setPhase("scene");
-  }, []);
-
   const handleToggle = useCallback(
-    (id: string) => {
+    async (id: string) => {
       const engine = engineRef.current;
       if (!engine) return;
+
+      // Lazy unlock on first interaction (requires user gesture)
+      if (!isAudioUnlocked) {
+        await engine.unlock();
+        setIsAudioUnlocked(true);
+      }
 
       const wasActive = engine.isActive(id);
       const nowActive = engine.toggle(id);
@@ -112,7 +105,7 @@ export function StageScene() {
         bgRef.current?.panToMusician(id);
       }
     },
-    [isMobile],
+    [isMobile, isAudioUnlocked],
   );
 
   const handleVolumeChange = useCallback((value: number) => {
@@ -131,15 +124,15 @@ export function StageScene() {
     <main
       ref={stageRef}
       className="relative h-screen w-screen overflow-hidden"
-      style={{ backgroundColor: "var(--color-charcoal, #1a1210)" }}
+      style={{ backgroundColor: "var(--background, #460b08)" }}
     >
-      {/* Preloader / Audio unlock overlay */}
+      {/* Preloader overlay */}
       <AnimatePresence>
         {phase !== "scene" && (
           <motion.div
             key="preloader"
             className="fixed inset-0 z-50 flex flex-col items-center justify-center"
-            style={{ backgroundColor: "var(--color-charcoal, #1a1210)" }}
+            style={{ backgroundColor: "var(--background, #460b08)" }}
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -148,51 +141,22 @@ export function StageScene() {
             <div
               className="pointer-events-none absolute inset-0"
               style={{
-                background: "radial-gradient(ellipse 60% 40% at 50% 50%, rgba(201,169,110,0.06) 0%, transparent 70%)",
+                background: "radial-gradient(ellipse 60% 40% at 50% 50%, rgba(228,49,34,0.06) 0%, transparent 70%)",
               }}
               aria-hidden="true"
             />
 
-            <AnimatePresence mode="wait">
-              {phase === "preloader" ? (
-                <motion.p
-                  key="loading"
-                  className="font-display italic text-[clamp(1.5rem,4vw,2.5rem)]"
-                  style={{ color: "var(--color-cream, #f5f0e8)", opacity: 0.7 }}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 0.7, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                >
-                  Be creative
-                </motion.p>
-              ) : (
-                <motion.button
-                  key="unlock"
-                  onClick={handleUnlock}
-                  className="flex flex-col items-center gap-6 rounded-[2px] border px-12 py-8 transition-all duration-500 hover:border-[var(--color-brass,#c9a96e)] hover:bg-[rgba(201,169,110,0.1)]"
-                  style={{
-                    borderColor: "rgba(201, 169, 110, 0.3)",
-                    color: "var(--color-cream, #f5f0e8)",
-                  }}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.6, ease: "easeOut" }}
-                  autoFocus
-                >
-                  <span className="font-display text-2xl tracking-[-0.02em]">
-                    Be creative
-                  </span>
-                  <span
-                    className="font-mono text-xs uppercase tracking-[0.12em]"
-                    style={{ color: "#A89A8C" }}
-                  >
-                    Tap to begin
-                  </span>
-                </motion.button>
-              )}
-            </AnimatePresence>
+            <motion.p
+              key="loading"
+              className="font-display italic text-[clamp(1.5rem,4vw,2.5rem)]"
+              style={{ color: "var(--color-cream, #f5f0e8)", opacity: 0.7 }}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 0.7, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+              Be creative
+            </motion.p>
 
             <p
               className="absolute bottom-8 font-mono text-[10px] uppercase tracking-[0.1em]"
@@ -208,7 +172,7 @@ export function StageScene() {
       <div
         className="absolute inset-0 transition-all duration-[1500ms] ease-out"
         style={{
-          opacity: isAudioUnlocked ? 1 : 0.12,
+          opacity: phase === "scene" ? 1 : 0.12,
           filter: `hue-rotate(${-5 + activeCount * 2.6}deg) saturate(${0.7 + activeCount * 0.1}) brightness(${1 + activeCount * 0.018})`,
         }}
       >
@@ -226,21 +190,21 @@ export function StageScene() {
           <div
             className="absolute bottom-[15%] left-[8%] h-20 w-20 rounded-full"
             style={{
-              background: "radial-gradient(circle, rgba(201,169,110,0.18) 0%, transparent 70%)",
+              background: "radial-gradient(circle, rgba(228,49,34,0.18) 0%, transparent 70%)",
               animation: "candle-flicker 3s ease-in-out infinite",
             }}
           />
           <div
             className="absolute bottom-[18%] right-[12%] h-16 w-16 rounded-full"
             style={{
-              background: "radial-gradient(circle, rgba(201,169,110,0.12) 0%, transparent 70%)",
+              background: "radial-gradient(circle, rgba(228,49,34,0.12) 0%, transparent 70%)",
               animation: "candle-flicker 4s ease-in-out infinite 1s",
             }}
           />
           <div
             className="absolute bottom-[20%] left-[45%] h-14 w-14 rounded-full"
             style={{
-              background: "radial-gradient(circle, rgba(201,169,110,0.1) 0%, transparent 70%)",
+              background: "radial-gradient(circle, rgba(228,49,34,0.1) 0%, transparent 70%)",
               animation: "candle-flicker 5s ease-in-out infinite 2s",
             }}
           />
@@ -250,7 +214,7 @@ export function StageScene() {
         <div
           className="pointer-events-none absolute inset-0"
           style={{
-            background: `radial-gradient(ellipse ${30 + activeCount * 9}% ${25 + activeCount * 7}% at 50% 50%, transparent 0%, rgba(26,18,16,0.8) 100%)`,
+            background: `radial-gradient(ellipse ${30 + activeCount * 9}% ${25 + activeCount * 7}% at 50% 50%, transparent 0%, rgba(70,11,8,0.8) 100%)`,
             animation: activeCount === 0 ? "vignette-breathe 6s ease-in-out infinite" : "none",
             opacity: activeCount === 0 ? 1 : Math.max(0.35, 0.8 - activeCount * 0.08),
             transition: "opacity 1.5s ease",
@@ -283,7 +247,7 @@ export function StageScene() {
         <SceneHotspots
           activeInstruments={activeInstruments}
           onToggle={handleToggle}
-          disabled={!isAudioUnlocked}
+          disabled={phase !== "scene"}
         />
       )}
 
@@ -299,11 +263,11 @@ export function StageScene() {
       {/* Close button */}
       <button
         onClick={() => router.push("/")}
-        className="fixed top-4 right-4 z-40 flex h-10 w-10 items-center justify-center rounded-full transition-colors duration-300 hover:bg-[rgba(201,169,110,0.1)]"
+        className="fixed top-4 right-4 z-40 flex h-10 w-10 items-center justify-center rounded-full transition-colors duration-300 hover:bg-[rgba(228,49,34,0.1)]"
         style={{
           color: "#A89A8C",
           border: "1px solid rgba(61, 47, 40, 0.5)",
-          backgroundColor: "rgba(26, 18, 16, 0.85)",
+          backgroundColor: "rgba(70, 11, 8, 0.85)",
           backdropFilter: "blur(8px)",
         }}
         aria-label="Close and return to homepage"
@@ -317,7 +281,7 @@ export function StageScene() {
       <InstrumentToolbar
         activeInstruments={activeInstruments}
         onToggle={handleToggle}
-        disabled={!isAudioUnlocked}
+        disabled={phase !== "scene"}
       />
 
       {/* Screen reader live region */}

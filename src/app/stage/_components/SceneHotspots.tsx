@@ -56,7 +56,7 @@ export function SceneHotspots({
             <span
               className="absolute -top-8 whitespace-nowrap rounded-[2px] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.1em] transition-opacity duration-200"
               style={{
-                backgroundColor: "rgba(26,18,16,0.92)",
+                backgroundColor: "rgba(70,11,8,0.92)",
                 color: isActive ? inst.color : "#A89A8C",
                 border: `1px solid ${isActive ? inst.color + "40" : "rgba(61,47,40,0.5)"}`,
                 backdropFilter: "blur(4px)",

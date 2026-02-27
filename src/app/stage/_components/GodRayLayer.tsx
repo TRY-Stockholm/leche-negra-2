@@ -42,7 +42,7 @@ export function GodRayLayer({ activeCount }: GodRayLayerProps) {
             transformOrigin: "top center",
             scaleY: visible ? 1 : 0,
             transition: "scale 1.2s cubic-bezier(0.22, 1, 0.36, 1)",
-            background: "linear-gradient(180deg, rgba(212,175,55,0.08) 0%, rgba(212,175,55,0.03) 50%, transparent 100%)",
+            background: "linear-gradient(180deg, rgba(228,49,34,0.08) 0%, rgba(228,49,34,0.03) 50%, transparent 100%)",
             animation: `godray-sway ${8 + i * 2}s ease-in-out infinite`,
             animationDelay: `${ray.delay}s`,
             willChange: "transform",

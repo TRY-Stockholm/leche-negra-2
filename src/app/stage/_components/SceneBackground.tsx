@@ -219,7 +219,7 @@ export const SceneBackground = forwardRef<SceneBackgroundHandle, SceneBackground
         layers.forEach((el) => {
           el.style.opacity = isActive ? "1" : "0";
           el.style.filter = isActive
-            ? "drop-shadow(0 0 18px rgba(201,169,110,0.5)) drop-shadow(0 0 40px rgba(201,169,110,0.25))"
+            ? "drop-shadow(0 0 18px rgba(228,49,34,0.5)) drop-shadow(0 0 40px rgba(228,49,34,0.25))"
             : "none";
         });
         maskClonesRef.current.get(stemId)?.forEach((clone) => {
@@ -247,7 +247,7 @@ export const SceneBackground = forwardRef<SceneBackgroundHandle, SceneBackground
     return (
       <div
         className="absolute inset-0 overflow-hidden"
-        style={{ backgroundColor: "var(--color-charcoal, #1a1210)" }}
+        style={{ backgroundColor: "var(--background, #460b08)" }}
         aria-hidden="true"
       >
         {isMobile ? (
