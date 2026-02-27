@@ -16,7 +16,7 @@ export function BlackoutOverlay({ active }: BlackoutOverlayProps) {
           style={{ zIndex: 9998, background: "#0a0604" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.2, ease: "easeIn" }}
+          transition={{ duration: 0.3, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
         />
       )}
     </AnimatePresence>
