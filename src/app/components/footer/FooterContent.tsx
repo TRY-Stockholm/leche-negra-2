@@ -31,27 +31,28 @@ function MailIcon() {
 }
 
 interface FooterContentProps {
-  onTentacleHover: (active: boolean) => void;
+  onDragHint: () => void;
   siteSettings?: SiteSettings | null;
   socialLinks?: SocialLink[];
+  isDragging?: boolean;
 }
 
 export function FooterContent({
-  onTentacleHover,
+  onDragHint,
   siteSettings,
   socialLinks,
+  isDragging,
 }: FooterContentProps) {
   return (
     <div className="absolute inset-0 z-20 pointer-events-none flex flex-col justify-between p-6 md:p-10">
       {/* Top row */}
       <div className="flex items-start justify-between">
         {/* Trigger text — top left */}
-        <button
-          className="pointer-events-auto leading-snug text-foreground/40 hover:text-foreground transition-colors duration-500 cursor-pointer text-left"
-          onMouseEnter={() => onTentacleHover(true)}
-          onMouseLeave={() => onTentacleHover(false)}
-          onTouchStart={() => onTentacleHover(true)}
-          onTouchEnd={() => onTentacleHover(false)}
+        <div
+          className="pointer-events-auto leading-snug text-foreground/40 hover:text-foreground transition-colors duration-500 text-left select-none"
+          style={{ cursor: isDragging ? "grabbing" : "grab" }}
+          onMouseEnter={onDragHint}
+          onTouchStart={onDragHint}
         >
           <span className="font-display text-[clamp(1rem,2vw,1.5rem)] italic">
             not everything is on the menu.
@@ -60,7 +61,7 @@ export function FooterContent({
           <span className="font-display text-[clamp(1rem,2vw,1.5rem)] font-bold not-italic">
             go deeper.
           </span>
-        </button>
+        </div>
 
         <div className="flex gap-3 pointer-events-auto">
           {(socialLinks && socialLinks.length > 0) ? (
