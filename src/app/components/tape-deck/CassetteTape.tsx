@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, useEffect, memo } from 'react'
+import { useCallback, useRef, useState, useEffect, memo, useMemo } from 'react'
 import { motion } from 'motion/react'
 import { TAPES } from './types'
 import type { TapeConfig } from './types'
@@ -26,7 +26,10 @@ export const CassetteTapeSVG = memo(function CassetteTapeSVG({ tape, className, 
   }, [])
 
   // Replace #fff with the tape's accent color
-  const colored = svgContent?.replaceAll('fill="#fff"', `fill="${tape.accent}"`) ?? null
+  const colored = useMemo(
+    () => svgContent?.replaceAll('fill="#fff"', `fill="${tape.accent}"`) ?? null,
+    [svgContent, tape.accent],
+  )
 
   return (
     <svg

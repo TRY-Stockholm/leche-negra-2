@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react'
+import { createContext, useContext, useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import type { ReactNode, RefObject } from 'react'
 import { TAPES } from './types'
 
@@ -9,6 +9,7 @@ type TapeDeckContextValue = {
   deckPosRef: RefObject<{ x: number; y: number }>
   nearDeckIdRef: RefObject<string | null>
   registerDeckRef: (el: HTMLDivElement | null) => void
+  updateDeckPos: () => void
   handleTapeDrag: (id: string, screenCenter: { x: number; y: number }) => void
   handleTapeDragEnd: (id: string) => void
   play: () => void
@@ -134,20 +135,23 @@ export function TapeDeckProvider({ children }: { children: ReactNode }) {
     setPlaying(false); stopAudio(); setLoadedTapeId(null)
   }, [stopAudio])
 
+  const value = useMemo(() => ({
+    loadedTapeId,
+    playing,
+    nearDeckId,
+    deckPosRef,
+    nearDeckIdRef,
+    registerDeckRef,
+    updateDeckPos,
+    handleTapeDrag,
+    handleTapeDragEnd,
+    play,
+    pause,
+    eject,
+  }), [loadedTapeId, playing, nearDeckId, registerDeckRef, handleTapeDrag, handleTapeDragEnd, play, pause, eject, updateDeckPos])
+
   return (
-    <TapeDeckContext.Provider value={{
-      loadedTapeId,
-      playing,
-      nearDeckId,
-      deckPosRef,
-      nearDeckIdRef,
-      registerDeckRef,
-      handleTapeDrag,
-      handleTapeDragEnd,
-      play,
-      pause,
-      eject,
-    }}>
+    <TapeDeckContext.Provider value={value}>
       {children}
     </TapeDeckContext.Provider>
   )

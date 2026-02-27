@@ -44,7 +44,7 @@ function SoundWaves({ playing, color, side }: { playing: boolean; color: string;
 // ─── Cassette Player Component ─────────────────────────────────
 
 export const CassettePlayer = memo(function CassettePlayer({ className, style }: { className?: string; style?: React.CSSProperties }) {
-  const { loadedTapeId, playing, nearDeckId, registerDeckRef, play, pause, eject } = useTapeDeck()
+  const { loadedTapeId, playing, nearDeckId, registerDeckRef, updateDeckPos, play, pause, eject } = useTapeDeck()
   const canHover = useCanHover()
 
   const activeTape = loadedTapeId ? TAPES[loadedTapeId] : null
@@ -71,12 +71,12 @@ export const CassettePlayer = memo(function CassettePlayer({ className, style }:
     registerDeckRef(el)
   }, [registerDeckRef])
 
-  // Re-register on drag spring changes so deck position stays in sync
+  // Keep deck position in sync during drag animation
   useEffect(() => {
-    const unsub = dragSpringX.on('change', () => { registerDeckRef(deckSlotRef.current) })
-    const unsub2 = dragSpringY.on('change', () => { registerDeckRef(deckSlotRef.current) })
+    const unsub = dragSpringX.on('change', updateDeckPos)
+    const unsub2 = dragSpringY.on('change', updateDeckPos)
     return () => { unsub(); unsub2() }
-  }, [dragSpringX, dragSpringY, registerDeckRef])
+  }, [dragSpringX, dragSpringY, updateDeckPos])
 
   const handleDragEnd = useCallback(() => {
     animate(dragX, 0, { type: 'spring', stiffness: 150, damping: 18 })
