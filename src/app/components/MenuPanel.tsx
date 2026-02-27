@@ -62,7 +62,7 @@ export const MenuPanel = memo(function MenuPanel({
           className="grid"
         >
           <div className="overflow-hidden">
-            <div className="border-t border-border pt-8 pb-4 mt-6">
+            <div className="squiggly-border-t pt-8 pb-4 mt-6">
               {/* Header */}
               <div className="flex items-baseline justify-between mb-6">
                 <span className="font-body text-[0.6875rem] font-medium tracking-[0.06em] uppercase text-muted-foreground">
