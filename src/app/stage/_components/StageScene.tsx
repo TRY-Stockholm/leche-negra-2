@@ -290,7 +290,7 @@ export function StageScene() {
       <div className="sr-only" role="status" aria-live="polite">
         {activeInstruments.size === 0
           ? "No instruments playing"
-          : `Playing: ${Array.from(activeInstruments).join(", ")}`}
+          : `Playing: ${instruments.filter(i => activeInstruments.has(i.id)).map(i => i.name).join(", ")}`}
       </div>
     </main>
   );

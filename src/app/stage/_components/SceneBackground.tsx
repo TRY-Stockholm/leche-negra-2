@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback, useImperativeHandle, forwardRef } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
+import { motion, useMotionValue, useSpring, useTransform, animate } from "motion/react";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { instruments, MUSICIAN_LAYERS } from "./stage-config";
 
@@ -65,7 +65,7 @@ export const SceneBackground = forwardRef<SceneBackgroundHandle, SceneBackground
         const musicianPixelX = (inst.position.x / 100) * fullWidth;
         const targetPan = -(musicianPixelX - vw / 2);
         const clamped = Math.max(-panMax, Math.min(panMax, targetPan));
-        panX.set(clamped);
+        animate(panX, clamped, { type: "spring", stiffness: 100, damping: 20 });
       },
       [isMobile, panMax, panX],
     );

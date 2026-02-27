@@ -51,6 +51,7 @@ export function InstrumentToolbar({
                   boxShadow: isActive
                     ? `0 0 8px ${inst.color}60, 0 0 16px ${inst.color}30`
                     : "none",
+                  animation: isActive ? "stage-pulse 2s ease-in-out infinite" : "none",
                 }}
               />
               <span
