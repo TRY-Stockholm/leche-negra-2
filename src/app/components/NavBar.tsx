@@ -7,6 +7,7 @@ const WAITERAID_HASH = "dd34bd1ef6c76ba44556cd74fbb9fd3";
 interface NavBarProps {
   weather: { temp: number; code: number } | null;
   bookingUrl?: string | null;
+  onMenuClick?: () => void;
 }
 
 function useNightCountdown() {
@@ -34,7 +35,6 @@ function useNightCountdown() {
 }
 
 const NAV_LINKS = [
-  { href: "#menus", label: "Menus" },
   { href: "/press", label: "Press" },
   {
     href: "https://maps.google.com/?q=Engelbrektsgatan+3,+Stockholm",
@@ -43,7 +43,7 @@ const NAV_LINKS = [
   },
 ] as const;
 
-export const NavBar = memo(function NavBar({ weather }: NavBarProps) {
+export const NavBar = memo(function NavBar({ weather, onMenuClick }: NavBarProps) {
   const countdown = useNightCountdown();
   const [open, setOpen] = useState(false);
 
@@ -106,6 +106,12 @@ export const NavBar = memo(function NavBar({ weather }: NavBarProps) {
             data-hash={WAITERAID_HASH}
           >
             Book a Table
+          </button>
+          <button
+            onClick={onMenuClick}
+            className="hidden md:inline nav-bracket text-muted-foreground hover:text-accent transition-colors duration-200 cursor-pointer"
+          >
+            Menus
           </button>
           {NAV_LINKS.map((link) => (
             <a
@@ -172,6 +178,23 @@ export const NavBar = memo(function NavBar({ weather }: NavBarProps) {
               >
                 Book a Table
               </motion.button>
+              <motion.button
+                onClick={() => {
+                  setOpen(false);
+                  onMenuClick?.();
+                }}
+                className="font-display italic text-[2rem] text-accent-foreground hover:text-accent transition-colors duration-200 py-2 cursor-pointer"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{
+                  duration: 0.35,
+                  delay: 0.08 + 1 * 0.06,
+                  ease: [0.25, 0.46, 0.45, 0.94],
+                }}
+              >
+                Menus
+              </motion.button>
               {NAV_LINKS.map((link, i) => (
                 <motion.a
                   key={link.href}
@@ -186,7 +209,7 @@ export const NavBar = memo(function NavBar({ weather }: NavBarProps) {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{
                     duration: 0.35,
-                    delay: 0.08 + (i + 1) * 0.06,
+                    delay: 0.08 + (i + 2) * 0.06,
                     ease: [0.25, 0.46, 0.45, 0.94],
                   }}
                 >

@@ -8,6 +8,7 @@ import { EasterEggScene } from "./EasterEggScene";
 import { pickScene, type SceneConfig } from "./scenes";
 import { useWeather } from "@/hooks/useWeather";
 import { MenuPanel } from "./MenuPanel";
+import { MenuModal } from "./MenuModal";
 import { NavBar } from "./NavBar";
 import {
   TapeDeckProvider,
@@ -44,6 +45,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
   const { loadedTapeId } = useTapeDeck();
   const [hoverTheme, setHoverTheme] = useState<Theme | null>(null);
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
+  const [menuModalOpen, setMenuModalOpen] = useState(false);
   const [easterEgg, setEasterEgg] = useState(false);
   const [scene, setScene] = useState<SceneConfig | null>(null);
   const lastSceneIdRef = useRef<string | undefined>(undefined);
@@ -80,6 +82,10 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
     if (!loadedTapeId) setHoverTheme(null);
   }, [loadedTapeId]);
 
+  const handleNavMenuClick = useCallback(() => {
+    setMenuModalOpen(true);
+  }, []);
+
   const handleLongPressComplete = useCallback(() => {
     const picked = pickScene(lastSceneIdRef.current);
     lastSceneIdRef.current = picked.id;
@@ -95,7 +101,12 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
         className="relative z-10 min-h-screen bg-background"
         style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}
       >
-        <NavBar weather={weather} bookingUrl={siteSettings?.bookingUrl} />
+        <NavBar weather={weather} bookingUrl={siteSettings?.bookingUrl} onMenuClick={handleNavMenuClick} />
+        <MenuModal
+          open={menuModalOpen}
+          onClose={() => setMenuModalOpen(false)}
+          cmsMenus={menus}
+        />
 
         {/* Main Content — 12-column grid */}
         <div className="grid grid-cols-12 lg:grid-rows-[auto_1fr_auto] gap-x-4 px-5 md:px-10 min-h-[calc(100vh-65px)]">
