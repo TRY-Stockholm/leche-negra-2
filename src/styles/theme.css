@@ -143,6 +143,17 @@
   --ring: #c9a96e;
 }
 
+/* 411 Speakeasy — scoped dark romanticism palette */
+[data-scene="speakeasy"] {
+  --background: #0a0604;
+  --foreground: #8b2236;
+  --accent: #8b2236;
+  --muted-foreground: #6b1d2a;
+  --muted: #1a0a0d;
+  --border: #3d1520;
+  --card: #120608;
+}
+
 @theme inline {
   /* Fonts */
   --font-display: var(--font-display-next, "Playfair Display"), "Georgia", "Times New Roman", serif;
@@ -742,6 +753,26 @@
   }
 }
 
+/* ========================
+   SPEAKEASY 411 — Keyframe Animations
+   ======================== */
+@keyframes speakeasy-glow-pulse {
+  0%, 100% { opacity: 0.12; }
+  50% { opacity: 0.18; }
+}
+
+@keyframes speakeasy-drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(3px, -5px) rotate(0.3deg); }
+  50% { transform: translate(-2px, 3px) rotate(-0.2deg); }
+  75% { transform: translate(4px, 2px) rotate(0.15deg); }
+}
+
+@keyframes speakeasy-vignette-breathe {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 0.92; }
+}
+
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .neon-logo {
@@ -766,6 +797,9 @@
   .stage-glow-zone,
   .stage-glow-zone[data-active] {
     transition: none;
+  }
+  [data-scene="speakeasy"] * {
+    animation: none !important;
   }
 }
 
