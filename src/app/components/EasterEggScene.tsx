@@ -211,13 +211,9 @@ export function EasterEggScene({
 
   const ignitedRef = useRef(false);
 
-  const snapAndIgnite = useCallback((el: HTMLDivElement) => {
+  const snapAndIgnite = useCallback(() => {
     if (ignitedRef.current) return;
     ignitedRef.current = true;
-    animate(el, { opacity: 0 }, {
-      duration: 0.3,
-      ease: "easeOut",
-    });
     ignite();
   }, [ignite]);
 
@@ -228,7 +224,7 @@ export function EasterEggScene({
     const isNear = dist <= SNAP_DISTANCE;
     setNearPainting(isNear);
     if (isNear) {
-      snapAndIgnite(el);
+      snapAndIgnite();
     }
   }, [getDistance, snapAndIgnite]);
 
@@ -365,7 +361,7 @@ export function EasterEggScene({
                   </div>
                 </div>
 
-                {cursorHtml && !showVideo && (
+                {cursorHtml && (
                   <>
                     {/* "Grab me" hint near lighter — hidden once dragging */}
                     {!dragging && (
