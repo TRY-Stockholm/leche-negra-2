@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { instruments } from "./stage-config";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -20,6 +21,7 @@ const PRELOADER_MIN_MS = 2000;
 
 export function StageScene() {
   const isMobile = useIsMobile();
+  const router = useRouter();
   const engineRef = useRef<StageAudioEngine | null>(null);
   const stageRef = useRef<HTMLElement>(null);
   const bgRef = useRef<SceneBackgroundHandle>(null);
@@ -37,15 +39,30 @@ export function StageScene() {
 
     const minTimer = new Promise((r) => setTimeout(r, PRELOADER_MIN_MS));
 
-    engine.init(instruments).then(() => {
-      minTimer.then(() => setPhase("ready"));
-    });
+    engine
+      .init(instruments)
+      .then(() => {
+        minTimer.then(() => setPhase("ready"));
+      })
+      .catch(() => {
+        // Audio failed to load — still allow entry with degraded experience
+        minTimer.then(() => setPhase("ready"));
+      });
 
     return () => {
       engine.dispose();
       engineRef.current = null;
     };
   }, []);
+
+  // Escape key to exit
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") router.push("/");
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [router]);
 
   // Audio-reactive loop: sets --audio-level on <main>
   useEffect(() => {
@@ -278,6 +295,23 @@ export function StageScene() {
           onMuteAll={handleMuteAll}
         />
       )}
+
+      {/* Close button */}
+      <button
+        onClick={() => router.push("/")}
+        className="fixed top-4 right-4 z-40 flex h-10 w-10 items-center justify-center rounded-full transition-colors duration-300 hover:bg-[rgba(201,169,110,0.1)]"
+        style={{
+          color: "#A89A8C",
+          border: "1px solid rgba(61, 47, 40, 0.5)",
+          backgroundColor: "rgba(26, 18, 16, 0.85)",
+          backdropFilter: "blur(8px)",
+        }}
+        aria-label="Close and return to homepage"
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+          <path d="M1 1l12 12M13 1L1 13" />
+        </svg>
+      </button>
 
       {/* Instrument toolbar */}
       <InstrumentToolbar

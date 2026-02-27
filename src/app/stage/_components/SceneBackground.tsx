@@ -168,6 +168,9 @@ export const SceneBackground = forwardRef<SceneBackgroundHandle, SceneBackground
           musicianGroupsRef.current = groups;
           maskClonesRef.current = maskClones;
           setSvgLoaded(true);
+        })
+        .catch(() => {
+          // SVG failed to load — scene will show the dark background only
         });
     }, []);
 
@@ -175,32 +178,39 @@ export const SceneBackground = forwardRef<SceneBackgroundHandle, SceneBackground
       if (!svgLoaded) return;
       const svg = svgRef.current;
       if (!svg) return;
-      const vb = svg.viewBox.baseVal;
-      if (!vb.width || !vb.height) return;
 
-      if (isMobile) {
-        const svgAR = vb.width / vb.height;
-        const vh = window.innerHeight;
-        const vw = window.innerWidth;
-        const fullWidth = vh * svgAR;
-        const overflow = Math.max(0, fullWidth - vw);
+      const updateSize = () => {
+        const vb = svg.viewBox.baseVal;
+        if (!vb.width || !vb.height) return;
 
-        svg.setAttribute("preserveAspectRatio", "xMinYMid meet");
-        svg.style.width = `${fullWidth}px`;
-        svg.style.height = "100%";
-        svg.style.inset = "auto";
-        svg.style.top = "0";
-        svg.style.left = `${-overflow / 2}px`;
-        setPanMax(overflow / 2);
-      } else {
-        svg.setAttribute("preserveAspectRatio", "xMidYMid slice");
-        svg.style.width = "100%";
-        svg.style.height = "100%";
-        svg.style.inset = "0";
-        svg.style.top = "";
-        svg.style.left = "";
-        setPanMax(0);
-      }
+        if (isMobile) {
+          const svgAR = vb.width / vb.height;
+          const vh = window.innerHeight;
+          const vw = window.innerWidth;
+          const fullWidth = vh * svgAR;
+          const overflow = Math.max(0, fullWidth - vw);
+
+          svg.setAttribute("preserveAspectRatio", "xMinYMid meet");
+          svg.style.width = `${fullWidth}px`;
+          svg.style.height = "100%";
+          svg.style.inset = "auto";
+          svg.style.top = "0";
+          svg.style.left = `${-overflow / 2}px`;
+          setPanMax(overflow / 2);
+        } else {
+          svg.setAttribute("preserveAspectRatio", "xMidYMid slice");
+          svg.style.width = "100%";
+          svg.style.height = "100%";
+          svg.style.inset = "0";
+          svg.style.top = "";
+          svg.style.left = "";
+          setPanMax(0);
+        }
+      };
+
+      updateSize();
+      window.addEventListener("resize", updateSize);
+      return () => window.removeEventListener("resize", updateSize);
     }, [isMobile, svgLoaded]);
 
     useEffect(() => {

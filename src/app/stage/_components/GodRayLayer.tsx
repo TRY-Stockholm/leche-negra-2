@@ -34,18 +34,19 @@ export function GodRayLayer({ activeCount }: GodRayLayerProps) {
           key={i}
           className="absolute"
           style={{
+            "--ray-base-angle": `${ray.angle}deg`,
             left: `${ray.x}%`,
             top: 0,
             width: `${ray.w}px`,
             height: `${ray.h}vh`,
-            transform: `translateX(-50%) rotate(${ray.angle}deg) scaleY(${visible ? 1 : 0})`,
             transformOrigin: "top center",
-            transition: "transform 1.2s cubic-bezier(0.22, 1, 0.36, 1)",
+            scaleY: visible ? 1 : 0,
+            transition: "scale 1.2s cubic-bezier(0.22, 1, 0.36, 1)",
             background: "linear-gradient(180deg, rgba(212,175,55,0.08) 0%, rgba(212,175,55,0.03) 50%, transparent 100%)",
             animation: `godray-sway ${8 + i * 2}s ease-in-out infinite`,
             animationDelay: `${ray.delay}s`,
             willChange: "transform",
-          }}
+          } as React.CSSProperties}
         />
       ))}
     </div>
