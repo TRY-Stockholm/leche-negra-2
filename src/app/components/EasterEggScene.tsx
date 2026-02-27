@@ -12,6 +12,8 @@ import type { SceneConfig, Presentation } from "./scenes";
 const PRELOADER_MIN_MS = 2000;
 /** Inset from viewport edge for resting position */
 const REST_INSET = 48;
+/** Maximum distance (px) from painting center to snap-ignite */
+const SNAP_DISTANCE = 120;
 
 /** Module-level SVG cache keyed by scene id */
 const svgCache: Record<string, string> = {};
@@ -120,6 +122,8 @@ export function EasterEggScene({
     svgCache[scene.id] ?? null,
   );
   const [ready, setReady] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [nearPainting, setNearPainting] = useState(false);
 
   // Derived cursor dimensions from scene config
   const cursorH = scene.cursorDisplayHeight;
@@ -190,6 +194,64 @@ export function EasterEggScene({
     vid.addEventListener("ended", handleEnded);
   }, []);
 
+  const getDistance = useCallback(
+    (lighterEl: HTMLDivElement) => {
+      const paintingEl = paintingRef.current;
+      if (!paintingEl) return Infinity;
+      const lr = lighterEl.getBoundingClientRect();
+      const pr = paintingEl.getBoundingClientRect();
+      const lx = lr.left + lr.width / 2;
+      const ly = lr.top + lr.height / 2;
+      const px = pr.left + pr.width / 2;
+      const py = pr.top + pr.height / 2;
+      return Math.sqrt((lx - px) ** 2 + (ly - py) ** 2);
+    },
+    [],
+  );
+
+  const onDrag = useCallback(() => {
+    if (!lighterRef.current) return;
+    const dist = getDistance(lighterRef.current);
+    setNearPainting(dist <= SNAP_DISTANCE);
+  }, [getDistance]);
+
+  const onDragStart = useCallback(() => {
+    setDragging(true);
+  }, []);
+
+  const onDragEnd = useCallback(() => {
+    setDragging(false);
+    setNearPainting(false);
+    if (!lighterRef.current) return;
+    const dist = getDistance(lighterRef.current);
+    if (dist <= SNAP_DISTANCE) {
+      const pr = paintingRef.current?.getBoundingClientRect();
+      const lr = lighterRef.current.getBoundingClientRect();
+      if (pr && lighterRef.current) {
+        const targetX = pr.left + pr.width / 2 - lr.width / 2;
+        const targetY = pr.top + pr.height / 2 - lr.height / 2;
+        const currentX = lr.left;
+        const currentY = lr.top;
+        const el = lighterRef.current;
+        el.style.position = 'fixed';
+        el.style.left = `${currentX}px`;
+        el.style.top = `${currentY}px`;
+        el.style.transform = 'none';
+        animate(el, {
+          left: targetX,
+          top: targetY,
+          opacity: 0,
+        }, {
+          duration: 0.3,
+          ease: [0.2, 0, 0, 1],
+          onComplete: () => {
+            ignite();
+          },
+        });
+      }
+    }
+  }, [getDistance, ignite]);
+
   // Cleanup on deactivate
   useEffect(() => {
     if (!active) {
@@ -214,7 +276,7 @@ export function EasterEggScene({
     <AnimatePresence>
       {active && (
         <motion.div
-          className="fixed inset-0 z-50 cursor-none select-none"
+          className="fixed inset-0 z-50 cursor-default select-none"
           style={{ backgroundColor: scene.background }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -293,28 +355,54 @@ export function EasterEggScene({
                   </div>
                 </div>
 
-                {/* Lighter — placeholder until drag-and-drop is added */}
                 {cursorHtml && !showVideo && (
                   <>
-                    <img
-                      src="/GrabMe.gif"
-                      alt=""
-                      className="fixed pointer-events-none select-none"
-                      style={{
-                        width: 70,
-                        right: REST_INSET + cursorW + 12,
-                        bottom: REST_INSET + cursorH - 10,
-                      }}
-                    />
+                    {/* "Grab me" hint near lighter — hidden once dragging */}
+                    {!dragging && (
+                      <img
+                        src="/GrabMe.gif"
+                        alt=""
+                        className="fixed pointer-events-none select-none"
+                        style={{
+                          width: 70,
+                          right: REST_INSET + cursorW + 12,
+                          bottom: REST_INSET + cursorH - 10,
+                        }}
+                      />
+                    )}
+                    {/* "Torch me" hint on painting — appears while dragging, hides when near */}
+                    {dragging && !nearPainting && (
+                      <img
+                        src="/TorchMe.gif"
+                        alt=""
+                        className="absolute pointer-events-none select-none"
+                        style={{
+                          width: 70,
+                          left: paintingRef.current
+                            ? paintingRef.current.getBoundingClientRect().left - 36
+                            : 0,
+                          top: paintingRef.current
+                            ? paintingRef.current.getBoundingClientRect().top - 36
+                            : 0,
+                        }}
+                      />
+                    )}
                     <motion.div
                       ref={lighterRef}
-                      className={`${scene.cursorClassName} fixed`}
+                      className={`${scene.cursorClassName} fixed cursor-grab active:cursor-grabbing touch-none`}
                       style={{
                         width: cursorW,
                         height: cursorH,
                         right: REST_INSET,
                         bottom: REST_INSET,
                       }}
+                      drag
+                      dragElastic={0.08}
+                      dragMomentum={false}
+                      onDragStart={onDragStart}
+                      onDrag={onDrag}
+                      onDragEnd={onDragEnd}
+                      whileDrag={{ scale: 1.08, zIndex: 50 }}
                       dangerouslySetInnerHTML={{ __html: cursorHtml }}
                     />
                   </>
