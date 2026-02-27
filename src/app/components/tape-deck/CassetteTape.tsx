@@ -10,10 +10,10 @@ import { useCanHover } from '@/hooks/useCanHover'
 let tapeContentCache: string | null = null
 
 const WOBBLE_ROTATIONS: Record<string, number[]> = {
-  morning: [0, -3, 2.5, -1.5, 0],
-  midday: [0, 2.5, -3, 1.5, 0],
-  evening: [0, -2, 3, -2, 0],
-  night: [0, 3, -2.5, 1, 0],
+  morning: [0, -12, 10, -6, 0],
+  midday: [0, 10, -12, 6, 0],
+  evening: [0, -8, 12, -8, 0],
+  night: [0, 12, -10, 4, 0],
 }
 
 const WOBBLE_DELAYS: Record<string, number> = {
@@ -91,7 +91,7 @@ export const CassetteTape = memo(function CassetteTape({
 
   if (isLoaded) return null
 
-  const touchAnimationProps = !canHover ? {
+  const wobbleProps = {
     animate: { rotate: wobbleRotation },
     transition: {
       rotate: {
@@ -100,7 +100,7 @@ export const CassetteTape = memo(function CassetteTape({
         delay: wobbleDelay,
       },
     },
-  } : {}
+  }
 
   return (
     <div className={className} style={style}>
@@ -114,7 +114,7 @@ export const CassetteTape = memo(function CassetteTape({
         whileDrag={{ scale: 1.08, zIndex: 50 }}
         whileHover={canHover ? { scale: 1.04 } : undefined}
         whileTap={{ scale: 1.06 }}
-        {...touchAnimationProps}
+        {...wobbleProps}
         className="cursor-grab active:cursor-grabbing touch-none relative w-fit"
         style={{ zIndex: 12 }}
       >

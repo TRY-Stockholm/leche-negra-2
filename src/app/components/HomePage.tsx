@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
-import type { Theme, MenuKey, SiteSettings, SocialLink, CMSMenu } from "@/lib/types";
+import type {
+  Theme,
+  MenuKey,
+  SiteSettings,
+  SocialLink,
+  CMSMenu,
+} from "@/lib/types";
 import { menuThemeMap, isLightTheme } from "@/lib/constants";
 import { NeonLogo } from "./NeonLogo";
 import { EasterEggScene } from "./EasterEggScene";
@@ -32,10 +38,18 @@ interface HomePageProps {
   menus: CMSMenu[];
 }
 
-export default function HomePage({ siteSettings, socialLinks, menus }: HomePageProps) {
+export default function HomePage({
+  siteSettings,
+  socialLinks,
+  menus,
+}: HomePageProps) {
   return (
     <TapeDeckProvider>
-      <PageContent siteSettings={siteSettings} socialLinks={socialLinks} menus={menus} />
+      <PageContent
+        siteSettings={siteSettings}
+        socialLinks={socialLinks}
+        menus={menus}
+      />
     </TapeDeckProvider>
   );
 }
@@ -101,7 +115,11 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
         className="relative z-10 min-h-screen bg-background"
         style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}
       >
-        <NavBar weather={weather} bookingUrl={siteSettings?.bookingUrl} onMenuClick={handleNavMenuClick} />
+        <NavBar
+          weather={weather}
+          bookingUrl={siteSettings?.bookingUrl}
+          onMenuClick={handleNavMenuClick}
+        />
         <MenuModal
           open={menuModalOpen}
           onClose={() => setMenuModalOpen(false)}
@@ -109,7 +127,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
         />
 
         {/* Main Content — 12-column grid */}
-        <div className="grid grid-cols-12 lg:grid-rows-[auto_1fr_auto] gap-x-4 px-5 md:px-10 min-h-[calc(100vh-65px)]">
+        <div className="grid grid-cols-12 lg:grid-rows-[auto_1fr_auto] gap-x-4 px-5 md:px-10 min-h-[calc(100svh-48px)] lg:min-h-[calc(100vh-65px)]">
           {/* Logo */}
           <div className="col-span-12 row-start-1 self-start pt-8 md:col-span-5 md:pt-16">
             <div className="relative">
@@ -126,7 +144,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
           </div>
 
           {/* Menu section — full-width bottom grid */}
-          <div className="col-span-12 self-end row-start-4 pb-4 lg:pb-8">
+          <div className="col-span-12 self-end row-start-4 pb-6 lg:pb-8">
             <div className="grid grid-cols-2 md:flex gap-y-6 gap-x-3 lg:gap-12">
               {[
                 {
