@@ -249,9 +249,6 @@ export function EasterEggScene({
           },
         });
       }
-    } else {
-      // Spring back to rest position
-      animate(el, { x: 0, y: 0 }, { type: "spring", stiffness: 150, damping: 18 });
     }
   }, [getDistance, ignite]);
 
@@ -360,7 +357,7 @@ export function EasterEggScene({
                           className="absolute -inset-2 pointer-events-none rounded"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: [0.2, 0.5, 0.2] }}
-                          exit={{ opacity: 0 }}
+                          exit={{ opacity: 0, transition: { duration: 0.3 } }}
                           transition={{ duration: 0.8, repeat: Infinity }}
                           style={{
                             boxShadow:
@@ -417,6 +414,7 @@ export function EasterEggScene({
                         bottom: REST_INSET,
                       }}
                       drag
+                      dragConstraints={{ top: 0, left: 0, right: 0, bottom: 0 }}
                       dragElastic={0.08}
                       dragMomentum={false}
                       onDragStart={onDragStart}
