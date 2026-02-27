@@ -9,6 +9,20 @@ import { useCanHover } from '@/hooks/useCanHover'
 
 let tapeContentCache: string | null = null
 
+const WOBBLE_ROTATIONS: Record<string, number[]> = {
+  morning: [0, -3, 2.5, -1.5, 0],
+  midday: [0, 2.5, -3, 1.5, 0],
+  evening: [0, -2, 3, -2, 0],
+  night: [0, 3, -2.5, 1, 0],
+}
+
+const WOBBLE_DELAYS: Record<string, number> = {
+  morning: 1.0,
+  midday: 1.15,
+  evening: 1.3,
+  night: 1.45,
+}
+
 export const CassetteTapeSVG = memo(function CassetteTapeSVG({ tape, className, style }: { tape: TapeConfig; className?: string; style?: React.CSSProperties }) {
   const [svgContent, setSvgContent] = useState(tapeContentCache)
 
@@ -61,6 +75,10 @@ export const CassetteTape = memo(function CassetteTape({
   const isNearDeck = nearDeckId === id
   const elRef = useRef<HTMLDivElement>(null)
 
+  // Wobble on mount for touch devices — hints tapes are interactive
+  const wobbleRotation = WOBBLE_ROTATIONS[id] ?? [0, -3, 2, 0]
+  const wobbleDelay = WOBBLE_DELAYS[id] ?? 1.0
+
   const onDrag = useCallback(() => {
     if (!elRef.current) return
     const rect = elRef.current.getBoundingClientRect()
@@ -73,6 +91,17 @@ export const CassetteTape = memo(function CassetteTape({
 
   if (isLoaded) return null
 
+  const touchAnimationProps = !canHover ? {
+    animate: { rotate: wobbleRotation },
+    transition: {
+      rotate: {
+        duration: 0.6,
+        ease: "easeInOut" as const,
+        delay: wobbleDelay,
+      },
+    },
+  } : {}
+
   return (
     <div className={className} style={style}>
       <motion.div
@@ -84,6 +113,8 @@ export const CassetteTape = memo(function CassetteTape({
         onDragEnd={onDragEnd}
         whileDrag={{ scale: 1.08, zIndex: 50 }}
         whileHover={canHover ? { scale: 1.04 } : undefined}
+        whileTap={{ scale: 1.06 }}
+        {...touchAnimationProps}
         className="cursor-grab active:cursor-grabbing touch-none relative w-fit"
         style={{ zIndex: 12 }}
       >
