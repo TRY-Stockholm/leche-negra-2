@@ -764,3 +764,74 @@
     animation: none;
   }
 }
+
+/* ========================
+   STAGE — Keyframe Animations
+   ======================== */
+@keyframes stage-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.08); opacity: 0.15; }
+}
+
+@keyframes candle-flicker {
+  0%, 100% { opacity: 1; }
+  25% { opacity: 0.8; }
+  50% { opacity: 1; }
+  75% { opacity: 0.6; }
+}
+
+@keyframes vignette-breathe {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.55; }
+}
+
+@keyframes haze-drift-1 {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(3vw, -2vh); }
+  50% { transform: translate(-2vw, 3vh); }
+  75% { transform: translate(4vw, 1vh); }
+}
+
+@keyframes haze-drift-2 {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(-4vw, 2vh); }
+  66% { transform: translate(2vw, -3vh); }
+}
+
+@keyframes haze-drift-3 {
+  0%, 100% { transform: translate(0, 0); }
+  30% { transform: translate(2vw, 4vh); }
+  60% { transform: translate(-3vw, -1vh); }
+}
+
+@keyframes godray-sway {
+  0%, 100% { transform: translateX(-50%) rotate(var(--ray-base-angle, 0deg)); }
+  50% { transform: translateX(-50%) rotate(calc(var(--ray-base-angle, 0deg) + 2deg)); }
+}
+
+@keyframes bokeh-float {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(8px, -12px); }
+  50% { transform: translate(-5px, 8px); }
+  75% { transform: translate(10px, -5px); }
+}
+
+/* ========================
+   STAGE — Glow Zones (audio-reactive via --audio-level)
+   ======================== */
+.stage-glow-zone {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: clamp(140px, 18vw, 240px);
+  height: clamp(140px, 18vw, 240px);
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  pointer-events: none;
+}
+
+.stage-glow-zone[data-active] {
+  opacity: calc(0.45 + var(--audio-level, 0) * 0.55);
+  transition: opacity 0.12s ease;
+}
