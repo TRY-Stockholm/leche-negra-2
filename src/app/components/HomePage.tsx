@@ -88,7 +88,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
         className="relative z-10 min-h-screen bg-background"
         style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}
       >
-        <NavBar weather={weather} />
+        <NavBar weather={weather} bookingUrl={siteSettings?.bookingUrl} />
 
         {/* Main Content — 12-column grid */}
         <div className="grid grid-cols-12 lg:grid-rows-[auto_1fr_auto] gap-x-4 px-5 md:px-10 min-h-[calc(100vh-65px)]">
@@ -169,7 +169,12 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
               })}
             </div>
 
-            <MenuPanel activeMenu={openMenu} onClose={handleMenuClose} />
+            <MenuPanel
+              activeMenu={openMenu}
+              onClose={handleMenuClose}
+              cmsMenus={menus}
+              bookingUrl={siteSettings?.bookingUrl}
+            />
           </div>
 
           {/* Cassette player — right side, vertically centered */}
@@ -212,7 +217,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
           onDismiss={() => setEasterEgg(false)}
         />
       )}
-      <Footer />
+      <Footer siteSettings={siteSettings} socialLinks={socialLinks} />
     </div>
   );
 }

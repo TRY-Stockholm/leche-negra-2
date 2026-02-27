@@ -2,18 +2,39 @@
 
 import { useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import type { MenuKey } from "@/lib/types";
+import type { MenuKey, CMSMenu } from "@/lib/types";
 import { menus } from "@/data/menus";
 import { EASE_OUT_EXPO } from "@/lib/constants";
+
+const MENU_KEY_TO_TITLE: Record<MenuKey, string> = {
+  breakfast: "Breakfast",
+  lunch: "Lunch",
+  dinner: "Dinner",
+  drinks: "Drinks",
+};
+
+interface MenuPanelProps {
+  activeMenu: MenuKey | null;
+  onClose: () => void;
+  cmsMenus?: CMSMenu[];
+  bookingUrl?: string | null;
+}
 
 export function MenuPanel({
   activeMenu,
   onClose,
-}: {
-  activeMenu: MenuKey | null;
-  onClose: () => void;
-}) {
+  cmsMenus,
+  bookingUrl,
+}: MenuPanelProps) {
   const panelEndRef = useRef<HTMLDivElement>(null);
+
+  const cmsMenu = activeMenu
+    ? cmsMenus?.find(
+        (m) =>
+          m.title.toLowerCase() ===
+          MENU_KEY_TO_TITLE[activeMenu].toLowerCase(),
+      )
+    : undefined;
 
   return (
     <AnimatePresence mode="wait">
@@ -44,7 +65,7 @@ export function MenuPanel({
             {/* Header */}
             <div className="flex items-baseline justify-between mb-6">
               <span className="font-body text-[0.6875rem] font-medium tracking-[0.06em] uppercase text-muted-foreground">
-                {menus[activeMenu].hours}
+                {cmsMenu?.hours ?? menus[activeMenu].hours}
               </span>
               <button
                 onClick={onClose}
@@ -61,7 +82,7 @@ export function MenuPanel({
               transition={{ delay: 0.2, duration: 0.5 }}
               className="text-muted-foreground mb-8 font-display italic text-[clamp(0.875rem,2vw,1.0625rem)] leading-[1.6] max-w-[520px]"
             >
-              {menus[activeMenu].intro}
+              {cmsMenu?.intro ?? menus[activeMenu].intro}
             </motion.p>
 
             {/* CTA buttons */}
@@ -72,17 +93,21 @@ export function MenuPanel({
               className="flex flex-col sm:flex-row gap-3"
             >
               <a
-                href="#"
+                href={bookingUrl ?? "#"}
                 className="inline-flex items-center justify-center border border-foreground px-8 py-4 font-display text-[clamp(0.875rem,1.5vw,1.0625rem)] font-medium tracking-[0.04em] uppercase hover:bg-foreground hover:text-background transition-colors duration-300"
               >
                 Book a Table
               </a>
-              <a
-                href="#"
-                className="inline-flex items-center justify-center border border-muted-foreground/40 px-8 py-4 font-display text-[clamp(0.875rem,1.5vw,1.0625rem)] font-medium tracking-[0.04em] uppercase hover:border-foreground transition-colors duration-300"
-              >
-                See Menu
-              </a>
+              {cmsMenu?.pdfUrl && (
+                <a
+                  href={cmsMenu.pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center border border-muted-foreground/40 px-8 py-4 font-display text-[clamp(0.875rem,1.5vw,1.0625rem)] font-medium tracking-[0.04em] uppercase hover:border-foreground transition-colors duration-300"
+                >
+                  See Menu
+                </a>
+              )}
             </motion.div>
             <div ref={panelEndRef} />
           </div>

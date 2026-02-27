@@ -4,6 +4,7 @@ import { weatherPoem } from "@/lib/constants";
 
 interface NavBarProps {
   weather: { temp: number; code: number } | null;
+  bookingUrl?: string | null;
 }
 
 function useNightCountdown() {
@@ -40,14 +41,14 @@ const NAV_LINKS = [
   },
 ] as const;
 
-const OVERLAY_LINKS = [
-  { href: "#book", label: "Book a Table" },
-  ...NAV_LINKS,
-] as const;
-
-export function NavBar({ weather }: NavBarProps) {
+export function NavBar({ weather, bookingUrl }: NavBarProps) {
   const countdown = useNightCountdown();
   const [open, setOpen] = useState(false);
+
+  const overlayLinks = [
+    { href: bookingUrl ?? "#", label: "Book a Table" },
+    ...NAV_LINKS,
+  ];
 
   // Lock body scroll when menu is open
   useEffect(() => {
@@ -104,7 +105,7 @@ export function NavBar({ weather }: NavBarProps) {
 
           {/* Desktop links */}
           <a
-            href="#book"
+            href={bookingUrl ?? "#"}
             className="hidden md:inline nav-bracket text-muted-foreground hover:text-accent transition-colors duration-200"
           >
             Book a Table
@@ -139,7 +140,7 @@ export function NavBar({ weather }: NavBarProps) {
 
           {/* Book a Table — mobile only, always visible */}
           <a
-            href="#book"
+            href={bookingUrl ?? "#"}
             className="md:hidden nav-bracket text-muted-foreground hover:text-accent transition-colors duration-200"
           >
             Book a Table
@@ -159,7 +160,7 @@ export function NavBar({ weather }: NavBarProps) {
           >
             <div className="flex flex-col items-center justify-center h-full gap-2 px-8">
               {/* Nav links */}
-              {OVERLAY_LINKS.map((link, i) => (
+              {overlayLinks.map((link, i) => (
                 <motion.a
                   key={link.href}
                   href={link.href}

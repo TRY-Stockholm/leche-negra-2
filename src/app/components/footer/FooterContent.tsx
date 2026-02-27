@@ -1,5 +1,7 @@
 "use client";
 
+import type { SiteSettings, SocialLink } from "@/lib/types";
+
 function InstagramIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -28,11 +30,17 @@ function MailIcon() {
   );
 }
 
+interface FooterContentProps {
+  onTentacleHover: (active: boolean) => void;
+  siteSettings?: SiteSettings | null;
+  socialLinks?: SocialLink[];
+}
+
 export function FooterContent({
   onTentacleHover,
-}: {
-  onTentacleHover: (active: boolean) => void;
-}) {
+  siteSettings,
+  socialLinks,
+}: FooterContentProps) {
   return (
     <div className="absolute inset-0 z-20 pointer-events-none flex flex-col justify-between p-6 md:p-10">
       {/* Top row */}
@@ -55,15 +63,30 @@ export function FooterContent({
         </button>
 
         <div className="flex gap-3 pointer-events-auto">
-          <a
-            href="https://instagram.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-foreground/70 hover:text-accent transition-colors duration-300"
-            aria-label="Instagram"
-          >
-            <InstagramIcon />
-          </a>
+          {(socialLinks && socialLinks.length > 0) ? (
+            socialLinks.map((link) => (
+              <a
+                key={link._id}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-foreground/70 hover:text-accent transition-colors duration-300 text-[0.6875rem] font-body font-medium tracking-[0.06em] uppercase"
+                aria-label={link.platform}
+              >
+                {link.platform}
+              </a>
+            ))
+          ) : (
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-foreground/70 hover:text-accent transition-colors duration-300"
+              aria-label="Instagram"
+            >
+              <InstagramIcon />
+            </a>
+          )}
         </div>
       </div>
 
@@ -71,17 +94,17 @@ export function FooterContent({
       <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
         <div className="flex flex-col gap-2 text-foreground/60">
           <a
-            href="https://maps.google.com/?q=Engelbrektsgatan+3,+Stockholm"
+            href={siteSettings?.addressMapUrl ?? "https://maps.google.com/?q=Engelbrektsgatan+3,+Stockholm"}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-[0.75rem] tracking-[0.06em] uppercase font-body pointer-events-auto hover:text-foreground transition-colors duration-300"
           >
             <MapPinIcon />
-            <span>Engelbrektsgatan 3, Stockholm</span>
+            <span>{siteSettings?.address ?? "Engelbrektsgatan 3, Stockholm"}</span>
           </a>
           <div className="flex items-center gap-2 text-[0.75rem] tracking-[0.06em] uppercase font-body">
             <MailIcon />
-            <span>hola@lechenegra.se</span>
+            <span>{siteSettings?.email ?? "hola@lechenegra.se"}</span>
           </div>
         </div>
 
