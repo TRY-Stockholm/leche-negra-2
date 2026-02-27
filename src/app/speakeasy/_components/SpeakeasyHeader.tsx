@@ -21,7 +21,7 @@ export function SpeakeasyHeader() {
       {/* Cryptic tagline */}
       <SpeakeasyReveal delay={0.2}>
         <p
-          className="font-display italic text-[clamp(1rem,3vw,1.75rem)] mt-6 leading-snug"
+          className="font-display italic text-[clamp(1.5rem,4vw,3rem)] mt-6 leading-snug"
           style={{ color: "rgba(107,29,42,0.8)" }}
         >
           what the walls remember

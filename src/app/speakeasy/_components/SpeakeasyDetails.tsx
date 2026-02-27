@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { EASE_OUT_EXPO } from "@/lib/constants";
 import { SpeakeasyReveal } from "./SpeakeasyReveal";
 
@@ -11,6 +11,7 @@ interface SpeakeasyDetailsProps {
 
 export function SpeakeasyDetails({ menuPdfUrl }: SpeakeasyDetailsProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
   return (
     <div className="flex flex-col items-center gap-8 w-full max-w-md mx-auto">
@@ -19,6 +20,8 @@ export function SpeakeasyDetails({ menuPdfUrl }: SpeakeasyDetailsProps) {
         <div className="flex flex-col items-center">
           <button
             onClick={() => setIsOpen((prev) => !prev)}
+            aria-expanded={isOpen}
+            aria-controls="speakeasy-about"
             className="cursor-pointer font-body text-[0.6875rem] font-medium tracking-[0.06em] uppercase transition-opacity duration-300 hover:opacity-80"
             style={{ color: "rgba(107,29,42,0.4)" }}
           >
@@ -28,21 +31,26 @@ export function SpeakeasyDetails({ menuPdfUrl }: SpeakeasyDetailsProps) {
           <AnimatePresence mode="wait">
             {isOpen && (
               <motion.div
+                id="speakeasy-about"
                 key="details"
-                initial={{ gridTemplateRows: "0fr", opacity: 0 }}
+                initial={prefersReducedMotion ? false : { gridTemplateRows: "0fr", opacity: 0 }}
                 animate={{ gridTemplateRows: "1fr", opacity: 1 }}
                 exit={{ gridTemplateRows: "0fr", opacity: 0 }}
-                transition={{
-                  gridTemplateRows: { duration: 0.6, ease: EASE_OUT_EXPO },
-                  opacity: { duration: 0.4, ease: "easeInOut" },
-                }}
+                transition={
+                  prefersReducedMotion
+                    ? { duration: 0 }
+                    : {
+                        gridTemplateRows: { duration: 0.6, ease: EASE_OUT_EXPO },
+                        opacity: { duration: 0.4, ease: "easeInOut" },
+                      }
+                }
                 className="grid w-full"
               >
                 <div className="overflow-hidden">
                   <motion.p
-                    initial={{ opacity: 0, y: 8 }}
+                    initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2, duration: 0.5 }}
+                    transition={prefersReducedMotion ? { duration: 0 } : { delay: 0.2, duration: 0.5 }}
                     className="font-display italic text-[clamp(0.875rem,2vw,1.0625rem)] leading-[1.65] text-center mt-6"
                     style={{ color: "rgba(107,29,42,0.7)" }}
                   >

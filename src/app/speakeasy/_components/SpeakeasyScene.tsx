@@ -54,6 +54,7 @@ export function SpeakeasyScene({ menuPdfUrl }: SpeakeasySceneProps) {
         <SpeakeasyReveal delay={1.0} className="mt-16">
           <button
             onClick={handleExit}
+            aria-label="Return to homepage"
             className="cursor-pointer font-body text-[0.6875rem] tracking-[0.04em] lowercase transition-opacity duration-300 hover:opacity-60"
             style={{ color: "rgba(107,29,42,0.25)" }}
           >

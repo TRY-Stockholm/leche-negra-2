@@ -22,7 +22,7 @@ export function SpeakeasyBotanicals() {
           key={slot.id}
           delay={0.4 + i * 0.1}
           y={0}
-          className="absolute"
+          className="absolute inset-0"
           duration={1.2}
         >
           <div

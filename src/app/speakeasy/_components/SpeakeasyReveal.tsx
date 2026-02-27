@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { EASE_OUT_EXPO } from "@/lib/constants";
 import type { ReactNode } from "react";
 
@@ -19,11 +19,17 @@ export function SpeakeasyReveal({
   className,
   y = 12,
 }: SpeakeasyRevealProps) {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <motion.div
-      initial={{ opacity: 0, y }}
+      initial={prefersReducedMotion ? false : { opacity: 0, y }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration, ease: EASE_OUT_EXPO }}
+      transition={
+        prefersReducedMotion
+          ? { duration: 0 }
+          : { delay, duration, ease: EASE_OUT_EXPO }
+      }
       className={className}
     >
       {children}
