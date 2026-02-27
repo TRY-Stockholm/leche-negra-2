@@ -119,7 +119,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
         {/* Main Content — 12-column grid */}
         <div className="grid grid-cols-12 lg:grid-rows-[auto_1fr_auto] gap-x-4 px-5 md:px-10 min-h-[calc(100vh-65px)]">
           {/* Logo */}
-          <div className="col-span-12 row-start-1 self-start pt-8 md:col-span-5 md:pt-16">
+          <div className="col-span-12 row-start-1 self-start pt-6 md:col-span-5 md:pt-16">
             <div className="relative">
               <NeonLogo
                 isOff={isLightTheme(activeTheme)}
@@ -187,32 +187,34 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
             />
           </div>
 
-          {/* Cassette player — right side, vertically centered */}
-          <div className="col-span-12 row-start-3 flex justify-center py-8 overflow-visible md:col-start-7 md:col-span-5 md:row-start-1 md:row-span-3 md:self-center md:py-0">
+          {/* Cassette player */}
+          <div className="col-span-12 row-start-2 flex justify-center py-4 overflow-visible md:col-start-7 md:col-span-5 md:row-start-1 md:row-span-3 md:self-center md:py-0">
             <CassettePlayer />
           </div>
 
-          {/* Cassette tapes — scattered */}
-          <CassetteTape
-            id="morning"
-            className="col-span-3 row-start-2 self-center pb-8 md:pb-0 md:col-start-7 md:col-span-2 md:row-start-2 md:self-start md:mt-8"
-            style={{ rotate: "-5deg" }}
-          />
-          <CassetteTape
-            id="midday"
-            className="col-span-3 col-start-4 row-start-2 self-center pb-8 md:pb-0 md:col-start-11 md:col-span-2 md:row-start-1 md:self-center"
-            style={{ rotate: "3deg" }}
-          />
-          <CassetteTape
-            id="evening"
-            className="col-span-3 col-start-7 row-start-2 self-center pb-8 md:pb-0 md:col-start-9 md:col-span-2 md:row-start-2 md:self-start md:mt-12"
-            style={{ rotate: "7deg" }}
-          />
-          <CassetteTape
-            id="night"
-            className="col-span-3 col-start-10 row-start-2 self-center pb-8 md:pb-0 md:col-start-11 md:col-span-2 md:row-start-2 md:self-start md:mt-4"
-            style={{ rotate: "-3deg" }}
-          />
+          {/* Tapes: 2x2 grid on mobile, scattered grid-children on desktop */}
+          <div className="col-span-12 row-start-3 grid grid-cols-2 gap-3 justify-items-center md:contents">
+            <CassetteTape
+              id="morning"
+              className="md:col-start-7 md:col-span-2 md:row-start-2 md:self-start md:mt-8"
+              style={{ rotate: "-5deg" }}
+            />
+            <CassetteTape
+              id="midday"
+              className="md:col-start-11 md:col-span-2 md:row-start-1 md:self-center"
+              style={{ rotate: "3deg" }}
+            />
+            <CassetteTape
+              id="evening"
+              className="md:col-start-9 md:col-span-2 md:row-start-2 md:self-start md:mt-12"
+              style={{ rotate: "7deg" }}
+            />
+            <CassetteTape
+              id="night"
+              className="md:col-start-11 md:col-span-2 md:row-start-2 md:self-start md:mt-4"
+              style={{ rotate: "-3deg" }}
+            />
+          </div>
         </div>
 
         {/* <Ticker /> */}
