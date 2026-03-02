@@ -37,25 +37,20 @@ export const Footer = memo(function Footer({
   }, []);
 
   return (
-    <>
-      <div style={{ height }} />
-
-      <footer
-        className="theme-night fixed bottom-0 left-0 right-0 bg-background border-t border-border/30 touch-none"
-        style={{
-          height,
-          zIndex: 0,
-          cursor: isDragging ? "grabbing" : undefined,
-        }}
-        {...dragHandlers}
-      >
-        <FooterContent
-          onDragHint={onDragHint ?? (() => {})}
-          siteSettings={siteSettings}
-          socialLinks={socialLinks}
-          isDragging={isDragging}
-        />
-      </footer>
-    </>
+    <footer
+      className="theme-night bg-background border-t border-border/30 touch-none"
+      style={{
+        height,
+        cursor: isDragging ? "grabbing" : undefined,
+      }}
+      {...dragHandlers}
+    >
+      <FooterContent
+        onDragHint={onDragHint ?? (() => { })}
+        siteSettings={siteSettings}
+        socialLinks={socialLinks}
+        isDragging={isDragging}
+      />
+    </footer>
   );
 });
