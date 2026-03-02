@@ -6,7 +6,6 @@ import Link from "next/link";
 import { urlFor } from "@/sanity/lib/image";
 import { useCanvasDrag } from "./useCanvasDrag";
 import { PressLightbox } from "./PressLightbox";
-import gsap from "gsap";
 
 /* ── Types ── */
 interface SanityImage {
@@ -141,70 +140,17 @@ export function PressCanvas({
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const driftTween = useRef<gsap.core.Tween | null>(null);
-  const driftProxy = useRef({ x: 0, y: 0 });
-  const idleTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const onUpdate = useCallback((x: number, y: number) => {
     setPan({ x, y });
-    clearTimeout(idleTimer.current);
-    driftTween.current?.kill();
-    idleTimer.current = setTimeout(() => startDriftRef.current(), 3000);
   }, []);
 
-  const { handlers, stateRef } = useCanvasDrag({ onUpdate });
+  const { handlers } = useCanvasDrag({ onUpdate });
 
   const placed = useMemo(() => placeItems(images, quotes), [images, quotes]);
   const imageItems = useMemo(
     () => placed.filter((p): p is PlacedItem & { item: { kind: "image"; doc: PressImageDoc } } => p.item.kind === "image"),
     [placed],
-  );
-
-  // Ambient drift when idle
-  const startDrift = useCallback(() => {
-    if (reducedMotion) return;
-    driftProxy.current = { x: stateRef.current.panX, y: stateRef.current.panY };
-
-    driftTween.current = gsap.to(driftProxy.current, {
-      x: `+=${40 + Math.random() * 60}`,
-      y: `+=${20 + Math.random() * 40}`,
-      duration: 30,
-      ease: "none",
-      repeat: -1,
-      onUpdate: () => {
-        stateRef.current.panX = driftProxy.current.x;
-        stateRef.current.panY = driftProxy.current.y;
-        setPan({ x: driftProxy.current.x, y: driftProxy.current.y });
-      },
-    });
-  }, [stateRef, reducedMotion]);
-
-  const startDriftRef = useRef(startDrift);
-  startDriftRef.current = startDrift;
-
-  useEffect(() => {
-    idleTimer.current = setTimeout(() => startDrift(), 4000);
-    return () => {
-      clearTimeout(idleTimer.current);
-      driftTween.current?.kill();
-    };
-  }, [startDrift]);
-
-  const handlePointerDown = useCallback(
-    (e: React.PointerEvent) => {
-      clearTimeout(idleTimer.current);
-      driftTween.current?.kill();
-      handlers.onPointerDown(e);
-    },
-    [handlers],
-  );
-
-  const handlePointerUp = useCallback(
-    (e: React.PointerEvent) => {
-      handlers.onPointerUp();
-      idleTimer.current = setTimeout(() => startDriftRef.current(), 3000);
-    },
-    [handlers],
   );
 
   // Keyboard navigation in lightbox
@@ -256,10 +202,10 @@ export function PressCanvas({
       ref={containerRef}
       className="fixed inset-0 overflow-hidden bg-[#0a0604] select-none"
       style={{ cursor: lightboxIdx !== null ? "default" : "grab", touchAction: "none" }}
-      onPointerDown={handlePointerDown}
+      onPointerDown={handlers.onPointerDown}
       onPointerMove={handlers.onPointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
+      onPointerUp={handlers.onPointerUp}
+      onPointerCancel={handlers.onPointerUp}
     >
       {/* Back nav — fixed top-left */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 md:px-10 py-3 pointer-events-none">
@@ -353,7 +299,6 @@ export function PressCanvas({
                 left: `calc(50% + ${screenX}px)`,
                 top: `calc(50% + ${screenY}px)`,
                 width: p.w,
-                height: p.h,
                 transform: `rotate(${p.rotation}deg) scale(${isHovered ? 1.05 : 1}) translateY(${isHovered ? -8 : 0}px)`,
                 zIndex: isHovered ? 40 : p.zIndex,
                 cursor: "pointer",
@@ -370,11 +315,11 @@ export function PressCanvas({
               }}
             >
               <Image
-                src={urlFor(imgDoc.image).width(p.w * 2).height(p.h * 2).url()}
+                src={urlFor(imgDoc.image).width(p.w * 2).url()}
                 alt={imgDoc.image.alt || imgDoc.title}
                 width={p.w}
                 height={p.h}
-                className="w-full h-full object-cover block"
+                className="w-full h-auto block"
                 sizes={`${p.w}px`}
                 placeholder={imgDoc.image.asset.metadata?.lqip ? "blur" : "empty"}
                 blurDataURL={imgDoc.image.asset.metadata?.lqip}
