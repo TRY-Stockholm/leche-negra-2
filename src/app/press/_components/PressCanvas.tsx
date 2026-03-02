@@ -277,97 +277,112 @@ export function PressCanvas({
       {/* Drag hint */}
       <DragHint />
 
-      {/* Canvas items */}
-      {placed.map((p) => {
+      {/* Canvas items — render at multiple tile offsets for seamless wrapping */}
+      {placed.flatMap((p, idx) => {
         const parallax = reducedMotion ? 1 : 1 + p.depth * 0.3;
-        const screenX = wrap(p.x - pan.x * parallax, TILE_W) - TILE_W / 2;
-        const screenY = wrap(p.y - pan.y * parallax, TILE_H) - TILE_H / 2;
+        const baseX = wrap(p.x - pan.x * parallax, TILE_W) - TILE_W / 2;
+        const baseY = wrap(p.y - pan.y * parallax, TILE_H) - TILE_H / 2;
 
         const margin = 400;
-        const centerX = screenX + viewport.w / 2;
-        const centerY = screenY + viewport.h / 2;
+        const tileOffsets = [
+          [0, 0], [TILE_W, 0], [-TILE_W, 0],
+          [0, TILE_H], [0, -TILE_H],
+          [TILE_W, TILE_H], [TILE_W, -TILE_H],
+          [-TILE_W, TILE_H], [-TILE_W, -TILE_H],
+        ] as const;
 
-        if (
-          centerX + p.w < -margin ||
-          centerX > viewport.w + margin ||
-          centerY + p.h < -margin ||
-          centerY > viewport.h + margin
-        ) {
-          return null;
-        }
+        return tileOffsets.flatMap(([ox, oy]) => {
+          const screenX = baseX + ox;
+          const screenY = baseY + oy;
 
-        if (p.item.kind === "quote") {
-          return (
+          const centerX = screenX + viewport.w / 2;
+          const centerY = screenY + viewport.h / 2;
+
+          if (
+            centerX + p.w < -margin ||
+            centerX > viewport.w + margin ||
+            centerY + p.h < -margin ||
+            centerY > viewport.h + margin
+          ) {
+            return [];
+          }
+
+          const tileKey = `${p.item.doc._id}_${ox}_${oy}`;
+
+          if (p.item.kind === "quote") {
+            return [
+              <div
+                key={tileKey}
+                className="absolute pointer-events-none"
+                style={{
+                  left: `calc(50% + ${screenX}px)`,
+                  top: `calc(50% + ${screenY}px)`,
+                  width: p.w,
+                  transform: `rotate(${p.rotation}deg)`,
+                  zIndex: p.zIndex,
+                  opacity: p.depth > 0 ? 0.5 : 0.8,
+                }}
+              >
+                <p
+                  className="font-display italic text-[#f0ebe3]/40 leading-snug"
+                  style={{
+                    fontSize: `clamp(0.875rem, ${p.w / 14}px, 1.5rem)`,
+                    textShadow: "0 0 30px rgba(201,169,110,0.08)",
+                  }}
+                >
+                  {p.item.doc.text}
+                </p>
+              </div>,
+            ];
+          }
+
+          const imgDoc = p.item.doc;
+          const isHovered = hovered === imgDoc._id;
+          const imageIndex = imageItems.findIndex(
+            (pi) => pi.item.doc._id === imgDoc._id,
+          );
+          const isPrimaryTile = ox === 0 && oy === 0;
+
+          return [
             <div
-              key={p.item.doc._id}
-              className="absolute pointer-events-none"
+              key={tileKey}
+              data-press-item={isPrimaryTile ? "" : undefined}
+              data-item-id={isPrimaryTile ? imgDoc._id : undefined}
+              className="absolute transition-[transform,box-shadow] duration-300 ease-out"
               style={{
                 left: `calc(50% + ${screenX}px)`,
                 top: `calc(50% + ${screenY}px)`,
                 width: p.w,
-                transform: `rotate(${p.rotation}deg)`,
-                zIndex: p.zIndex,
-                opacity: p.depth > 0 ? 0.5 : 0.8,
+                height: p.h,
+                transform: `rotate(${p.rotation}deg) scale(${isHovered ? 1.05 : 1}) translateY(${isHovered ? -8 : 0}px)`,
+                zIndex: isHovered ? 40 : p.zIndex,
+                cursor: "pointer",
+                boxShadow: isHovered
+                  ? "0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,169,110,0.15)"
+                  : "0 4px 20px rgba(0,0,0,0.4)",
+                opacity: p.depth > 0 ? 0.7 : 1,
+              }}
+              onPointerEnter={() => setHovered(imgDoc._id)}
+              onPointerLeave={() => setHovered(null)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightboxIdx(imageIndex);
               }}
             >
-              <p
-                className="font-display italic text-[#f0ebe3]/40 leading-snug"
-                style={{
-                  fontSize: `clamp(0.875rem, ${p.w / 14}px, 1.5rem)`,
-                  textShadow: "0 0 30px rgba(201,169,110,0.08)",
-                }}
-              >
-                {p.item.doc.text}
-              </p>
-            </div>
-          );
-        }
-
-        const imgDoc = p.item.doc;
-        const isHovered = hovered === imgDoc._id;
-        const imageIndex = imageItems.findIndex(
-          (pi) => pi.item.doc._id === imgDoc._id,
-        );
-
-        return (
-          <div
-            key={imgDoc._id}
-            data-press-item
-            data-item-id={imgDoc._id}
-            className="absolute transition-[transform,box-shadow] duration-300 ease-out"
-            style={{
-              left: `calc(50% + ${screenX}px)`,
-              top: `calc(50% + ${screenY}px)`,
-              width: p.w,
-              height: p.h,
-              transform: `rotate(${p.rotation}deg) scale(${isHovered ? 1.05 : 1}) translateY(${isHovered ? -8 : 0}px)`,
-              zIndex: isHovered ? 40 : p.zIndex,
-              cursor: "pointer",
-              boxShadow: isHovered
-                ? "0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,169,110,0.15)"
-                : "0 4px 20px rgba(0,0,0,0.4)",
-              opacity: p.depth > 0 ? 0.7 : 1,
-            }}
-            onPointerEnter={() => setHovered(imgDoc._id)}
-            onPointerLeave={() => setHovered(null)}
-            onClick={(e) => {
-              e.stopPropagation();
-              setLightboxIdx(imageIndex);
-            }}
-          >
-            <Image
-              src={urlFor(imgDoc.image).width(p.w * 2).height(p.h * 2).url()}
-              alt={imgDoc.image.alt || imgDoc.title}
-              width={p.w}
-              height={p.h}
-              className="w-full h-full object-cover block"
-              sizes={`${p.w}px`}
-              placeholder={imgDoc.image.asset.metadata?.lqip ? "blur" : "empty"}
-              blurDataURL={imgDoc.image.asset.metadata?.lqip}
-              draggable={false}
-            />
-          </div>
-        );
+              <Image
+                src={urlFor(imgDoc.image).width(p.w * 2).height(p.h * 2).url()}
+                alt={imgDoc.image.alt || imgDoc.title}
+                width={p.w}
+                height={p.h}
+                className="w-full h-full object-cover block"
+                sizes={`${p.w}px`}
+                placeholder={imgDoc.image.asset.metadata?.lqip ? "blur" : "empty"}
+                blurDataURL={imgDoc.image.asset.metadata?.lqip}
+                draggable={false}
+              />
+            </div>,
+          ];
+        });
       })}
 
       {/* Lightbox */}
