@@ -60,8 +60,15 @@ export const SCENES: SceneConfig[] = [
   // },
 ];
 
-export function pickScene(lastId?: string): SceneConfig {
-  const candidates =
-    SCENES.length > 1 ? SCENES.filter((s) => s.id !== lastId) : SCENES;
-  return candidates[Math.floor(Math.random() * candidates.length)];
+export type EasterEgg =
+  | { type: "scene"; config: SceneConfig }
+  | { type: "stage" };
+
+export const EASTER_EGGS: EasterEgg[] = [
+  { type: "scene", config: SCENES[0] },
+  { type: "stage" },
+];
+
+export function pickNextEgg(index: number): EasterEgg {
+  return EASTER_EGGS[index % EASTER_EGGS.length];
 }

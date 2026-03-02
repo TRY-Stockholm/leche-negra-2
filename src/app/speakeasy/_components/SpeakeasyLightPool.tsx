@@ -7,7 +7,11 @@ import { useCanHover } from "@/hooks/useCanHover";
 const POOL_SIZE = 600;
 const SPRING = { damping: 50, stiffness: 80, mass: 1.2 };
 
-export function SpeakeasyLightPool() {
+interface SpeakeasyLightPoolProps {
+  visible?: boolean;
+}
+
+export function SpeakeasyLightPool({ visible = true }: SpeakeasyLightPoolProps) {
   const { x, y } = useMousePosition();
   const canHover = useCanHover();
 
@@ -15,11 +19,10 @@ export function SpeakeasyLightPool() {
   const springY = useSpring(y, SPRING);
 
   if (!canHover) {
-    // Mobile: fixed breathing candle at bottom-center
     return (
       <div
         className="pointer-events-none fixed inset-0"
-        style={{ zIndex: 1 }}
+        style={{ zIndex: 1, opacity: visible ? 1 : 0, transition: "opacity 2s ease-in-out" }}
         aria-hidden="true"
       >
         <div
@@ -51,6 +54,8 @@ export function SpeakeasyLightPool() {
         background:
           "radial-gradient(circle, rgba(212,68,68,0.07) 0%, rgba(212,68,68,0.03) 30%, transparent 70%)",
         filter: "blur(20px)",
+        opacity: visible ? 1 : 0,
+        transition: "opacity 2s ease-in-out",
       }}
       aria-hidden="true"
     />

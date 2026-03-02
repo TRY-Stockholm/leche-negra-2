@@ -3,9 +3,14 @@
 interface SpeakeasyBackgroundProps {
   /** 0=darkness, 1=ember glow started, 2+=fully alive */
   phase: number;
+  isIdle?: boolean;
 }
 
-export function SpeakeasyBackground({ phase }: SpeakeasyBackgroundProps) {
+export function SpeakeasyBackground({ phase, isIdle = false }: SpeakeasyBackgroundProps) {
+  const vignetteW = isIdle ? "28%" : "38%";
+  const vignetteH = isIdle ? "22%" : "32%";
+  const vignetteDuration = isIdle ? "4s" : "2s";
+
   return (
     <div className="pointer-events-none fixed inset-0" aria-hidden="true">
       {/* Deep black base — always visible */}
@@ -23,33 +28,18 @@ export function SpeakeasyBackground({ phase }: SpeakeasyBackgroundProps) {
         }}
       />
 
-      {/* Heavy vignette — tighter keyhole than before */}
+      {/* Heavy vignette — tightens when idle, relaxes when active */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 38% 32% at 50% 50%, transparent 0%, rgba(10,6,4,0.95) 100%)",
+            `radial-gradient(ellipse ${vignetteW} ${vignetteH} at 50% 50%, transparent 0%, rgba(10,6,4,0.95) 100%)`,
           animation: phase >= 2 ? "speakeasy-vignette-breathe 10s ease-in-out infinite" : "none",
           opacity: phase >= 1 ? 1 : 0,
-          transition: "opacity 2.5s ease-in-out",
+          transition: `opacity 2.5s ease-in-out, background ${vignetteDuration} ease-in-out`,
         }}
       />
 
-      {/* Enhanced noise/grain overlay — always visible for texture during darkness */}
-      <div className="absolute inset-0" style={{ opacity: 0.18 }}>
-        <svg width="100%" height="100%">
-          <filter id="speakeasy-grain">
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.75"
-              numOctaves="4"
-              stitchTiles="stitch"
-            />
-            <feColorMatrix type="saturate" values="0" />
-          </filter>
-          <rect width="100%" height="100%" filter="url(#speakeasy-grain)" />
-        </svg>
-      </div>
     </div>
   );
 }

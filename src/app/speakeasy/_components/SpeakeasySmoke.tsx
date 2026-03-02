@@ -6,9 +6,17 @@ const WISPS = [
   { top: "70%", height: "clamp(70px, 11vh, 150px)", width: "clamp(280px, 42vw, 650px)", duration: 35, delay: -22 },
 ];
 
-export function SpeakeasySmoke() {
+interface SpeakeasySmokeProps {
+  visible?: boolean;
+}
+
+export function SpeakeasySmoke({ visible = true }: SpeakeasySmokeProps) {
   return (
-    <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+    <div
+      className="pointer-events-none fixed inset-0 overflow-hidden"
+      style={{ opacity: visible ? 1 : 0, transition: "opacity 2s ease-in-out" }}
+      aria-hidden="true"
+    >
       {WISPS.map((wisp, i) => (
         <div
           key={i}

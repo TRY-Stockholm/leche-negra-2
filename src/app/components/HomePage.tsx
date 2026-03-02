@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import type {
   Theme,
   MenuKey,
@@ -11,7 +12,7 @@ import type {
 import { menuThemeMap, isLightTheme } from "@/lib/constants";
 import { NeonLogo } from "./NeonLogo";
 import { EasterEggScene } from "./EasterEggScene";
-import { pickScene, type SceneConfig } from "./scenes";
+import { pickNextEgg, type EasterEgg, type SceneConfig } from "./scenes";
 import { useWeather } from "@/hooks/useWeather";
 import { MenuPanel } from "./MenuPanel";
 import { MenuModal } from "./MenuModal";
@@ -59,6 +60,7 @@ export default function HomePage({
 }
 
 function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
+  const router = useRouter();
   const weather = useWeather();
   const { loadedTapeId } = useTapeDeck();
   const [hoverTheme, setHoverTheme] = useState<Theme | null>(null);
@@ -66,7 +68,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
   const [menuModalOpen, setMenuModalOpen] = useState(false);
   const [easterEgg, setEasterEgg] = useState(false);
   const [scene, setScene] = useState<SceneConfig | null>(null);
-  const lastSceneIdRef = useRef<string | undefined>(undefined);
+  const eggIndexRef = useRef(0);
 
   const { state: dragState, containerRef, handlers: dragHandlers, nudge } = useSpeakeasyDrag({
     maxDrag: 300,
@@ -111,11 +113,15 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
   }, []);
 
   const handleLongPressComplete = useCallback(() => {
-    const picked = pickScene(lastSceneIdRef.current);
-    lastSceneIdRef.current = picked.id;
-    setScene(picked);
-    setEasterEgg(true);
-  }, []);
+    const egg = pickNextEgg(eggIndexRef.current);
+    eggIndexRef.current++;
+    if (egg.type === "scene") {
+      setScene(egg.config);
+      setEasterEgg(true);
+    } else {
+      router.push("/stage");
+    }
+  }, [router]);
 
   return (
     <div

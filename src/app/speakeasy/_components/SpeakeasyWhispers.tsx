@@ -4,33 +4,62 @@ import { useEffect, useRef, useState } from "react";
 import { type MotionValue, motion } from "motion/react";
 import { useCanHover } from "@/hooks/useCanHover";
 
-const WHISPERS = [
+const BASE_WHISPERS = [
   { text: "she never left", x: "12%", y: "22%" },
   { text: "the third drink is free", x: "78%", y: "32%" },
   { text: "ask about the painting", x: "82%", y: "78%" },
   { text: "we\u2019ve been expecting you", x: "8%", y: "68%" },
 ] as const;
 
-const REVEAL_RADIUS = 200;
+const TIMED_WHISPERS = [
+  { text: "you remind me of someone", x: "18%", y: "48%", delayMs: 45000 },
+  { text: "the painting blinks if you don\u2019t", x: "72%", y: "58%", delayMs: 90000 },
+] as const;
+
+const BASE_REVEAL_RADIUS = 200;
+const EDGE_REVEAL_RADIUS = 300;
+const EDGE_THRESHOLD = 0.15; // 15% of viewport
+
+function isNearEdge(mx: number, my: number): boolean {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const ex = vw * EDGE_THRESHOLD;
+  const ey = vh * EDGE_THRESHOLD;
+  return mx < ex || mx > vw - ex || my < ey || my > vh - ey;
+}
 
 interface SpeakeasyWhispersProps {
   mouseX: MotionValue<number>;
   mouseY: MotionValue<number>;
+  visible?: boolean;
 }
 
-export function SpeakeasyWhispers({ mouseX, mouseY }: SpeakeasyWhispersProps) {
+export function SpeakeasyWhispers({ mouseX, mouseY, visible = true }: SpeakeasyWhispersProps) {
   const canHover = useCanHover();
+  const [unlockedCount, setUnlockedCount] = useState(0);
 
-  if (!canHover) return <MobileWhispers />;
+  useEffect(() => {
+    const timers = TIMED_WHISPERS.map((w, i) =>
+      setTimeout(() => setUnlockedCount(i + 1), w.delayMs)
+    );
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  const allWhispers = [
+    ...BASE_WHISPERS,
+    ...TIMED_WHISPERS.slice(0, unlockedCount).map(({ text, x, y }) => ({ text, x, y })),
+  ];
+
+  if (!canHover) return <MobileWhispers visible={visible} whispers={allWhispers} />;
 
   return (
     <div
       className="pointer-events-none fixed inset-0"
-      style={{ zIndex: 2 }}
+      style={{ zIndex: 2, opacity: visible ? 1 : 0, transition: "opacity 2s ease-in-out" }}
       aria-hidden="true"
     >
-      {WHISPERS.map((w, i) => (
-        <DesktopWhisper key={i} {...w} mouseX={mouseX} mouseY={mouseY} />
+      {allWhispers.map((w, i) => (
+        <DesktopWhisper key={`${w.text}-${i}`} {...w} mouseX={mouseX} mouseY={mouseY} />
       ))}
     </div>
   );
@@ -57,11 +86,14 @@ function DesktopWhisper({
 
     function update() {
       if (!el) return;
+      const mx = mouseX.get();
+      const my = mouseY.get();
       const rect = el.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
-      const dist = Math.hypot(mouseX.get() - cx, mouseY.get() - cy);
-      const opacity = dist < REVEAL_RADIUS ? (1 - dist / REVEAL_RADIUS) * 0.6 : 0;
+      const dist = Math.hypot(mx - cx, my - cy);
+      const radius = isNearEdge(mx, my) ? EDGE_REVEAL_RADIUS : BASE_REVEAL_RADIUS;
+      const opacity = dist < radius ? (1 - dist / radius) * 0.6 : 0;
       el.style.opacity = String(opacity);
     }
 
@@ -84,28 +116,34 @@ function DesktopWhisper({
   );
 }
 
-function MobileWhispers() {
+interface WhisperData {
+  text: string;
+  x: string;
+  y: string;
+}
+
+function MobileWhispers({ visible = true, whispers }: { visible?: boolean; whispers: WhisperData[] }) {
   const [active, setActive] = useState(-1);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setActive((prev) => {
         if (prev >= 0) return -1;
-        return Math.floor(Math.random() * WHISPERS.length);
+        return Math.floor(Math.random() * whispers.length);
       });
     }, 8000);
     return () => clearInterval(interval);
-  }, []);
+  }, [whispers.length]);
 
   return (
     <div
       className="pointer-events-none fixed inset-0"
-      style={{ zIndex: 2 }}
+      style={{ zIndex: 2, opacity: visible ? 1 : 0, transition: "opacity 2s ease-in-out" }}
       aria-hidden="true"
     >
-      {WHISPERS.map((w, i) => (
+      {whispers.map((w, i) => (
         <motion.span
-          key={i}
+          key={`${w.text}-${i}`}
           className="absolute font-display italic text-[0.875rem]"
           style={{ left: w.x, top: w.y, color: "#a05555" }}
           animate={{ opacity: active === i ? 0.5 : 0 }}
