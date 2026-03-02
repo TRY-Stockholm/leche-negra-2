@@ -19,8 +19,6 @@ export function useCanvasDrag({ onUpdate }: UseCanvasDragOptions) {
   const velocity = useRef({ x: 0, y: 0 });
   const lastTime = useRef(0);
   const tweenRef = useRef<gsap.core.Tween | null>(null);
-  const rafId = useRef<number>(0);
-
   const onPointerDown = useCallback((e: React.PointerEvent) => {
     if ((e.target as HTMLElement).closest("[data-press-item]")) return;
 
@@ -89,7 +87,6 @@ export function useCanvasDrag({ onUpdate }: UseCanvasDragOptions) {
   useEffect(() => {
     return () => {
       tweenRef.current?.kill();
-      cancelAnimationFrame(rafId.current);
     };
   }, []);
 

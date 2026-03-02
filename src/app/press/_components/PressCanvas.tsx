@@ -149,7 +149,7 @@ export function PressCanvas({
     setPan({ x, y });
     clearTimeout(idleTimer.current);
     driftTween.current?.kill();
-    idleTimer.current = setTimeout(() => startDrift(), 3000);
+    idleTimer.current = setTimeout(() => startDriftRef.current(), 3000);
   }, []);
 
   const { handlers, stateRef } = useCanvasDrag({ onUpdate });
@@ -179,6 +179,9 @@ export function PressCanvas({
     });
   }, [stateRef, reducedMotion]);
 
+  const startDriftRef = useRef(startDrift);
+  startDriftRef.current = startDrift;
+
   useEffect(() => {
     idleTimer.current = setTimeout(() => startDrift(), 4000);
     return () => {
@@ -199,9 +202,9 @@ export function PressCanvas({
   const handlePointerUp = useCallback(
     (e: React.PointerEvent) => {
       handlers.onPointerUp();
-      idleTimer.current = setTimeout(() => startDrift(), 3000);
+      idleTimer.current = setTimeout(() => startDriftRef.current(), 3000);
     },
-    [handlers, startDrift],
+    [handlers],
   );
 
   // Keyboard navigation in lightbox
@@ -390,24 +393,30 @@ export function PressCanvas({
 
 /* ── Drag hint ── */
 function DragHint() {
-  const [visible, setVisible] = useState(true);
+  const [show, setShow] = useState(true);
+  const [fading, setFading] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setVisible(false), 5000);
-    const hide = () => setVisible(false);
+    const fadeTimer = setTimeout(() => setFading(true), 4000);
+    const removeTimer = setTimeout(() => setShow(false), 5000);
+    const hide = () => {
+      setFading(true);
+      setTimeout(() => setShow(false), 1000);
+    };
     window.addEventListener("pointerdown", hide, { once: true });
     return () => {
-      clearTimeout(timer);
+      clearTimeout(fadeTimer);
+      clearTimeout(removeTimer);
       window.removeEventListener("pointerdown", hide);
     };
   }, []);
 
-  if (!visible) return null;
+  if (!show) return null;
 
   return (
     <div
       className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none transition-opacity duration-1000"
-      style={{ opacity: visible ? 1 : 0 }}
+      style={{ opacity: fading ? 0 : 1 }}
     >
       <div className="text-center">
         <p className="font-display italic text-[#f0ebe3]/30 text-lg mb-1">

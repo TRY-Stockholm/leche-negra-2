@@ -74,7 +74,7 @@ export function PressLightbox({
           opacity: 1,
           duration: 0.5,
           ease: "power3.out",
-          clearProps: "position,left,top,width,height",
+          clearProps: "position,left,top,width,height,xPercent,yPercent",
         },
       );
     }
