@@ -128,13 +128,22 @@ export function PressCanvas({
   images: PressImageDoc[];
   quotes: PressQuoteDoc[];
 }) {
+  const [reducedMotion, setReducedMotion] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const driftTween = useRef<gsap.core.Tween | null>(null);
   const driftProxy = useRef({ x: 0, y: 0 });
-  const idleTimer = useRef<ReturnType<typeof setTimeout>>();
+  const idleTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const onUpdate = useCallback((x: number, y: number) => {
     setPan({ x, y });
@@ -153,6 +162,7 @@ export function PressCanvas({
 
   // Ambient drift when idle
   const startDrift = useCallback(() => {
+    if (reducedMotion) return;
     driftProxy.current = { x: stateRef.current.panX, y: stateRef.current.panY };
 
     driftTween.current = gsap.to(driftProxy.current, {
@@ -167,7 +177,7 @@ export function PressCanvas({
         setPan({ x: driftProxy.current.x, y: driftProxy.current.y });
       },
     });
-  }, [stateRef]);
+  }, [stateRef, reducedMotion]);
 
   useEffect(() => {
     idleTimer.current = setTimeout(() => startDrift(), 4000);
@@ -188,7 +198,7 @@ export function PressCanvas({
 
   const handlePointerUp = useCallback(
     (e: React.PointerEvent) => {
-      handlers.onPointerUp(e);
+      handlers.onPointerUp();
       idleTimer.current = setTimeout(() => startDrift(), 3000);
     },
     [handlers, startDrift],
@@ -266,7 +276,7 @@ export function PressCanvas({
 
       {/* Canvas items */}
       {placed.map((p) => {
-        const parallax = 1 + p.depth * 0.3;
+        const parallax = reducedMotion ? 1 : 1 + p.depth * 0.3;
         const screenX = wrap(p.x - pan.x * parallax, TILE_W) - TILE_W / 2;
         const screenY = wrap(p.y - pan.y * parallax, TILE_H) - TILE_H / 2;
 
