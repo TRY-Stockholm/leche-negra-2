@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { urlFor } from "@/sanity/lib/image";
 import { useCanvasDrag } from "./useCanvasDrag";
+import { PressLightbox } from "./PressLightbox";
 import gsap from "gsap";
 
 /* ── Types ── */
@@ -356,9 +357,9 @@ export function PressCanvas({
         );
       })}
 
-      {/* Lightbox — placeholder import until Task 5 */}
+      {/* Lightbox */}
       {lightboxIdx !== null && (
-        <PressLightboxPlaceholder
+        <PressLightbox
           images={imageItems.map((p) => p.item.doc)}
           activeIndex={lightboxIdx}
           onClose={() => setLightboxIdx(null)}
@@ -373,71 +374,6 @@ export function PressCanvas({
           background: "radial-gradient(ellipse at center, transparent 40%, #0a0604 100%)",
         }}
       />
-    </div>
-  );
-}
-
-/* ── Temporary Lightbox Placeholder (replaced in Task 5) ── */
-function PressLightboxPlaceholder({
-  images,
-  activeIndex,
-  onClose,
-  onNavigate,
-}: {
-  images: PressImageDoc[];
-  activeIndex: number;
-  onClose: () => void;
-  onNavigate: (i: number) => void;
-}) {
-  const active = images[activeIndex];
-  if (!active) return null;
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ backgroundColor: "rgba(10, 6, 4, 0.92)", backdropFilter: "blur(8px)" }}
-      onClick={onClose}
-    >
-      <button
-        className="absolute top-4 right-6 text-[#a89a8c] hover:text-[#f0ebe3] transition-colors duration-200 text-2xl z-10 normal-case tracking-normal"
-        onClick={(e) => { e.stopPropagation(); onClose(); }}
-        aria-label="Close"
-      >
-        &times;
-      </button>
-      {images.length > 1 && (
-        <>
-          <button
-            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 text-[#a89a8c] hover:text-[#f0ebe3] transition-colors duration-200 text-3xl z-10 normal-case tracking-normal"
-            onClick={(e) => { e.stopPropagation(); onNavigate((activeIndex - 1 + images.length) % images.length); }}
-            aria-label="Previous"
-          >
-            &#8249;
-          </button>
-          <button
-            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 text-[#a89a8c] hover:text-[#f0ebe3] transition-colors duration-200 text-3xl z-10 normal-case tracking-normal"
-            onClick={(e) => { e.stopPropagation(); onNavigate((activeIndex + 1) % images.length); }}
-            aria-label="Next"
-          >
-            &#8250;
-          </button>
-        </>
-      )}
-      <Image
-        src={urlFor(active.image).width(1800).url()}
-        alt={active.image.alt || active.title}
-        width={1800}
-        height={1200}
-        className="max-w-[90vw] max-h-[85vh] w-auto h-auto object-contain"
-        sizes="90vw"
-        onClick={(e) => e.stopPropagation()}
-        draggable={false}
-      />
-      <div className="absolute bottom-6 left-0 right-0 text-center pointer-events-none">
-        <span className="font-body text-[0.6875rem] tracking-[0.06em] uppercase text-[#a89a8c]/60">
-          {active.title}
-        </span>
-      </div>
     </div>
   );
 }
