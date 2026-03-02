@@ -3,22 +3,17 @@
 import { useRef, useEffect, useCallback, useState } from "react";
 import {
   motion,
+  animate,
   AnimatePresence,
-  useMotionValue,
-  useSpring,
 } from "motion/react";
 import type { SceneConfig, Presentation } from "./scenes";
 
-/** How long the cursor must stay still before the video ignites */
-const DWELL_MS = 1000;
-/** Movement beyond this resets the dwell timer */
-const MOVE_THRESHOLD = 8;
 /** Minimum time the preloader stays visible */
 const PRELOADER_MIN_MS = 2000;
 /** Inset from viewport edge for resting position */
 const REST_INSET = 48;
-
-const SPRING_CONFIG = { damping: 25, stiffness: 200, mass: 0.5 };
+/** Maximum distance (px) from painting center to snap-ignite */
+const SNAP_DISTANCE = 120;
 
 /** Module-level SVG cache keyed by scene id */
 const svgCache: Record<string, string> = {};
@@ -127,40 +122,12 @@ export function EasterEggScene({
     svgCache[scene.id] ?? null,
   );
   const [ready, setReady] = useState(false);
-  const [holding, setHolding] = useState(false);
-  const anchorRef = useRef<{ x: number; y: number } | null>(null);
-  const dwellTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const restPosRef = useRef({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+  const [nearPainting, setNearPainting] = useState(false);
 
   // Derived cursor dimensions from scene config
   const cursorH = scene.cursorDisplayHeight;
   const cursorW = cursorH * (scene.cursorWidth / scene.cursorHeight);
-  const offsetX = cursorW * scene.cursorOffsetX;
-  const offsetY = cursorH * scene.cursorOffsetY;
-
-  // Motion spring values — drive the lighter position
-  const cursorX = useMotionValue(0);
-  const cursorY = useMotionValue(0);
-  const springX = useSpring(cursorX, SPRING_CONFIG);
-  const springY = useSpring(cursorY, SPRING_CONFIG);
-
-  // Compute resting position (bottom-right corner) and park lighter there
-  useEffect(() => {
-    if (!active) return;
-    const update = () => {
-      restPosRef.current = {
-        x: window.innerWidth - cursorW - REST_INSET,
-        y: window.innerHeight - cursorH - REST_INSET,
-      };
-      if (!holding) {
-        cursorX.set(restPosRef.current.x);
-        cursorY.set(restPosRef.current.y);
-      }
-    };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, [active, cursorW, cursorH, cursorX, cursorY, holding]);
 
   // Load and cache the cursor SVG
   useEffect(() => {
@@ -211,14 +178,6 @@ export function EasterEggScene({
     };
   }, [active, scene.id, scene.cursorSvg, scene.still]);
 
-  const clearDwell = useCallback(() => {
-    if (dwellTimerRef.current) {
-      clearTimeout(dwellTimerRef.current);
-      dwellTimerRef.current = null;
-    }
-    anchorRef.current = null;
-  }, []);
-
   const onDismissRef = useRef(onDismiss);
   onDismissRef.current = onDismiss;
 
@@ -235,99 +194,63 @@ export function EasterEggScene({
     vid.addEventListener("ended", handleEnded);
   }, []);
 
-  const extinguish = useCallback(() => {
-    setShowVideo(false);
-  }, []);
-
-  const isOverPainting = useCallback(
-    (x: number, y: number) => {
-      const el = paintingRef.current;
-      if (!el) return false;
-      const rect = el.getBoundingClientRect();
-      return (
-        x >= rect.left &&
-        x <= rect.right &&
-        y >= rect.top &&
-        y <= rect.bottom
-      );
+  const getDistance = useCallback(
+    (lighterEl: HTMLDivElement) => {
+      const paintingEl = paintingRef.current;
+      if (!paintingEl) return Infinity;
+      const lr = lighterEl.getBoundingClientRect();
+      const pr = paintingEl.getBoundingClientRect();
+      const lx = lr.left + lr.width / 2;
+      const ly = lr.top + lr.height / 2;
+      const px = pr.left + pr.width / 2;
+      const py = pr.top + pr.height / 2;
+      return Math.sqrt((lx - px) ** 2 + (ly - py) ** 2);
     },
     [],
   );
 
-  // Click lighter to pick it up — it becomes the cursor permanently
-  const handleLighterPickUp = useCallback(
-    (e: React.PointerEvent) => {
-      e.stopPropagation();
-      if (showVideo || holding) return;
-      setHolding(true);
-      cursorX.set(e.clientX - offsetX);
-      cursorY.set(e.clientY - offsetY);
-    },
-    [holding, showVideo, cursorX, cursorY, offsetX, offsetY],
-  );
+  const ignitedRef = useRef(false);
 
-  // Move lighter + dwell detection (only when holding)
-  const handlePointerMove = useCallback(
-    (e: React.PointerEvent) => {
-      if (!holding) return;
+  const snapAndIgnite = useCallback(() => {
+    if (ignitedRef.current) return;
+    ignitedRef.current = true;
+    ignite();
+  }, [ignite]);
 
-      const { clientX: x, clientY: y } = e;
-      cursorX.set(x - offsetX);
-      cursorY.set(y - offsetY);
+  const onDrag = useCallback(() => {
+    if (!lighterRef.current || ignitedRef.current) return;
+    const el = lighterRef.current;
+    const dist = getDistance(el);
+    const isNear = dist <= SNAP_DISTANCE;
+    setNearPainting(isNear);
+    if (isNear) {
+      snapAndIgnite();
+    }
+  }, [getDistance, snapAndIgnite]);
 
-      const overPainting = isOverPainting(x, y);
+  const onDragStart = useCallback(() => {
+    setDragging(true);
+    ignitedRef.current = false;
+  }, []);
 
-      const anchor = anchorRef.current;
-      if (anchor) {
-        const dx = x - anchor.x;
-        const dy = y - anchor.y;
-        if (Math.sqrt(dx * dx + dy * dy) > MOVE_THRESHOLD) {
-          clearDwell();
-          extinguish();
-          anchorRef.current = { x, y };
-          if (overPainting) {
-            dwellTimerRef.current = setTimeout(ignite, DWELL_MS);
-          }
-        }
-      } else {
-        anchorRef.current = { x, y };
-        if (overPainting) {
-          dwellTimerRef.current = setTimeout(ignite, DWELL_MS);
-        }
-      }
-
-      if (!overPainting) {
-        clearDwell();
-        extinguish();
-        anchorRef.current = { x, y };
-      }
-    },
-    [
-      holding,
-      cursorX,
-      cursorY,
-      offsetX,
-      offsetY,
-      clearDwell,
-      ignite,
-      extinguish,
-      isOverPainting,
-    ],
-  );
+  const onDragEnd = useCallback(() => {
+    setDragging(false);
+    setNearPainting(false);
+    if (!lighterRef.current || ignitedRef.current) return;
+    // Spring back to rest position
+    animate(lighterRef.current, { x: 0, y: 0 }, { type: "spring", stiffness: 150, damping: 18 });
+  }, []);
 
   // Cleanup on deactivate
   useEffect(() => {
     if (!active) {
-      clearDwell();
       setShowVideo(false);
-      setHolding(false);
       if (videoRef.current) {
         videoRef.current.pause();
         videoRef.current.currentTime = 0;
       }
     }
-  }, [active, clearDwell]);
-
+  }, [active]);
 
   useEffect(() => {
     if (!active) return;
@@ -342,13 +265,12 @@ export function EasterEggScene({
     <AnimatePresence>
       {active && (
         <motion.div
-          className="fixed inset-0 z-50 cursor-none select-none"
+          className="fixed inset-0 z-50 cursor-default select-none"
           style={{ backgroundColor: scene.background }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          onPointerMove={ready ? handlePointerMove : undefined}
         >
           {/* Noise overlay */}
           <div
@@ -417,34 +339,32 @@ export function EasterEggScene({
                       preload="auto"
                     />
 
+                    {/* Proximity glow when lighter is near */}
+                    <AnimatePresence>
+                      {nearPainting && (
+                        <motion.div
+                          className="absolute -inset-2 pointer-events-none rounded"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: [0.2, 0.5, 0.2] }}
+                          exit={{ opacity: 0, transition: { duration: 0.3 } }}
+                          transition={{ duration: 0.8, repeat: Infinity }}
+                          style={{
+                            boxShadow:
+                              "inset 0 0 20px rgba(255,107,0,0.6), 0 0 15px rgba(255,68,0,0.4)",
+                          }}
+                        />
+                      )}
+                    </AnimatePresence>
+
                     {scene.presentation === "framed" && <ArtDecoFrame />}
                     {scene.presentation === "vignette" && <VignetteOverlay />}
                   </div>
                 </div>
 
-                {/* "Torch me" hint on painting — appears after lighter picked up */}
-                {holding && !showVideo && (
-                  <img
-                    src="/TorchMe.gif"
-                    alt=""
-                    className="absolute pointer-events-none select-none"
-                    style={{
-                      width: 70,
-                      left: paintingRef.current
-                        ? paintingRef.current.getBoundingClientRect().left - 36
-                        : 0,
-                      top: paintingRef.current
-                        ? paintingRef.current.getBoundingClientRect().top - 36
-                        : 0,
-                    }}
-                  />
-                )}
-
-                {/* Lighter — rests in corner, click to pick up */}
                 {cursorHtml && (
                   <>
-                    {/* "Grab me" hint near lighter — hidden once picked up */}
-                    {!holding && !showVideo && (
+                    {/* "Grab me" hint near lighter — hidden once dragging */}
+                    {!dragging && (
                       <img
                         src="/GrabMe.gif"
                         alt=""
@@ -456,18 +376,39 @@ export function EasterEggScene({
                         }}
                       />
                     )}
+                    {/* "Torch me" hint on painting — appears while dragging, hides when near */}
+                    {dragging && !nearPainting && (
+                      <img
+                        src="/TorchMe.gif"
+                        alt=""
+                        className="absolute pointer-events-none select-none"
+                        style={{
+                          width: 70,
+                          left: paintingRef.current
+                            ? paintingRef.current.getBoundingClientRect().left - 36
+                            : 0,
+                          top: paintingRef.current
+                            ? paintingRef.current.getBoundingClientRect().top - 36
+                            : 0,
+                        }}
+                      />
+                    )}
                     <motion.div
                       ref={lighterRef}
-                      className={`${scene.cursorClassName} fixed top-0 left-0`}
+                      className={`${scene.cursorClassName} fixed cursor-grab active:cursor-grabbing touch-none`}
                       style={{
                         width: cursorW,
                         height: cursorH,
-                        x: springX,
-                        y: springY,
-                        pointerEvents:
-                          !holding && !showVideo ? "auto" : "none",
+                        right: REST_INSET,
+                        bottom: REST_INSET,
                       }}
-                      onPointerDown={handleLighterPickUp}
+                      drag
+                      dragElastic={0.08}
+                      dragMomentum={false}
+                      onDragStart={onDragStart}
+                      onDrag={onDrag}
+                      onDragEnd={onDragEnd}
+                      whileDrag={{ scale: 1.08, zIndex: 50 }}
                       dangerouslySetInnerHTML={{ __html: cursorHtml }}
                     />
                   </>

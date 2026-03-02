@@ -143,6 +143,17 @@
   --ring: #c9a96e;
 }
 
+/* 411 Speakeasy — scoped dark romanticism palette */
+[data-scene="speakeasy"] {
+  --background: #0a0604;
+  --foreground: #d44444;
+  --accent: #d44444;
+  --muted-foreground: #a05555;
+  --muted: #1a0a0a;
+  --border: #4a2525;
+  --card: #120808;
+}
+
 @theme inline {
   /* Fonts */
   --font-display: var(--font-display-next, "Playfair Display"), "Georgia", "Times New Roman", serif;
@@ -237,7 +248,7 @@
     content: "";
     position: fixed;
     inset: 0;
-    z-index: 9999;
+    z-index: 99;
     pointer-events: none;
     opacity: 0.12;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -742,6 +753,116 @@
   }
 }
 
+/* ========================
+   SPEAKEASY 411 — Keyframe Animations
+   ======================== */
+@keyframes speakeasy-glow-pulse {
+  0%, 100% { opacity: 0.12; }
+  50% { opacity: 0.18; }
+}
+
+@keyframes speakeasy-drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(3px, -5px) rotate(0.3deg); }
+  50% { transform: translate(-2px, 3px) rotate(-0.2deg); }
+  75% { transform: translate(4px, 2px) rotate(0.15deg); }
+}
+
+@keyframes speakeasy-vignette-breathe {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 0.92; }
+}
+
+@keyframes speakeasy-neon-stutter {
+  0% { opacity: 0; }
+  8% { opacity: 0.8; }
+  12% { opacity: 0; }
+  20% { opacity: 0; }
+  28% { opacity: 1; }
+  32% { opacity: 0; }
+  36% { opacity: 0; }
+  50% { opacity: 0.6; }
+  54% { opacity: 0; }
+  70% { opacity: 0; }
+  78% { opacity: 1; }
+  82% { opacity: 0.9; }
+  100% { opacity: 1; }
+}
+
+@keyframes speakeasy-cursor-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes speakeasy-smoke-0 {
+  0% { transform: translateX(-30%) translateY(0); opacity: 0; }
+  10% { opacity: 0.5; }
+  90% { opacity: 0.5; }
+  100% { transform: translateX(130%) translateY(-5vh); opacity: 0; }
+}
+
+@keyframes speakeasy-smoke-1 {
+  0% { transform: translateX(-40%) translateY(0); opacity: 0; }
+  10% { opacity: 0.4; }
+  90% { opacity: 0.4; }
+  100% { transform: translateX(140%) translateY(8vh); opacity: 0; }
+}
+
+@keyframes speakeasy-smoke-2 {
+  0% { transform: translateX(-25%) translateY(0); opacity: 0; }
+  10% { opacity: 0.35; }
+  90% { opacity: 0.35; }
+  100% { transform: translateX(125%) translateY(-3vh); opacity: 0; }
+}
+
+@keyframes speakeasy-smolder {
+  0% {
+    transform: translateY(0) scaleX(1);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-25px) scaleX(1.8);
+    opacity: 0;
+  }
+}
+
+.speakeasy-button-wrap {
+  position: relative;
+}
+
+.speakeasy-button-wrap::before,
+.speakeasy-button-wrap::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  width: 40px;
+  height: 30px;
+  background: radial-gradient(ellipse, rgba(212,68,68,0.2), transparent 70%);
+  filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.speakeasy-button-wrap::before {
+  left: 25%;
+}
+
+.speakeasy-button-wrap::after {
+  right: 25%;
+}
+
+.speakeasy-button-wrap:hover::before,
+.speakeasy-button-wrap:hover::after {
+  animation: speakeasy-smolder 2s ease-out infinite;
+}
+
+.speakeasy-button-wrap:hover::after {
+  animation-delay: 0.6s;
+}
+
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .neon-logo {
@@ -763,4 +884,82 @@
   .incense-cursor {
     animation: none;
   }
+  .stage-glow-zone,
+  .stage-glow-zone[data-active] {
+    transition: none;
+  }
+  [data-scene="speakeasy"] * {
+    animation: none !important;
+  }
+}
+
+/* ========================
+   STAGE — Keyframe Animations
+   ======================== */
+@keyframes stage-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.08); opacity: 0.15; }
+}
+
+@keyframes candle-flicker {
+  0%, 100% { opacity: 1; }
+  25% { opacity: 0.8; }
+  50% { opacity: 1; }
+  75% { opacity: 0.6; }
+}
+
+@keyframes vignette-breathe {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.55; }
+}
+
+@keyframes haze-drift-1 {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(3vw, -2vh); }
+  50% { transform: translate(-2vw, 3vh); }
+  75% { transform: translate(4vw, 1vh); }
+}
+
+@keyframes haze-drift-2 {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(-4vw, 2vh); }
+  66% { transform: translate(2vw, -3vh); }
+}
+
+@keyframes haze-drift-3 {
+  0%, 100% { transform: translate(0, 0); }
+  30% { transform: translate(2vw, 4vh); }
+  60% { transform: translate(-3vw, -1vh); }
+}
+
+@keyframes godray-sway {
+  0%, 100% { transform: translateX(-50%) rotate(var(--ray-base-angle, 0deg)); }
+  50% { transform: translateX(-50%) rotate(calc(var(--ray-base-angle, 0deg) + 2deg)); }
+}
+
+@keyframes bokeh-float {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(8px, -12px); }
+  50% { transform: translate(-5px, 8px); }
+  75% { transform: translate(10px, -5px); }
+}
+
+/* ========================
+   STAGE — Glow Zones (audio-reactive via --audio-level)
+   ======================== */
+.stage-glow-zone {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: clamp(140px, 18vw, 240px);
+  height: clamp(140px, 18vw, 240px);
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  pointer-events: none;
+}
+
+.stage-glow-zone[data-active] {
+  opacity: calc(0.45 + var(--audio-level, 0) * 0.55);
+  transition: opacity 0.12s ease;
 }

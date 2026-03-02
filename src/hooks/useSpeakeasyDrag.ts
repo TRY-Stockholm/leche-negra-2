@@ -2,6 +2,7 @@
 
 import { useRef, useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { playHeartbeat } from "@/lib/heartbeat";
 
 interface DragState {
   /** How far the footer has been dragged up in px (always >= 0) */
@@ -143,10 +144,15 @@ export function useSpeakeasyDrag({
       containerRef.current.style.setProperty("--speakeasy-progress", "1");
     }
 
+    // Heartbeat during the iris close — a gut-level "am I supposed to be here?"
+    if (!prefersReducedMotion) {
+      playHeartbeat();
+    }
+
     // After the footer flies up + glow fills screen, navigate
     safeTimeout(() => {
       router.push("/speakeasy");
-    }, prefersReducedMotion ? 100 : 600);
+    }, prefersReducedMotion ? 100 : 1600);
   }, [router, prefersReducedMotion, safeTimeout]);
 
   const snapBack = useCallback((e?: React.PointerEvent) => {

@@ -6,8 +6,6 @@ export interface SceneConfig {
   cursorWidth: number;
   cursorHeight: number;
   cursorDisplayHeight: number;
-  cursorOffsetX: number;
-  cursorOffsetY: number;
   cursorClassName: string;
   still: string;
   video: string;
@@ -23,8 +21,6 @@ export const SCENES: SceneConfig[] = [
     cursorWidth: 480.35,
     cursorHeight: 615.47,
     cursorDisplayHeight: 160,
-    cursorOffsetX: 0.5,
-    cursorOffsetY: 0.04,
     cursorClassName: "zippo-lighter",
     still: "/video/floral-combustion-frame1.jpg",
     video: "/video/floral-combustion.mp4",
@@ -64,8 +60,15 @@ export const SCENES: SceneConfig[] = [
   // },
 ];
 
-export function pickScene(lastId?: string): SceneConfig {
-  const candidates =
-    SCENES.length > 1 ? SCENES.filter((s) => s.id !== lastId) : SCENES;
-  return candidates[Math.floor(Math.random() * candidates.length)];
+export type EasterEgg =
+  | { type: "scene"; config: SceneConfig }
+  | { type: "stage" };
+
+export const EASTER_EGGS: EasterEgg[] = [
+  { type: "scene", config: SCENES[0] },
+  { type: "stage" },
+];
+
+export function pickNextEgg(index: number): EasterEgg {
+  return EASTER_EGGS[index % EASTER_EGGS.length];
 }
