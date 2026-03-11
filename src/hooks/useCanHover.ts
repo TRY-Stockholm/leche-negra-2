@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 
 /** Returns true on devices that support hover (i.e. not touch-only). */
 export function useCanHover() {
-  const [canHover, setCanHover] = useState(true)
+  const [canHover, setCanHover] = useState(false)
 
   useEffect(() => {
     const mq = window.matchMedia('(hover: hover)')

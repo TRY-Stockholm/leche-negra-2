@@ -17,11 +17,13 @@ import { SpeakeasyWhispers } from "./SpeakeasyWhispers";
 import { SpeakeasyReveal } from "./SpeakeasyReveal";
 import { useMousePosition } from "@/hooks/useMousePosition";
 import { useCanHover } from "@/hooks/useCanHover";
-import type { SiteSettings } from "@/lib/types";
+import { MenuModal } from "@/app/components/MenuModal";
+import type { SiteSettings, CMSMenu } from "@/lib/types";
 
 interface SpeakeasySceneProps {
   menuPdfUrl?: string;
   siteSettings: SiteSettings | null;
+  cmsMenus?: CMSMenu[];
 }
 
 /**
@@ -33,11 +35,12 @@ interface SpeakeasySceneProps {
  *  3 — Content reveals begin (staggered, slow).
  */
 
-export function SpeakeasyScene({ menuPdfUrl, siteSettings }: SpeakeasySceneProps) {
+export function SpeakeasyScene({ menuPdfUrl, siteSettings, cmsMenus }: SpeakeasySceneProps) {
   const router = useRouter();
   const weather = useWeather();
   const prefersReducedMotion = useReducedMotion();
   const [isExiting, setIsExiting] = useState(false);
+  const [menuModalOpen, setMenuModalOpen] = useState(false);
   const [phase, setPhase] = useState(prefersReducedMotion ? 3 : -1);
   const [showPatience, setShowPatience] = useState(false);
   const [preloaderDismissed, setPreloaderDismissed] = useState(!!prefersReducedMotion);
@@ -79,7 +82,7 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings }: SpeakeasySceneProps
   return (
     <div
       data-scene="speakeasy"
-      className="relative min-h-screen overflow-hidden bg-background text-foreground font-body"
+      className="relative h-dvh overflow-hidden bg-background text-foreground font-body"
       style={{ isolation: "isolate" }}
     >
       <SpeakeasyBackground phase={phase} isIdle={isIdle} />
@@ -97,36 +100,39 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings }: SpeakeasySceneProps
         transition={{ duration: 0.5, ease: "easeInOut" }}
       />
 
-      {/* "Be Quiet" preloader — timed, then fades out */}
+      {/* Preloader — timed, then fades out */}
       {!prefersReducedMotion && (
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-background"
+          className="fixed inset-0 z-[9999] flex items-center justify-center"
           style={{
+            backgroundColor: "#460b08",
             opacity: preloaderDismissed ? 0 : 1,
             transition: "opacity 0.8s ease-in-out",
             pointerEvents: preloaderDismissed ? "none" : "auto",
           }}
         >
           <p
-            className="font-display italic text-[clamp(1.5rem,5vw,3rem)] text-muted-foreground select-none"
+            className="font-display italic text-[clamp(1.5rem,5vw,3rem)] select-none"
             style={{
+              color: "#e43122",
               opacity: preloaderDismissed ? 0 : 0.7,
               transition: "opacity 1.5s ease-out 0.3s",
             }}
           >
-            be quiet
+            Be curious
           </p>
         </div>
       )}
 
       {/* Content layer */}
-      <div className="relative z-10 min-h-screen bg-transparent">
-        <NavBar weather={weather} bookingUrl={siteSettings?.bookingUrl} />
+      <div className="relative z-10 h-full bg-transparent">
+        <NavBar weather={weather} bookingUrl={siteSettings?.bookingUrl} onMenuClick={() => setMenuModalOpen(true)} />
+        <MenuModal open={menuModalOpen} onClose={() => setMenuModalOpen(false)} cmsMenus={cmsMenus} />
 
         {/* Main Content — 12-column grid mirroring homepage */}
-        <div className="grid grid-cols-12 lg:grid-rows-[auto_1fr_auto] gap-x-4 px-5 md:px-10 min-h-[calc(100vh-65px)]">
+        <div className="flex flex-col gap-x-4 px-5 md:px-10 h-[calc(100%-65px)] md:grid md:grid-cols-12 md:grid-rows-[auto_1fr_auto]">
           {/* 411 Logo — stutters on at phase 2, click to exit */}
-          <div className="col-span-12 row-start-1 self-start pt-8 md:col-span-5 md:pt-16">
+          <div className="shrink-0 pt-8 md:col-span-5 md:pt-16">
             <div className="max-w-[52%]">
               <button
                 onClick={handleExit}
@@ -149,7 +155,7 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings }: SpeakeasySceneProps
 
           {/* Bottom section — always in DOM, opacity-controlled */}
           <div
-            className="col-span-12 self-end row-start-4 pb-4 lg:pb-8"
+            className="mt-auto overflow-y-auto pb-4 lg:pb-8 md:col-span-12 md:self-end md:row-start-3"
             style={{
               opacity: phase >= 3 ? 1 : 0,
               transition: "opacity 1.2s ease-in-out",
@@ -189,26 +195,11 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings }: SpeakeasySceneProps
             </div>
 
             {/* Action row */}
-            <SpeakeasyDetails menuPdfUrl={menuPdfUrl} />
+            <SpeakeasyDetails menuPdfUrl={menuPdfUrl} isMuted={isMuted} onToggleMute={toggleMute} />
           </div>
         </div>
       </div>
 
-      {/* Sound toggle — subtle, bottom-right */}
-      <button
-        onClick={toggleMute}
-        aria-label={isMuted ? "Unmute ambient sound" : "Mute ambient sound"}
-        className="fixed bottom-4 right-5 md:right-10 z-20 font-body text-[0.5625rem] tracking-[0.08em] uppercase text-muted-foreground transition-opacity duration-300 hover:opacity-80"
-        style={{
-          opacity: phase >= 3 ? 0.5 : 0,
-          transition: "opacity 1.2s ease-in-out",
-          pointerEvents: phase >= 3 ? "auto" : "none",
-        }}
-      >
-        <span style={{ textDecoration: isMuted ? "line-through" : "none" }}>
-          sound
-        </span>
-      </button>
     </div>
   );
 }

@@ -34,7 +34,7 @@ function createBrownNoise(ctx: AudioContext, duration: number): AudioBuffer {
 export function useSpeakeasyAmbience(enabled: boolean, isIdle: boolean) {
   const nodesRef = useRef<AmbienceNodes | null>(null);
   const startedRef = useRef(false);
-  const breatheRef = useRef<number>(0);
+  const breatheRef = useRef<ReturnType<typeof setInterval>>(undefined);
   const [isMuted, setIsMuted] = useState(false);
 
   const startAmbience = useCallback(() => {
@@ -80,7 +80,7 @@ export function useSpeakeasyAmbience(enabled: boolean, isIdle: boolean) {
     nodesRef.current = { ctx, hum, humGain, noiseSource, noiseGain, master };
 
     // Hum gain breathing — slow modulation between 0.03 and 0.06
-    function breathe() {
+    breatheRef.current = setInterval(() => {
       if (!nodesRef.current) return;
       const t = Date.now() / 1000;
       const mod = 0.045 + 0.015 * Math.sin(t * 0.18 * Math.PI * 2);
@@ -89,9 +89,7 @@ export function useSpeakeasyAmbience(enabled: boolean, isIdle: boolean) {
         nodesRef.current.ctx.currentTime,
         0.5
       );
-      breatheRef.current = requestAnimationFrame(breathe);
-    }
-    breathe();
+    }, 100);
   }, [enabled]);
 
   const toggleMute = useCallback(() => {
@@ -125,7 +123,7 @@ export function useSpeakeasyAmbience(enabled: boolean, isIdle: boolean) {
   // Cleanup
   useEffect(() => {
     return () => {
-      cancelAnimationFrame(breatheRef.current);
+      clearInterval(breatheRef.current);
       if (nodesRef.current) {
         nodesRef.current.hum.stop();
         nodesRef.current.noiseSource.stop();

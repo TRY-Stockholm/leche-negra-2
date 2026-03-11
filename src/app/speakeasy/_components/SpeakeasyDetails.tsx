@@ -7,9 +7,11 @@ import { SpeakeasyReveal } from "./SpeakeasyReveal";
 
 interface SpeakeasyDetailsProps {
   menuPdfUrl?: string;
+  isMuted?: boolean;
+  onToggleMute?: () => void;
 }
 
-export function SpeakeasyDetails({ menuPdfUrl }: SpeakeasyDetailsProps) {
+export function SpeakeasyDetails({ menuPdfUrl, isMuted, onToggleMute }: SpeakeasyDetailsProps) {
   const [isOpen, setIsOpen] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
@@ -22,19 +24,33 @@ export function SpeakeasyDetails({ menuPdfUrl }: SpeakeasyDetailsProps) {
             onClick={() => setIsOpen((prev) => !prev)}
             aria-expanded={isOpen}
             aria-controls="speakeasy-about"
-            className="cursor-pointer font-body text-[0.6875rem] font-medium tracking-[0.06em] uppercase text-muted-foreground transition-opacity duration-300 hover:opacity-80"
+            className="cursor-pointer py-2 font-body text-[0.6875rem] font-medium tracking-[0.06em] uppercase text-muted-foreground transition-opacity duration-300 hover:opacity-80"
           >
             {isOpen ? "close" : "about the room"}
           </button>
 
-          <a
-            href={menuPdfUrl ?? "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-body text-[0.6875rem] font-medium tracking-[0.06em] uppercase text-muted-foreground transition-opacity duration-300 hover:opacity-80"
-          >
-            see cocktails <span aria-hidden="true">&rarr;</span>
-          </a>
+          <div className="flex items-baseline gap-4">
+            {onToggleMute && (
+              <button
+                onClick={onToggleMute}
+                aria-label={isMuted ? "Unmute ambient sound" : "Mute ambient sound"}
+                className="cursor-pointer py-2 font-body text-[0.6875rem] font-medium tracking-[0.06em] uppercase text-muted-foreground transition-opacity duration-300 hover:opacity-80"
+                style={{ opacity: 0.5 }}
+              >
+                <span style={{ textDecoration: isMuted ? "line-through" : "none" }}>
+                  sound
+                </span>
+              </button>
+            )}
+            <a
+              href={menuPdfUrl ?? "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="py-2 font-body text-[0.6875rem] font-medium tracking-[0.06em] uppercase text-muted-foreground transition-opacity duration-300 hover:opacity-80"
+            >
+              see cocktails <span aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
         </div>
       </SpeakeasyReveal>
 
@@ -68,13 +84,13 @@ export function SpeakeasyDetails({ menuPdfUrl }: SpeakeasyDetailsProps) {
               <div className="font-display italic text-[clamp(0.875rem,2vw,1.0625rem)] leading-[1.65] text-muted-foreground mt-6 max-w-[520px]">
                 {prefersReducedMotion ? (
                   <p>
-                    Behind the painting, past the lady with still lips — a room
-                    that trades in whispers and well-kept secrets. The cocktails
-                    here have no names you&apos;ll remember by morning.
+                    Past the painting, down the stairs — a smaller room with a
+                    longer pour. The menu changes when it feels like it. Most
+                    people find this place by accident. You&apos;re here now.
                   </p>
                 ) : (
                   <TypewriterText
-                    text="Behind the painting, past the lady with still lips \u2014 a room that trades in whispers and well-kept secrets. The cocktails here have no names you\u2019ll remember by morning."
+                    text="Past the painting, down the stairs — a smaller room with a longer pour. The menu changes when it feels like it. Most people find this place by accident. You're here now."
                   />
                 )}
               </div>

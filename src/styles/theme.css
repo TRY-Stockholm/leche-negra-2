@@ -230,9 +230,13 @@
     @apply bg-background text-foreground;
     font-family: "General Sans", "Helvetica Neue", "Arial", sans-serif;
     position: relative;
-    /* The 'font-rendering' property is not a valid CSS property.
-       If you want accurate geometry, use 'text-rendering: geometricPrecision;' */
     text-rendering: geometricPrecision;
+  }
+
+  /* Global focus-visible ring for all interactive elements */
+  :is(button, a, input, select, textarea, [role="button"], [tabindex]):focus-visible {
+    outline: 1.5px solid var(--accent);
+    outline-offset: 2px;
   }
 
   body::after {
@@ -380,11 +384,27 @@
 .nav-bracket::before {
   content: "[  ";
   white-space: pre;
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+  opacity: 0.5;
 }
 
 .nav-bracket::after {
   content: "  ]";
   white-space: pre;
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+  opacity: 0.5;
+}
+
+.nav-bracket:hover::before {
+  transform: translateX(-3px);
+  opacity: 1;
+}
+
+.nav-bracket:hover::after {
+  transform: translateX(3px);
+  opacity: 1;
 }
 
 /* ── Neon logo glow ── */
@@ -953,4 +973,14 @@
 .stage-glow-zone[data-active] {
   opacity: calc(0.45 + var(--audio-level, 0) * 0.55);
   transition: opacity 0.12s ease;
+}
+
+@media (max-width: 768px) {
+  .stage-glow-zone {
+    width: clamp(80px, 14vw, 140px);
+    height: clamp(80px, 14vw, 140px);
+  }
+  .stage-glow-zone[data-active] {
+    transition: opacity 0.2s ease;
+  }
 }

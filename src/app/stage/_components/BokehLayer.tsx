@@ -18,7 +18,9 @@ interface BokehLayerProps {
 
 export function BokehLayer({ activeCount }: BokehLayerProps) {
   const isMobile = useIsMobile();
-  const circles = isMobile ? BOKEH_CIRCLES.slice(0, 3) : BOKEH_CIRCLES;
+  // Skip entirely on mobile to reduce compositing layers
+  if (isMobile) return null;
+  const circles = BOKEH_CIRCLES;
   const visible = activeCount >= 3;
   const intensity = Math.min(1, (activeCount - 2) / 3);
 

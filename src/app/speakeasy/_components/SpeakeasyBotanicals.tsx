@@ -5,10 +5,10 @@ import { type MotionValue } from "motion/react";
 import { SpeakeasyReveal } from "./SpeakeasyReveal";
 
 const BOTANICAL_SLOTS = [
-  { id: "top-left", x: "3%", y: "5%", size: "clamp(120px, 18vw, 220px)", rotate: -12 },
-  { id: "top-right", x: "75%", y: "3%", size: "clamp(100px, 15vw, 200px)", rotate: 8 },
-  { id: "bottom-left", x: "2%", y: "65%", size: "clamp(130px, 20vw, 240px)", rotate: -5 },
-  { id: "bottom-right", x: "78%", y: "70%", size: "clamp(110px, 16vw, 210px)", rotate: 15 },
+  { id: "top-left", src: "/Vine.svg", x: "-0.5%", y: ".05%", size: "clamp(200px, 28vw, 380px)", rotate: -12, static: true },
+  { id: "top-right", src: "/Rose.svg", x: "auto", y: "-0.5%", size: "clamp(220px, 30vw, 420px)", rotate: 15, right: "-4%", static: true },
+  { id: "bottom-left", src: "/Candle.svg", x: "2%", y: "55%", size: "clamp(160px, 24vw, 300px)", rotate: -5 },
+  { id: "bottom-right", src: "/Moth.svg", x: "78%", y: "70%", size: "clamp(110px, 14vw, 210px)", rotate: 15 },
 ] as const;
 
 const PARALLAX_FACTOR = 3;
@@ -53,6 +53,7 @@ function BotanicalSlot({
 
   useEffect(() => {
     if (!mouseX || !mouseY) return;
+    if ("static" in slot && slot.static) return;
     const el = ref.current;
     if (!el) return;
 
@@ -98,7 +99,8 @@ function BotanicalSlot({
       ref={ref}
       className="absolute"
       style={{
-        left: slot.x,
+        left: "right" in slot ? "auto" : slot.x,
+        right: "right" in slot ? slot.right : "auto",
         top: slot.y,
         width: slot.size,
         height: slot.size,
@@ -115,7 +117,15 @@ function BotanicalSlot({
           animationDelay: `${index * -4}s`,
         }}
       >
-        <PlaceholderBotanical rotate={slot.rotate} />
+        <img
+          src={slot.src}
+          alt=""
+          className="w-full h-full"
+          style={{
+            transform: `rotate(${slot.rotate}deg)`,
+            opacity: 0.6,
+          }}
+        />
       </div>
 
       {/* The illustration */}
@@ -128,31 +138,12 @@ function BotanicalSlot({
           animationDelay: `${index * -3}s`,
         }}
       >
-        <PlaceholderBotanical rotate={0} />
+        <img
+          src={slot.src}
+          alt=""
+          className="w-full h-full object-contain"
+        />
       </div>
     </div>
-  );
-}
-
-function PlaceholderBotanical({ rotate }: { rotate: number }) {
-  return (
-    <svg
-      viewBox="0 0 200 200"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full h-full"
-      style={{ transform: `rotate(${rotate}deg)` }}
-    >
-      <path
-        d="M100 10 C120 40, 160 50, 140 90 C120 130, 160 150, 130 180 C110 190, 90 190, 70 180 C40 150, 80 130, 60 90 C40 50, 80 40, 100 10Z"
-        fill="var(--foreground)"
-        opacity="0.6"
-      />
-      <path
-        d="M85 60 C90 45, 110 45, 115 60 C120 75, 110 85, 100 90 C90 85, 80 75, 85 60Z"
-        fill="var(--muted-foreground)"
-        opacity="0.4"
-      />
-    </svg>
   );
 }

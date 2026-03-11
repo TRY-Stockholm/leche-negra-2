@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback, useImperativeHandle, forwardRef } from "react";
+import { useRef, useEffect, useState, useCallback, useImperativeHandle, forwardRef, useMemo } from "react";
 import { motion, useMotionValue, useSpring, useTransform, animate } from "motion/react";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { instruments, MUSICIAN_LAYERS } from "./stage-config";
+
+const MOBILE_MASK_BLUR = 0;
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const MASK_STROKE_WIDTH = 40;
@@ -92,81 +94,87 @@ export const SceneBackground = forwardRef<SceneBackgroundHandle, SceneBackground
 
           const vb = svg.viewBox.baseVal;
 
-          let defs = svg.querySelector("defs");
-          if (!defs) {
-            defs = document.createElementNS(SVG_NS, "defs");
-            svg.insertBefore(defs, svg.firstChild);
-          }
-
-          const mask = document.createElementNS(SVG_NS, "mask");
-          mask.id = "bg-cutout";
-          mask.setAttribute("maskUnits", "userSpaceOnUse");
-          mask.setAttribute("x", String(vb.x));
-          mask.setAttribute("y", String(vb.y));
-          mask.setAttribute("width", String(vb.width));
-          mask.setAttribute("height", String(vb.height));
-
-          const whiteRect = document.createElementNS(SVG_NS, "rect");
-          whiteRect.setAttribute("x", String(vb.x));
-          whiteRect.setAttribute("y", String(vb.y));
-          whiteRect.setAttribute("width", String(vb.width));
-          whiteRect.setAttribute("height", String(vb.height));
-          whiteRect.setAttribute("fill", "white");
-          mask.appendChild(whiteRect);
-
-          const blurFilter = document.createElementNS(SVG_NS, "filter");
-          blurFilter.id = "mask-blur";
-          blurFilter.setAttribute("x", "-50%");
-          blurFilter.setAttribute("y", "-50%");
-          blurFilter.setAttribute("width", "200%");
-          blurFilter.setAttribute("height", "200%");
-          const blur = document.createElementNS(SVG_NS, "feGaussianBlur");
-          blur.setAttribute("stdDeviation", "8");
-          blurFilter.appendChild(blur);
-          defs.appendChild(blurFilter);
-          defs.appendChild(mask);
+          const isMob = window.matchMedia("(max-width: 768px)").matches;
 
           const bg = svg.querySelector<SVGGElement>("#Background");
           if (bg) {
             bg.style.opacity = "0.3";
             bg.style.transition = "opacity 1s ease";
-            bg.setAttribute("mask", "url(#bg-cutout)");
             bgGroupRef.current = bg;
           }
 
-          const groups = new Map<string, SVGGElement[]>();
-          const maskClones = new Map<string, SVGGElement[]>();
-
-          for (const [stemId, layerIds] of Object.entries(MUSICIAN_LAYERS)) {
-            const layers: SVGGElement[] = [];
-            const clones: SVGGElement[] = [];
-
-            for (const id of layerIds) {
-              const el = svg.querySelector<SVGGElement>(`#${CSS.escape(id)}`);
-              if (!el) continue;
-
-              el.style.opacity = "0";
-              el.style.transition = "opacity 0.6s ease, filter 0.6s ease";
-              layers.push(el);
-
-              const clone = el.cloneNode(true) as SVGGElement;
-              clone.removeAttribute("id");
-              blackenForMask(clone);
-              clone.setAttribute("filter", "url(#mask-blur)");
-              clone.style.opacity = "0";
-              clone.style.transition = "opacity 0.4s ease";
-              mask.appendChild(clone);
-              clones.push(clone);
+          // On desktop: create mask with cloned musician layers for bg-cutout reveal effect
+          // On mobile: skip mask cloning entirely to halve SVG DOM node count
+          if (!isMob) {
+            let defs = svg.querySelector("defs");
+            if (!defs) {
+              defs = document.createElementNS(SVG_NS, "defs");
+              svg.insertBefore(defs, svg.firstChild);
             }
 
-            if (layers.length > 0) {
-              groups.set(stemId, layers);
-              maskClones.set(stemId, clones);
+            const mask = document.createElementNS(SVG_NS, "mask");
+            mask.id = "bg-cutout";
+            mask.setAttribute("maskUnits", "userSpaceOnUse");
+            mask.setAttribute("x", String(vb.x));
+            mask.setAttribute("y", String(vb.y));
+            mask.setAttribute("width", String(vb.width));
+            mask.setAttribute("height", String(vb.height));
+
+            const whiteRect = document.createElementNS(SVG_NS, "rect");
+            whiteRect.setAttribute("x", String(vb.x));
+            whiteRect.setAttribute("y", String(vb.y));
+            whiteRect.setAttribute("width", String(vb.width));
+            whiteRect.setAttribute("height", String(vb.height));
+            whiteRect.setAttribute("fill", "white");
+            mask.appendChild(whiteRect);
+
+            const blurFilter = document.createElementNS(SVG_NS, "filter");
+            blurFilter.id = "mask-blur";
+            blurFilter.setAttribute("x", "-50%");
+            blurFilter.setAttribute("y", "-50%");
+            blurFilter.setAttribute("width", "200%");
+            blurFilter.setAttribute("height", "200%");
+            const blur = document.createElementNS(SVG_NS, "feGaussianBlur");
+            blur.setAttribute("stdDeviation", "8");
+            blurFilter.appendChild(blur);
+            defs.appendChild(blurFilter);
+            defs.appendChild(mask);
+
+            if (bg) bg.setAttribute("mask", "url(#bg-cutout)");
+
+            for (const [stemId, layerIds] of Object.entries(MUSICIAN_LAYERS)) {
+              const clones: SVGGElement[] = [];
+              for (const id of layerIds) {
+                const el = svg.querySelector<SVGGElement>(`#${CSS.escape(id)}`);
+                if (!el) continue;
+                const clone = el.cloneNode(true) as SVGGElement;
+                clone.removeAttribute("id");
+                blackenForMask(clone);
+                clone.setAttribute("filter", "url(#mask-blur)");
+                clone.style.opacity = "0";
+                clone.style.transition = "opacity 0.4s ease";
+                mask.appendChild(clone);
+                clones.push(clone);
+              }
+              if (clones.length > 0) maskClonesRef.current.set(stemId, clones);
             }
           }
 
+          const groups = new Map<string, SVGGElement[]>();
+
+          for (const [stemId, layerIds] of Object.entries(MUSICIAN_LAYERS)) {
+            const layers: SVGGElement[] = [];
+            for (const id of layerIds) {
+              const el = svg.querySelector<SVGGElement>(`#${CSS.escape(id)}`);
+              if (!el) continue;
+              el.style.opacity = "0";
+              el.style.transition = "opacity 0.6s ease, filter 0.6s ease";
+              layers.push(el);
+            }
+            if (layers.length > 0) groups.set(stemId, layers);
+          }
+
           musicianGroupsRef.current = groups;
-          maskClonesRef.current = maskClones;
           setSvgLoaded(true);
         })
         .catch(() => {
@@ -218,7 +226,7 @@ export const SceneBackground = forwardRef<SceneBackgroundHandle, SceneBackground
         const isActive = activeInstruments.has(stemId);
         layers.forEach((el) => {
           el.style.opacity = isActive ? "1" : "0";
-          el.style.filter = isActive
+          el.style.filter = isActive && !isMobile
             ? "drop-shadow(0 0 18px rgba(228,49,34,0.5)) drop-shadow(0 0 40px rgba(228,49,34,0.25))"
             : "none";
         });
@@ -226,7 +234,7 @@ export const SceneBackground = forwardRef<SceneBackgroundHandle, SceneBackground
           clone.style.opacity = isActive ? "1" : "0";
         });
       });
-    }, [activeInstruments]);
+    }, [activeInstruments, isMobile]);
 
     useEffect(() => {
       if (bgGroupRef.current) {

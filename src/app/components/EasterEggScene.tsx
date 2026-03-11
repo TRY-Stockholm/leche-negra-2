@@ -241,15 +241,21 @@ export function EasterEggScene({
     animate(lighterRef.current, { x: 0, y: 0 }, { type: "spring", stiffness: 150, damping: 18 });
   }, []);
 
-  // Cleanup on deactivate
+  // Lock body scroll when active; cleanup on deactivate
   useEffect(() => {
-    if (!active) {
+    if (active) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
       setShowVideo(false);
       if (videoRef.current) {
         videoRef.current.pause();
         videoRef.current.currentTime = 0;
       }
     }
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [active]);
 
   useEffect(() => {
@@ -265,22 +271,14 @@ export function EasterEggScene({
     <AnimatePresence>
       {active && (
         <motion.div
-          className="fixed inset-0 z-50 cursor-default select-none"
+          className="fixed inset-0 z-[100] cursor-default select-none overflow-hidden"
           style={{ backgroundColor: scene.background }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          {/* Noise overlay */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              opacity: 0.12,
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-              backgroundRepeat: "repeat",
-            }}
-          />
+          {/* Noise comes from the global body::after overlay */}
 
           <AnimatePresence mode="wait">
             {!ready ? (

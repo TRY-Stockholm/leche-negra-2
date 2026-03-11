@@ -12,11 +12,7 @@ interface SpeakeasyLightPoolProps {
 }
 
 export function SpeakeasyLightPool({ visible = true }: SpeakeasyLightPoolProps) {
-  const { x, y } = useMousePosition();
   const canHover = useCanHover();
-
-  const springX = useSpring(x, SPRING);
-  const springY = useSpring(y, SPRING);
 
   if (!canHover) {
     return (
@@ -39,6 +35,14 @@ export function SpeakeasyLightPool({ visible = true }: SpeakeasyLightPoolProps) 
       </div>
     );
   }
+
+  return <DesktopLightPool visible={visible} />;
+}
+
+function DesktopLightPool({ visible }: { visible: boolean }) {
+  const { x, y } = useMousePosition();
+  const springX = useSpring(x, SPRING);
+  const springY = useSpring(y, SPRING);
 
   return (
     <motion.div
