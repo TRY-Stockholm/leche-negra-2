@@ -26,7 +26,7 @@ export function SpeakeasySmoke({ visible = true }: SpeakeasySmokeProps) {
             width: wisp.width,
             height: wisp.height,
             background:
-              "radial-gradient(ellipse at center, rgba(212,68,68,0.04) 0%, transparent 70%)",
+              "radial-gradient(ellipse at center, color-mix(in srgb, var(--foreground) 4%, transparent) 0%, transparent 70%)",
             filter: "blur(40px)",
             animation: `speakeasy-smoke-${i} ${wisp.duration}s linear infinite`,
             animationDelay: `${wisp.delay}s`,

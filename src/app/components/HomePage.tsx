@@ -134,6 +134,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
 
       {/* The "panel" — entire page moves as one rigid piece */}
       <motion.div
+        style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
         animate={{
           y: dragState.isTransitioning
             ? -window.innerHeight - 200
@@ -150,7 +151,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
         }
       >
         <div
-          className="relative z-10 min-h-screen bg-background"
+          className="relative z-10 flex-1 bg-background"
           style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}
         >
           <NavBar
