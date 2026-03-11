@@ -241,15 +241,21 @@ export function EasterEggScene({
     animate(lighterRef.current, { x: 0, y: 0 }, { type: "spring", stiffness: 150, damping: 18 });
   }, []);
 
-  // Cleanup on deactivate
+  // Lock body scroll when active; cleanup on deactivate
   useEffect(() => {
-    if (!active) {
+    if (active) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
       setShowVideo(false);
       if (videoRef.current) {
         videoRef.current.pause();
         videoRef.current.currentTime = 0;
       }
     }
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [active]);
 
   useEffect(() => {
@@ -265,7 +271,7 @@ export function EasterEggScene({
     <AnimatePresence>
       {active && (
         <motion.div
-          className="fixed inset-0 z-50 cursor-default select-none"
+          className="fixed inset-0 z-[100] cursor-default select-none overflow-hidden"
           style={{ backgroundColor: scene.background }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
