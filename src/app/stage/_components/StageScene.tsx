@@ -172,7 +172,10 @@ export function StageScene() {
         className="absolute inset-0 transition-all duration-[1500ms] ease-out"
         style={{
           opacity: phase === "scene" ? 1 : 0.12,
-          filter: `hue-rotate(${-5 + activeCount * 2.6}deg) saturate(${0.7 + activeCount * 0.1}) brightness(${1 + activeCount * 0.018})`,
+          // Skip expensive CSS filters on mobile — they force GPU recompositing of all children
+          filter: isMobile
+            ? "none"
+            : `hue-rotate(${-5 + activeCount * 2.6}deg) saturate(${0.7 + activeCount * 0.1}) brightness(${1 + activeCount * 0.018})`,
         }}
       >
         <SceneBackground
@@ -184,30 +187,32 @@ export function StageScene() {
         <HazeLayer activeCount={activeCount} />
         <GodRayLayer activeCount={activeCount} />
 
-        {/* Candle glows */}
-        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-          <div
-            className="absolute bottom-[15%] left-[8%] h-20 w-20 rounded-full"
-            style={{
-              background: "radial-gradient(circle, rgba(228,49,34,0.18) 0%, transparent 70%)",
-              animation: "candle-flicker 3s ease-in-out infinite",
-            }}
-          />
-          <div
-            className="absolute bottom-[18%] right-[12%] h-16 w-16 rounded-full"
-            style={{
-              background: "radial-gradient(circle, rgba(228,49,34,0.12) 0%, transparent 70%)",
-              animation: "candle-flicker 4s ease-in-out infinite 1s",
-            }}
-          />
-          <div
-            className="absolute bottom-[20%] left-[45%] h-14 w-14 rounded-full"
-            style={{
-              background: "radial-gradient(circle, rgba(228,49,34,0.1) 0%, transparent 70%)",
-              animation: "candle-flicker 5s ease-in-out infinite 2s",
-            }}
-          />
-        </div>
+        {/* Candle glows — skip on mobile to reduce compositing layers */}
+        {!isMobile && (
+          <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+            <div
+              className="absolute bottom-[15%] left-[8%] h-20 w-20 rounded-full"
+              style={{
+                background: "radial-gradient(circle, rgba(228,49,34,0.18) 0%, transparent 70%)",
+                animation: "candle-flicker 3s ease-in-out infinite",
+              }}
+            />
+            <div
+              className="absolute bottom-[18%] right-[12%] h-16 w-16 rounded-full"
+              style={{
+                background: "radial-gradient(circle, rgba(228,49,34,0.12) 0%, transparent 70%)",
+                animation: "candle-flicker 4s ease-in-out infinite 1s",
+              }}
+            />
+            <div
+              className="absolute bottom-[20%] left-[45%] h-14 w-14 rounded-full"
+              style={{
+                background: "radial-gradient(circle, rgba(228,49,34,0.1) 0%, transparent 70%)",
+                animation: "candle-flicker 5s ease-in-out infinite 2s",
+              }}
+            />
+          </div>
+        )}
 
         {/* Dynamic vignette */}
         <div
@@ -223,20 +228,22 @@ export function StageScene() {
 
         <ParticleCanvas activeCount={activeCount} />
 
-        {/* Grain overlay */}
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{ opacity: isMobile ? 0.02 : 0.06 }}
-          aria-hidden="true"
-        >
-          <svg width="100%" height="100%">
-            <filter id="stage-grain">
-              <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
-              <feColorMatrix type="saturate" values="0" />
-            </filter>
-            <rect width="100%" height="100%" filter="url(#stage-grain)" />
-          </svg>
-        </div>
+        {/* Grain overlay — skip feTurbulence on mobile (very expensive) */}
+        {!isMobile && (
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{ opacity: 0.06 }}
+            aria-hidden="true"
+          >
+            <svg width="100%" height="100%">
+              <filter id="stage-grain">
+                <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+                <feColorMatrix type="saturate" values="0" />
+              </filter>
+              <rect width="100%" height="100%" filter="url(#stage-grain)" />
+            </svg>
+          </div>
+        )}
 
         <BokehLayer activeCount={activeCount} />
       </div>
@@ -257,8 +264,8 @@ export function StageScene() {
         style={{
           color: "#A89A8C",
           border: "1px solid rgba(61, 47, 40, 0.5)",
-          backgroundColor: "rgba(70, 11, 8, 0.85)",
-          backdropFilter: "blur(8px)",
+          backgroundColor: isMobile ? "rgba(70, 11, 8, 0.95)" : "rgba(70, 11, 8, 0.85)",
+          backdropFilter: isMobile ? "none" : "blur(8px)",
         }}
         aria-label="Close and return to homepage"
       >
