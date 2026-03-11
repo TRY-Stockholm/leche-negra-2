@@ -217,7 +217,7 @@ export function PressCanvas({
                 }}
               >
                 <p
-                  className="font-display italic text-foreground/40 leading-snug"
+                  className="font-display italic text-foreground/50 leading-snug"
                   style={{
                     fontSize: `clamp(0.875rem, ${p.w / 14}px, 1.5rem)`,
                     textShadow: "0 0 30px color-mix(in srgb, var(--accent) 8%, transparent)",
@@ -239,6 +239,9 @@ export function PressCanvas({
           return [
             <div
               key={tileKey}
+              role="button"
+              tabIndex={isPrimaryTile ? 0 : -1}
+              aria-label={imgDoc.image.alt || imgDoc.title}
               data-press-item={isPrimaryTile ? "" : undefined}
               data-item-id={isPrimaryTile ? imgDoc._id : undefined}
               className="absolute transition-[transform,box-shadow] duration-300 ease-out"
@@ -259,6 +262,12 @@ export function PressCanvas({
               onClick={(e) => {
                 e.stopPropagation();
                 setLightboxIdx(imageIndex);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setLightboxIdx(imageIndex);
+                }
               }}
             >
               <Image
@@ -326,10 +335,10 @@ function DragHint() {
       style={{ opacity: fading ? 0 : 1 }}
     >
       <div className="text-center">
-        <p className="font-display italic text-foreground/30 text-lg mb-1">
+        <p className="font-display italic text-foreground/50 text-lg mb-1">
           drag to explore
         </p>
-        <p className="font-body text-muted-foreground/30 text-xs uppercase tracking-[0.08em]">
+        <p className="font-body text-muted-foreground/50 text-xs uppercase tracking-[0.08em]">
           click any image to view
         </p>
       </div>

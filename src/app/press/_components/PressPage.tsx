@@ -40,18 +40,18 @@ export function PressPage({
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 md:px-10 py-3 pointer-events-none">
         <Link
           href="/"
-          className="pointer-events-auto text-[0.6875rem] font-body font-medium tracking-[0.04em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
+          className="pointer-events-auto font-display italic text-sm text-muted-foreground hover:text-foreground transition-colors duration-300"
         >
-          &larr; Back
+          Back
         </Link>
         <span className="font-display italic text-foreground/60 text-sm">
           Press
         </span>
       </nav>
 
-      {/* View toggle — top right, below nav */}
-      <div className="fixed top-10 right-5 md:right-10 z-50">
-        <div className="flex items-center gap-0 font-body text-[0.625rem] tracking-[0.06em] uppercase">
+      {/* View toggle — bottom right */}
+      <div className="fixed bottom-6 right-5 md:right-10 z-50">
+        <div className="flex items-center gap-0 font-display italic text-sm">
           <button
             onClick={() => setView("canvas")}
             className={`px-2 py-1 transition-colors duration-300 cursor-pointer ${

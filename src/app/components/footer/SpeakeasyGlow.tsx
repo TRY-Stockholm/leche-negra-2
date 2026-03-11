@@ -15,7 +15,7 @@ export function SpeakeasyGlow() {
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 60% 40% at 50% 85%, rgba(201,169,110,0.3) 0%, rgba(201,169,110,0.1) 35%, transparent 65%)",
+            "radial-gradient(ellipse 60% 40% at 50% 85%, rgba(210,140,60,0.35) 0%, rgba(195,120,50,0.12) 35%, transparent 65%)",
         }}
       />
       {/* Noise texture overlay */}

@@ -55,7 +55,7 @@ export function InstrumentToolbar({
                 }}
               />
               <span
-                className="font-mono text-[9px] uppercase tracking-[0.12em] transition-colors duration-300"
+                className="font-mono text-[10px] uppercase tracking-[0.12em] transition-colors duration-300"
                 style={{ color: isActive ? inst.color : "rgba(168,154,140,0.5)" }}
               >
                 {inst.name}

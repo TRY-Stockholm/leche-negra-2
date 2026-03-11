@@ -69,7 +69,7 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick }: NavBarProps
             onClick={() => setOpen((v) => !v)}
             aria-label="Toggle menu"
             aria-expanded={open}
-            className="md:hidden text-muted-foreground hover:text-accent transition-colors duration-200 p-1"
+            className="md:hidden text-muted-foreground hover:text-accent transition-colors duration-200 p-2.5"
           >
             <svg
               width="16"

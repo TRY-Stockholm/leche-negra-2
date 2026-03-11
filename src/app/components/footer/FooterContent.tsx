@@ -44,12 +44,12 @@ export function FooterContent({
   isDragging,
 }: FooterContentProps) {
   return (
-    <div className="absolute inset-0 z-20 pointer-events-none flex flex-col justify-between p-6 md:p-10">
+    <div className="absolute inset-0 z-20 pointer-events-none flex flex-col justify-between px-5 py-6 md:px-10 md:py-10">
       {/* Top row */}
       <div className="flex items-start justify-between">
         {/* Trigger text — top left */}
         <div
-          className="pointer-events-auto leading-snug text-foreground/40 hover:text-foreground transition-colors duration-500 text-left select-none"
+          className="pointer-events-auto leading-snug text-foreground/60 hover:text-foreground transition-colors duration-500 text-left select-none"
           style={{ cursor: isDragging ? "grabbing" : "grab" }}
           onMouseEnter={onDragHint}
           onTouchStart={onDragHint}
@@ -92,7 +92,7 @@ export function FooterContent({
       </div>
 
       {/* Bottom row */}
-      <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
+      <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-3 md:gap-4">
         <div className="flex flex-col gap-2 text-foreground/60">
           <a
             href={siteSettings?.addressMapUrl ?? "https://maps.google.com/?q=Engelbrektsgatan+3,+Stockholm"}
@@ -115,7 +115,7 @@ export function FooterContent({
               link === "Book a Table" ? (
                 <button
                   key={link}
-                  className="waiteraid-widget text-[0.6875rem] font-body font-medium tracking-[0.06em] uppercase text-foreground/50 hover:text-foreground transition-colors duration-300 cursor-pointer"
+                  className="waiteraid-widget text-[0.6875rem] font-body font-medium tracking-[0.06em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300 cursor-pointer py-1"
                   data-hash="dd34bd1ef6c76ba44556cd74fbb9fd3"
                 >
                   {link}
@@ -124,14 +124,14 @@ export function FooterContent({
                 <a
                   key={link}
                   href="#"
-                  className="text-[0.6875rem] font-body font-medium tracking-[0.06em] uppercase text-foreground/50 hover:text-foreground transition-colors duration-300"
+                  className="text-[0.6875rem] font-body font-medium tracking-[0.06em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300 py-1"
                 >
                   {link}
                 </a>
               ),
             )}
           </nav>
-          <span className="text-[0.625rem] font-body tracking-[0.06em] uppercase text-foreground/30">
+          <span className="text-[0.6875rem] font-body tracking-[0.06em] uppercase text-foreground/50">
             &copy; {new Date().getFullYear()} Leche Negra
           </span>
         </div>

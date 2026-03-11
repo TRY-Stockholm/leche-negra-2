@@ -6,7 +6,7 @@ import { useCanHover } from "@/hooks/useCanHover";
 
 const BASE_WHISPERS = [
   { text: "she never left", x: "12%", y: "22%" },
-  { text: "the third drink is free", x: "78%", y: "32%" },
+  { text: "some doors only open once", x: "78%", y: "32%" },
   { text: "ask about the painting", x: "82%", y: "78%" },
   { text: "we\u2019ve been expecting you", x: "8%", y: "68%" },
 ] as const;
@@ -54,7 +54,7 @@ export function SpeakeasyWhispers({ mouseX, mouseY, visible = true }: SpeakeasyW
 
   return (
     <div
-      className="pointer-events-none fixed inset-0"
+      className="pointer-events-none fixed inset-0 overflow-hidden"
       style={{ zIndex: 2, opacity: visible ? 1 : 0, transition: "opacity 2s ease-in-out" }}
       aria-hidden="true"
     >
@@ -137,7 +137,7 @@ function MobileWhispers({ visible = true, whispers }: { visible?: boolean; whisp
 
   return (
     <div
-      className="pointer-events-none fixed inset-0"
+      className="pointer-events-none fixed inset-0 overflow-hidden"
       style={{ zIndex: 2, opacity: visible ? 1 : 0, transition: "opacity 2s ease-in-out" }}
       aria-hidden="true"
     >
@@ -145,7 +145,7 @@ function MobileWhispers({ visible = true, whispers }: { visible?: boolean; whisp
         <motion.span
           key={`${w.text}-${i}`}
           className="absolute font-display italic text-[0.875rem]"
-          style={{ left: w.x, top: w.y, color: "var(--muted-foreground)" }}
+          style={{ left: w.x, top: w.y, color: "var(--muted-foreground)", maxWidth: `calc(100% - ${w.x})` }}
           animate={{ opacity: active === i ? 0.5 : 0 }}
           transition={{ duration: 3 }}
         >

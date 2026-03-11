@@ -59,7 +59,7 @@ export function PressGallery({ images }: { images: PressImageDoc[] }) {
                 />
               </div>
               {doc.title && (
-                <span className="block mt-1.5 font-body text-[0.625rem] tracking-[0.06em] uppercase text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <span className="block mt-1.5 font-body text-[0.6875rem] tracking-[0.06em] uppercase text-muted-foreground/50 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-300">
                   {doc.title}
                 </span>
               )}

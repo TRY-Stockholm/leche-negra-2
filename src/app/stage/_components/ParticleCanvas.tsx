@@ -57,15 +57,23 @@ export function ParticleCanvas({ activeCount }: ParticleCanvasProps) {
 
     particlesRef.current = [];
 
+    const stageEl = canvas.closest("main");
+    let running = false;
+
     const tick = () => {
       const count = activeCountRef.current;
       const targetCount =
         count >= 5
           ? Math.round(minParticles + ((count - 4) / 2) * (maxParticles - minParticles))
           : 0;
-      const speed = 0.3 + (count / 6) * 1.2;
 
-      const stageEl = canvas.closest("main");
+      // Stop loop when no particles to draw
+      if (targetCount === 0 && particlesRef.current.length === 0) {
+        running = false;
+        return;
+      }
+
+      const speed = 0.3 + (count / 6) * 1.2;
       const audioLevel = parseFloat(
         stageEl?.style.getPropertyValue("--audio-level") || "0",
       );
@@ -102,9 +110,22 @@ export function ParticleCanvas({ activeCount }: ParticleCanvasProps) {
       rafRef.current = requestAnimationFrame(tick);
     };
 
-    rafRef.current = requestAnimationFrame(tick);
+    // Start/restart loop when activeCount changes
+    const startLoop = () => {
+      if (!running) {
+        running = true;
+        rafRef.current = requestAnimationFrame(tick);
+      }
+    };
+    // Check periodically if we should start (activeCount changed)
+    const checkInterval = setInterval(() => {
+      if (activeCountRef.current >= 5 && !running) startLoop();
+    }, 200);
+    startLoop();
 
     return () => {
+      running = false;
+      clearInterval(checkInterval);
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener("resize", resize);
       particlesRef.current = [];

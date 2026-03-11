@@ -71,6 +71,7 @@ export const MenuPanel = memo(function MenuPanel({
                 <button
                   onClick={onClose}
                   className="text-muted-foreground hover:text-accent cursor-pointer font-body text-[0.6875rem] font-medium tracking-[0.06em] uppercase"
+                  aria-label="Close menu"
                 >
                   Close
                 </button>

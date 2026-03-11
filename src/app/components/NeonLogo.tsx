@@ -65,7 +65,7 @@ export const NeonLogo = memo(function NeonLogo({
     const start = performance.now();
     const tick = () => {
       const elapsed = performance.now() - start;
-      const t = Math.min(elapsed / 2500, 1);
+      const t = Math.min(elapsed / 500, 1);
       intensityRef.current = t;
       const el = svgRef.current;
       if (el) {

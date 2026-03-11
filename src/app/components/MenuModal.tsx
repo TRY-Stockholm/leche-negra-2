@@ -124,6 +124,7 @@ export const MenuModal = memo(function MenuModal({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4, duration: 0.3 }}
+                    aria-label="Close menu"
                   >
                     Close
                   </motion.button>
@@ -191,12 +192,14 @@ export const MenuModal = memo(function MenuModal({
                     <button
                       onClick={() => setSelectedMenu(null)}
                       className="font-body text-[0.6875rem] font-medium tracking-[0.06em] uppercase text-muted-foreground hover:text-accent transition-colors duration-200 cursor-pointer"
+                      aria-label="Back to menu list"
                     >
                       Back
                     </button>
                     <button
                       onClick={onClose}
                       className="font-body text-[0.6875rem] font-medium tracking-[0.06em] uppercase text-muted-foreground hover:text-accent transition-colors duration-200 cursor-pointer"
+                      aria-label="Close menu"
                     >
                       Close
                     </button>

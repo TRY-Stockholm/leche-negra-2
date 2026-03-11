@@ -18,7 +18,7 @@ export function VolumeControl({ volume, onVolumeChange, onMuteAll }: VolumeContr
 
   return (
     <div
-      className="fixed bottom-6 right-6 z-40 flex items-center gap-3 rounded-[2px] px-4 py-3"
+      className="fixed top-4 right-[4.25rem] z-40 flex items-center gap-3 rounded-[2px] px-4 py-2"
       style={{
         backgroundColor: "rgba(70, 11, 8, 0.85)",
         border: "1px solid rgba(61, 47, 40, 0.5)",
@@ -27,7 +27,7 @@ export function VolumeControl({ volume, onVolumeChange, onMuteAll }: VolumeContr
     >
       <label
         htmlFor="stage-volume"
-        className="font-mono text-[10px] uppercase tracking-[0.1em]"
+        className="font-mono text-[11px] uppercase tracking-[0.1em]"
         style={{ color: "#A89A8C" }}
       >
         Vol
@@ -48,7 +48,7 @@ export function VolumeControl({ volume, onVolumeChange, onMuteAll }: VolumeContr
       />
       <button
         onClick={onMuteAll}
-        className="min-h-8 rounded-[2px] px-2 py-1 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors duration-300 hover:bg-[rgba(228,49,34,0.1)]"
+        className="min-h-11 rounded-[2px] px-2 py-1 font-mono text-[11px] uppercase tracking-[0.08em] transition-colors duration-300 hover:bg-[rgba(228,49,34,0.1)]"
         style={{
           color: "#A89A8C",
           border: "1px solid rgba(61, 47, 40, 0.5)",

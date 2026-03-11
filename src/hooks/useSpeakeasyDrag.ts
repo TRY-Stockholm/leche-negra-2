@@ -46,6 +46,9 @@ export function useSpeakeasyDrag({
   // Mirror boolean state in refs for reliable reads inside pointer handlers
   const isDraggingRef = useRef(false);
   const isTransitioningRef = useRef(false);
+  /** Whether we've committed to the speakeasy drag (past the intent threshold) */
+  const committedRef = useRef(false);
+  const INTENT_THRESHOLD = 12; // px of upward movement before we capture
 
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
@@ -89,12 +92,10 @@ export function useSpeakeasyDrag({
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
       if (isTransitioningRef.current) return;
-      e.preventDefault();
-      (e.target as HTMLElement).setPointerCapture(e.pointerId);
       startYRef.current = e.clientY;
       currentOffsetRef.current = 0;
+      committedRef.current = false;
       isDraggingRef.current = true;
-      setState((s) => ({ ...s, isDragging: true }));
     },
     [],
   );
@@ -104,6 +105,19 @@ export function useSpeakeasyDrag({
       if (!isDraggingRef.current || isTransitioningRef.current) return;
 
       const rawDelta = startYRef.current - e.clientY;
+
+      // Not yet committed: check if upward movement exceeds intent threshold
+      if (!committedRef.current) {
+        if (rawDelta < INTENT_THRESHOLD) {
+          // Not enough upward movement (or downward) — let browser scroll
+          return;
+        }
+        // Commit to speakeasy drag: capture pointer and prevent scroll
+        committedRef.current = true;
+        try { (e.target as HTMLElement).setPointerCapture(e.pointerId); } catch {}
+        setState((s) => ({ ...s, isDragging: true }));
+      }
+
       // Only allow upward drag
       if (rawDelta <= 0) {
         currentOffsetRef.current = 0;
@@ -175,6 +189,12 @@ export function useSpeakeasyDrag({
     (e: React.PointerEvent) => {
       if (!isDraggingRef.current) return;
 
+      // If we never committed, just clean up — browser handled the scroll
+      if (!committedRef.current) {
+        isDraggingRef.current = false;
+        return;
+      }
+
       const progress = currentOffsetRef.current / maxDrag;
 
       if (progress >= threshold) {
@@ -191,6 +211,10 @@ export function useSpeakeasyDrag({
   const onPointerCancel = useCallback(
     (e: React.PointerEvent) => {
       if (!isDraggingRef.current) return;
+      if (!committedRef.current) {
+        isDraggingRef.current = false;
+        return;
+      }
       snapBack(e);
     },
     [snapBack],

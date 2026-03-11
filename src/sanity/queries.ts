@@ -18,6 +18,12 @@ export const SOCIAL_LINKS_QUERY = defineQuery(
   }`
 )
 
+export const SPEAKEASY_MENU_QUERY = defineQuery(
+  `*[_type == "menu" && lower(title) == "speakeasy"][0] {
+    "pdfUrl": pdf.asset->url
+  }`
+)
+
 export const MENUS_QUERY = defineQuery(
   `*[_type == "menu"] | order(order asc, _createdAt asc) {
     _id,

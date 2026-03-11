@@ -8,7 +8,10 @@ interface HazeLayerProps {
 
 export function HazeLayer({ activeCount }: HazeLayerProps) {
   const isMobile = useIsMobile();
-  const baseOpacity = isMobile ? 0.5 : 1;
+
+  // Skip entirely on mobile — mix-blend-mode: screen forces expensive compositing
+  if (isMobile) return null;
+
   const visible = activeCount >= 2;
   const intensity = Math.min(1, (activeCount - 1) / 4);
 
@@ -16,7 +19,7 @@ export function HazeLayer({ activeCount }: HazeLayerProps) {
     <div
       className="pointer-events-none absolute inset-0"
       style={{
-        opacity: visible ? intensity * baseOpacity : 0,
+        opacity: visible ? intensity : 0,
         transition: "opacity 2s ease",
         mixBlendMode: "screen",
       }}

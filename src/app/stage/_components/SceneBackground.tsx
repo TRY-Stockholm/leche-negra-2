@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback, useImperativeHandle, forwardRef } from "react";
+import { useRef, useEffect, useState, useCallback, useImperativeHandle, forwardRef, useMemo } from "react";
 import { motion, useMotionValue, useSpring, useTransform, animate } from "motion/react";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { instruments, MUSICIAN_LAYERS } from "./stage-config";
+
+const MOBILE_MASK_BLUR = 0;
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const MASK_STROKE_WIDTH = 40;
@@ -114,15 +116,18 @@ export const SceneBackground = forwardRef<SceneBackgroundHandle, SceneBackground
           whiteRect.setAttribute("fill", "white");
           mask.appendChild(whiteRect);
 
+          const isMob = window.matchMedia("(max-width: 768px)").matches;
           const blurFilter = document.createElementNS(SVG_NS, "filter");
           blurFilter.id = "mask-blur";
           blurFilter.setAttribute("x", "-50%");
           blurFilter.setAttribute("y", "-50%");
           blurFilter.setAttribute("width", "200%");
           blurFilter.setAttribute("height", "200%");
-          const blur = document.createElementNS(SVG_NS, "feGaussianBlur");
-          blur.setAttribute("stdDeviation", "8");
-          blurFilter.appendChild(blur);
+          if (!isMob) {
+            const blur = document.createElementNS(SVG_NS, "feGaussianBlur");
+            blur.setAttribute("stdDeviation", "8");
+            blurFilter.appendChild(blur);
+          }
           defs.appendChild(blurFilter);
           defs.appendChild(mask);
 
@@ -218,7 +223,7 @@ export const SceneBackground = forwardRef<SceneBackgroundHandle, SceneBackground
         const isActive = activeInstruments.has(stemId);
         layers.forEach((el) => {
           el.style.opacity = isActive ? "1" : "0";
-          el.style.filter = isActive
+          el.style.filter = isActive && !isMobile
             ? "drop-shadow(0 0 18px rgba(228,49,34,0.5)) drop-shadow(0 0 40px rgba(228,49,34,0.25))"
             : "none";
         });
@@ -226,7 +231,7 @@ export const SceneBackground = forwardRef<SceneBackgroundHandle, SceneBackground
           clone.style.opacity = isActive ? "1" : "0";
         });
       });
-    }, [activeInstruments]);
+    }, [activeInstruments, isMobile]);
 
     useEffect(() => {
       if (bgGroupRef.current) {
