@@ -17,7 +17,7 @@ export function BlackoutOverlay({ active }: BlackoutOverlayProps) {
             zIndex: 9998,
             top: "50%",
             left: "50%",
-            boxShadow: "0 0 0 100vmax #0a0604",
+            boxShadow: "0 0 0 100vmax var(--background)",
           }}
           initial={{ width: "300vmax", height: "300vmax", x: "-50%", y: "-50%" }}
           animate={{ width: 0, height: 0, x: "-50%", y: "-50%" }}

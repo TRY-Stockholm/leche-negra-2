@@ -122,7 +122,7 @@ function TypewriterText({ text }: { text: string }) {
         <span
           className="inline-block w-[2px] h-[1em] ml-[1px] align-middle"
           style={{
-            backgroundColor: "#d44444",
+            backgroundColor: "var(--foreground)",
             animation: "speakeasy-cursor-blink 0.8s step-end infinite",
           }}
         />

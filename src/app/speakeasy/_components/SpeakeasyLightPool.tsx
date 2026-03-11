@@ -31,7 +31,7 @@ export function SpeakeasyLightPool({ visible = true }: SpeakeasyLightPoolProps) 
             width: 400,
             height: 400,
             background:
-              "radial-gradient(circle, rgba(212,68,68,0.08) 0%, rgba(212,68,68,0.03) 40%, transparent 70%)",
+              "radial-gradient(circle, color-mix(in srgb, var(--foreground) 8%, transparent) 0%, color-mix(in srgb, var(--foreground) 3%, transparent) 40%, transparent 70%)",
             filter: "blur(30px)",
             animation: "speakeasy-glow-pulse 8s ease-in-out infinite",
           }}
@@ -52,7 +52,7 @@ export function SpeakeasyLightPool({ visible = true }: SpeakeasyLightPoolProps) 
         marginLeft: -POOL_SIZE / 2,
         marginTop: -POOL_SIZE / 2,
         background:
-          "radial-gradient(circle, rgba(212,68,68,0.07) 0%, rgba(212,68,68,0.03) 30%, transparent 70%)",
+          "radial-gradient(circle, color-mix(in srgb, var(--foreground) 7%, transparent) 0%, color-mix(in srgb, var(--foreground) 3%, transparent) 30%, transparent 70%)",
         filter: "blur(20px)",
         opacity: visible ? 1 : 0,
         transition: "opacity 2s ease-in-out",

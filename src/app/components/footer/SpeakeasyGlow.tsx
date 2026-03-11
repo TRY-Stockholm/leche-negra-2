@@ -6,7 +6,7 @@ export function SpeakeasyGlow() {
       className="fixed inset-0 pointer-events-none"
       style={{
         zIndex: -1,
-        background: "#0a0604",
+        background: "var(--background)",
         opacity: "var(--speakeasy-progress, 0)",
       } as React.CSSProperties}
     >

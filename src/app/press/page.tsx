@@ -1,5 +1,5 @@
 import { client } from "@/sanity/lib/client";
-import { PressCanvas } from "./_components/PressCanvas";
+import { PressPage as PressPageClient } from "./_components/PressPage";
 
 export const dynamic = "force-dynamic";
 
@@ -30,5 +30,5 @@ export default async function PressPage() {
     client.fetch(PRESS_QUOTES_QUERY),
   ]);
 
-  return <PressCanvas images={images} quotes={quotes} />;
+  return <PressPageClient images={images} quotes={quotes} />;
 }

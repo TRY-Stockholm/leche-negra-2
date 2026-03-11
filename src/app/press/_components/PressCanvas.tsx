@@ -2,33 +2,10 @@
 
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { urlFor } from "@/sanity/lib/image";
 import { useCanvasDrag } from "./useCanvasDrag";
 import { PressLightbox } from "./PressLightbox";
-
-/* ── Types ── */
-interface SanityImage {
-  asset: {
-    _id: string;
-    url: string;
-    metadata?: { lqip?: string; dimensions?: { width: number; height: number } };
-  };
-  alt?: string;
-  hotspot?: { x: number; y: number };
-  crop?: { top: number; bottom: number; left: number; right: number };
-}
-
-interface PressImageDoc {
-  _id: string;
-  title: string;
-  image: SanityImage;
-}
-
-interface PressQuoteDoc {
-  _id: string;
-  text: string;
-}
+import type { PressImageDoc, PressQuoteDoc } from "./types";
 
 type CanvasItem =
   | { kind: "image"; doc: PressImageDoc; idx: number }
@@ -180,46 +157,16 @@ export function PressCanvas({
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  // Empty state
-  if (images.length === 0 && quotes.length === 0) {
-    return (
-      <div className="min-h-screen bg-[#0a0604] flex items-center justify-center">
-        <div className="text-center">
-          <p className="font-display italic text-[#f0ebe3]/40 text-lg mb-2">nothing here yet.</p>
-          <Link
-            href="/studio"
-            className="font-body text-[0.6875rem] tracking-[0.06em] uppercase text-[#c9a96e] hover:text-[#f0ebe3] transition-colors duration-300"
-          >
-            Add images in Studio
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 overflow-hidden bg-[#0a0604] select-none"
+      className="fixed inset-0 overflow-hidden bg-background select-none"
       style={{ cursor: lightboxIdx !== null ? "default" : "grab", touchAction: "none" }}
       onPointerDown={handlers.onPointerDown}
       onPointerMove={handlers.onPointerMove}
       onPointerUp={handlers.onPointerUp}
       onPointerCancel={handlers.onPointerUp}
     >
-      {/* Back nav — fixed top-left */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 md:px-10 py-3 pointer-events-none">
-        <Link
-          href="/"
-          className="pointer-events-auto text-[0.6875rem] font-body font-medium tracking-[0.04em] uppercase text-[#a89a8c] hover:text-[#f0ebe3] transition-colors duration-300"
-        >
-          &larr; Back
-        </Link>
-        <span className="font-display italic text-[#f0ebe3]/60 text-sm">
-          Press
-        </span>
-      </nav>
-
       {/* Drag hint */}
       <DragHint />
 
@@ -270,10 +217,10 @@ export function PressCanvas({
                 }}
               >
                 <p
-                  className="font-display italic text-[#f0ebe3]/40 leading-snug"
+                  className="font-display italic text-foreground/40 leading-snug"
                   style={{
                     fontSize: `clamp(0.875rem, ${p.w / 14}px, 1.5rem)`,
-                    textShadow: "0 0 30px rgba(201,169,110,0.08)",
+                    textShadow: "0 0 30px color-mix(in srgb, var(--accent) 8%, transparent)",
                   }}
                 >
                   {p.item.doc.text}
@@ -303,7 +250,7 @@ export function PressCanvas({
                 zIndex: isHovered ? 40 : p.zIndex,
                 cursor: "pointer",
                 boxShadow: isHovered
-                  ? "0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,169,110,0.15)"
+                  ? "0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px color-mix(in srgb, var(--accent) 15%, transparent)"
                   : "0 4px 20px rgba(0,0,0,0.4)",
                 opacity: p.depth > 0 ? 0.7 : 1,
               }}
@@ -344,7 +291,7 @@ export function PressCanvas({
       <div
         className="fixed inset-0 pointer-events-none z-30"
         style={{
-          background: "radial-gradient(ellipse at center, transparent 40%, #0a0604 100%)",
+          background: "radial-gradient(ellipse at center, transparent 40%, var(--background) 100%)",
         }}
       />
     </div>
@@ -379,10 +326,10 @@ function DragHint() {
       style={{ opacity: fading ? 0 : 1 }}
     >
       <div className="text-center">
-        <p className="font-display italic text-[#f0ebe3]/30 text-lg mb-1">
+        <p className="font-display italic text-foreground/30 text-lg mb-1">
           drag to explore
         </p>
-        <p className="font-body text-[#a89a8c]/30 text-xs uppercase tracking-[0.08em]">
+        <p className="font-body text-muted-foreground/30 text-xs uppercase tracking-[0.08em]">
           click any image to view
         </p>
       </div>

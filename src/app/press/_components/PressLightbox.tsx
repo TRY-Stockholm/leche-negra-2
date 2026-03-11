@@ -4,19 +4,7 @@ import { useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
 import gsap from "gsap";
-
-interface PressImageDoc {
-  _id: string;
-  title: string;
-  image: {
-    asset: {
-      _id: string;
-      url: string;
-      metadata?: { lqip?: string; dimensions?: { width: number; height: number } };
-    };
-    alt?: string;
-  };
-}
+import type { PressImageDoc } from "./types";
 
 interface PressLightboxProps {
   images: PressImageDoc[];
@@ -99,11 +87,11 @@ export function PressLightbox({
     <div
       ref={overlayRef}
       className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ backgroundColor: "rgba(10, 6, 4, 0.92)", backdropFilter: "blur(8px)" }}
+      style={{ backgroundColor: "color-mix(in srgb, var(--background) 92%, transparent)", backdropFilter: "blur(8px)" }}
       onClick={handleClose}
     >
       <button
-        className="absolute top-4 right-6 text-[#a89a8c] hover:text-[#f0ebe3] transition-colors duration-200 text-2xl z-10 normal-case tracking-normal"
+        className="absolute top-4 right-6 text-muted-foreground hover:text-foreground transition-colors duration-200 text-2xl z-10 normal-case tracking-normal"
         onClick={(e) => {
           e.stopPropagation();
           handleClose();
@@ -116,7 +104,7 @@ export function PressLightbox({
       {images.length > 1 && (
         <>
           <button
-            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 text-[#a89a8c] hover:text-[#f0ebe3] transition-colors duration-200 text-3xl z-10 normal-case tracking-normal"
+            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200 text-3xl z-10 normal-case tracking-normal"
             onClick={(e) => {
               e.stopPropagation();
               onNavigate((activeIndex - 1 + images.length) % images.length);
@@ -126,7 +114,7 @@ export function PressLightbox({
             &#8249;
           </button>
           <button
-            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 text-[#a89a8c] hover:text-[#f0ebe3] transition-colors duration-200 text-3xl z-10 normal-case tracking-normal"
+            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200 text-3xl z-10 normal-case tracking-normal"
             onClick={(e) => {
               e.stopPropagation();
               onNavigate((activeIndex + 1) % images.length);
@@ -151,7 +139,7 @@ export function PressLightbox({
       />
 
       <div className="absolute bottom-6 left-0 right-0 text-center pointer-events-none">
-        <span className="font-body text-[0.6875rem] tracking-[0.06em] uppercase text-[#a89a8c]/60">
+        <span className="font-body text-[0.6875rem] tracking-[0.06em] uppercase text-muted-foreground/60">
           {active.title}
         </span>
       </div>

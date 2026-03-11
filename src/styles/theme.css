@@ -143,16 +143,7 @@
   --ring: #c9a96e;
 }
 
-/* 411 Speakeasy — scoped dark romanticism palette */
-[data-scene="speakeasy"] {
-  --background: #0a0604;
-  --foreground: #d44444;
-  --accent: #d44444;
-  --muted-foreground: #a05555;
-  --muted: #1a0a0a;
-  --border: #4a2525;
-  --card: #120808;
-}
+/* 411 Speakeasy — inherits active theme colorway */
 
 @theme inline {
   /* Fonts */
@@ -840,7 +831,7 @@
   bottom: 100%;
   width: 40px;
   height: 30px;
-  background: radial-gradient(ellipse, rgba(212,68,68,0.2), transparent 70%);
+  background: radial-gradient(ellipse, color-mix(in srgb, var(--foreground) 20%, transparent), transparent 70%);
   filter: blur(8px);
   opacity: 0;
   pointer-events: none;

@@ -38,7 +38,7 @@ export const Footer = memo(function Footer({
 
   return (
     <footer
-      className="theme-night bg-background border-t border-border/30 touch-none"
+      className="relative theme-night bg-background border-t border-border/30 touch-none"
       style={{
         height,
         cursor: isDragging ? "grabbing" : undefined,

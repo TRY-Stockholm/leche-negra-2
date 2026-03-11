@@ -91,7 +91,7 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings }: SpeakeasySceneProps
       {/* Exit fade overlay */}
       <motion.div
         className="pointer-events-none fixed inset-0 z-[10000]"
-        style={{ backgroundColor: "#0a0604" }}
+        style={{ backgroundColor: "var(--background)" }}
         initial={{ opacity: 0 }}
         animate={{ opacity: isExiting ? 1 : 0 }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
@@ -167,7 +167,7 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings }: SpeakeasySceneProps
                 className="font-display italic text-[clamp(2.5rem,8vw,5.5rem)] font-medium leading-[0.95] text-foreground mb-6"
                 style={{
                   textShadow:
-                    "0 0 30px rgba(212,68,68,0.2), 0 0 60px rgba(212,68,68,0.08)",
+                    "0 0 30px color-mix(in srgb, var(--foreground) 20%, transparent), 0 0 60px color-mix(in srgb, var(--foreground) 8%, transparent)",
                 }}
               >
                 what the walls<br />remember

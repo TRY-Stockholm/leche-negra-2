@@ -109,7 +109,7 @@ function DesktopWhisper({
     <span
       ref={ref}
       className="absolute font-display italic text-[0.875rem]"
-      style={{ left: x, top: y, color: "#a05555", opacity: 0 }}
+      style={{ left: x, top: y, color: "var(--muted-foreground)", opacity: 0 }}
     >
       {text}
     </span>
@@ -145,7 +145,7 @@ function MobileWhispers({ visible = true, whispers }: { visible?: boolean; whisp
         <motion.span
           key={`${w.text}-${i}`}
           className="absolute font-display italic text-[0.875rem]"
-          style={{ left: w.x, top: w.y, color: "#a05555" }}
+          style={{ left: w.x, top: w.y, color: "var(--muted-foreground)" }}
           animate={{ opacity: active === i ? 0.5 : 0 }}
           transition={{ duration: 3 }}
         >
