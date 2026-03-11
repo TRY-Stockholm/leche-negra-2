@@ -1,6 +1,6 @@
 # Leche Negra
 
-Restaurant website for Leche Negra, Stockholm. Time-of-day adaptive theming with four menus: breakfast, lunch, dinner, and drinks.
+Restaurant website for Leche Negra, Stockholm.
 
 Built with React, Framer Motion, and Tailwind CSS v4.
 
