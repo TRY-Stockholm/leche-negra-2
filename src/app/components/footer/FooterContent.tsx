@@ -55,11 +55,11 @@ export function FooterContent({
           onTouchStart={onDragHint}
         >
           <span className="font-display text-[clamp(1rem,2vw,1.5rem)] italic">
-            not everything is on the menu.
+            there's a room downstairs.
           </span>
           <br />
           <span className="font-display text-[clamp(1rem,2vw,1.5rem)] font-bold not-italic">
-            go deeper.
+            find it.
           </span>
         </div>
 

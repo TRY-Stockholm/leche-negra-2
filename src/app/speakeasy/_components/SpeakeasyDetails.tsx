@@ -84,13 +84,13 @@ export function SpeakeasyDetails({ menuPdfUrl, isMuted, onToggleMute }: Speakeas
               <div className="font-display italic text-[clamp(0.875rem,2vw,1.0625rem)] leading-[1.65] text-muted-foreground mt-6 max-w-[520px]">
                 {prefersReducedMotion ? (
                   <p>
-                    Behind the painting, past the lady with still lips — a room
-                    that trades in whispers and well-kept secrets. The cocktails
-                    here have no names you&apos;ll remember by morning.
+                    Past the painting, down the stairs — a smaller room with a
+                    longer pour. The menu changes when it feels like it. Most
+                    people find this place by accident. You&apos;re here now.
                   </p>
                 ) : (
                   <TypewriterText
-                    text="Behind the painting, past the lady with still lips — a room that trades in whispers and well-kept secrets. The cocktails here have no names you'll remember by morning."
+                    text="Past the painting, down the stairs — a smaller room with a longer pour. The menu changes when it feels like it. Most people find this place by accident. You're here now."
                   />
                 )}
               </div>
