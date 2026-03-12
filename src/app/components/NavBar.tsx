@@ -2,7 +2,7 @@ import { useState, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { weatherPoem } from "@/lib/constants";
 
-const WAITERAID_HASH = "dd34bd1ef6c76ba44556cd74fbb9fd3";
+const WAITERAID_HASH = "ddd34bd1ef6c76ba44556cd74fbb9fd3";
 
 interface NavBarProps {
   weather: { temp: number; code: number } | null;

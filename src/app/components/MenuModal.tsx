@@ -19,7 +19,7 @@ const MENU_KEY_TO_TITLE: Record<MenuKey, string> = {
   drinks: "Drinks",
 };
 
-const WAITERAID_HASH = "dd34bd1ef6c76ba44556cd74fbb9fd3";
+const WAITERAID_HASH = "ddd34bd1ef6c76ba44556cd74fbb9fd3";
 
 interface MenuModalProps {
   open: boolean;

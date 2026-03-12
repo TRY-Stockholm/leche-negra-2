@@ -116,7 +116,7 @@ export function FooterContent({
                 <button
                   key={link}
                   className="waiteraid-widget text-[0.6875rem] font-body font-medium tracking-[0.06em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300 cursor-pointer py-1"
-                  data-hash="dd34bd1ef6c76ba44556cd74fbb9fd3"
+                  data-hash="ddd34bd1ef6c76ba44556cd74fbb9fd3"
                 >
                   {link}
                 </button>
