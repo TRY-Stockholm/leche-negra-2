@@ -3,7 +3,6 @@
 import { useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
-import gsap from "gsap";
 import type { PressImageDoc } from "./types";
 
 interface PressLightboxProps {
@@ -26,46 +25,48 @@ export function PressLightbox({
   useEffect(() => {
     if (!overlayRef.current) return;
 
-    gsap.fromTo(
-      overlayRef.current,
-      { opacity: 0 },
-      { opacity: 1, duration: 0.4, ease: "power2.out" },
-    );
-
-    const sourceEl = document.querySelector(
-      `[data-item-id="${active._id}"]`,
-    ) as HTMLElement | null;
-
-    if (sourceEl && imgRef.current) {
-      const rect = sourceEl.getBoundingClientRect();
-      const img = imgRef.current;
-
+    import("gsap").then(({ default: gsap }) => {
       gsap.fromTo(
-        img,
-        {
-          position: "fixed",
-          left: rect.left,
-          top: rect.top,
-          width: rect.width,
-          height: rect.height,
-          opacity: 0.8,
-        },
-        {
-          left: "50%",
-          top: "50%",
-          xPercent: -50,
-          yPercent: -50,
-          width: "auto",
-          height: "auto",
-          maxWidth: "90vw",
-          maxHeight: "85vh",
-          opacity: 1,
-          duration: 0.5,
-          ease: "power3.out",
-          clearProps: "position,left,top,width,height,xPercent,yPercent",
-        },
+        overlayRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.4, ease: "power2.out" },
       );
-    }
+
+      const sourceEl = document.querySelector(
+        `[data-item-id="${active._id}"]`,
+      ) as HTMLElement | null;
+
+      if (sourceEl && imgRef.current) {
+        const rect = sourceEl.getBoundingClientRect();
+        const img = imgRef.current;
+
+        gsap.fromTo(
+          img,
+          {
+            position: "fixed",
+            left: rect.left,
+            top: rect.top,
+            width: rect.width,
+            height: rect.height,
+            opacity: 0.8,
+          },
+          {
+            left: "50%",
+            top: "50%",
+            xPercent: -50,
+            yPercent: -50,
+            width: "auto",
+            height: "auto",
+            maxWidth: "90vw",
+            maxHeight: "85vh",
+            opacity: 1,
+            duration: 0.5,
+            ease: "power3.out",
+            clearProps: "position,left,top,width,height,xPercent,yPercent",
+          },
+        );
+      }
+    });
   }, [active._id]);
 
   const handleClose = useCallback(() => {
@@ -73,11 +74,13 @@ export function PressLightbox({
       onClose();
       return;
     }
-    gsap.to(overlayRef.current, {
-      opacity: 0,
-      duration: 0.3,
-      ease: "power2.in",
-      onComplete: onClose,
+    import("gsap").then(({ default: gsap }) => {
+      gsap.to(overlayRef.current, {
+        opacity: 0,
+        duration: 0.3,
+        ease: "power2.in",
+        onComplete: onClose,
+      });
     });
   }, [onClose]);
 

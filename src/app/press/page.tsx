@@ -1,7 +1,7 @@
 import { client } from "@/sanity/lib/client";
 import { PressPage as PressPageClient } from "./_components/PressPage";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata = {
   title: "Press — Leche Negra",

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import "@/styles/index.css";
-import { CustomCursor } from "./components/CustomCursor";
+import Script from "next/script";
 import { playfairDisplay } from "./fonts";
+import { LazyCustomCursor } from "./components/LazyCustomCursor";
 
 export const metadata: Metadata = {
   title: "Leche Negra",
@@ -23,15 +24,19 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         <link
+          rel="preload"
+          as="style"
+          href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap"
+        />
+        <link
           href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap"
           rel="stylesheet"
         />
       </head>
       <body className="overflow-x-hidden">
-        <CustomCursor />
+        <LazyCustomCursor />
         {children}
-        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
-        <script src="https://www.bokabord.se/widget.min.js" />
+        <Script src="https://www.bokabord.se/widget.min.js" strategy="lazyOnload" />
       </body>
     </html>
   );

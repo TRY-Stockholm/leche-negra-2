@@ -29,6 +29,7 @@ import { motion } from "motion/react";
 import { SpeakeasyGlow } from "./footer/SpeakeasyGlow";
 import { BlackoutOverlay } from "./footer/BlackoutOverlay";
 import { useSpeakeasyDrag } from "@/hooks/useSpeakeasyDrag";
+import { AmbientIllustrations } from "./AmbientIllustrations";
 
 const TAPE_THEME_MAP: Record<string, Theme> = {
   morning: "morning",
@@ -246,6 +247,9 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
               bookingUrl={siteSettings?.bookingUrl}
             />
           </div>
+
+          {/* Ambient sensual illustrations */}
+          <AmbientIllustrations activeMenu={openMenu} activeTheme={activeTheme} />
 
           {/* Cassette player — right side, vertically centered */}
           <div className="col-span-12 row-start-3 flex justify-center py-8 overflow-visible md:col-start-7 md:col-span-5 md:row-start-1 md:row-span-3 md:self-center md:py-0">

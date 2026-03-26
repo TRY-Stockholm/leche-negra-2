@@ -37,7 +37,7 @@ export const TAPES: Record<string, TapeConfig> = {
     accent: "#b8774a",
     reelColor: "#c98a5a",
     glow: "rgba(184,119,74,0.45)",
-    track: "/music/small-step.wav",
+    track: "/music/small-step.mp3",
   },
   evening: {
     id: "evening",

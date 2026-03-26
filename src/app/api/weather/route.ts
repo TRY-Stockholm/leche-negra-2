@@ -5,8 +5,15 @@ export async function GET() {
   const res = await fetch(WEATHER_URL, { next: { revalidate: 1800 } });
   const data = await res.json();
 
-  return Response.json({
-    temp: Math.round(data.current.temperature_2m),
-    code: data.current.weather_code,
-  });
+  return Response.json(
+    {
+      temp: Math.round(data.current.temperature_2m),
+      code: data.current.weather_code,
+    },
+    {
+      headers: {
+        "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=3600",
+      },
+    },
+  );
 }

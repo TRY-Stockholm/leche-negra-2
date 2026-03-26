@@ -1,7 +1,10 @@
 "use client";
 
 import { useRef, useCallback, useEffect } from "react";
-import gsap from "gsap";
+
+type GsapModule = typeof import("gsap");
+let gsapCache: GsapModule | null = null;
+const loadGsap = () => gsapCache ? Promise.resolve(gsapCache) : import("gsap").then(m => { gsapCache = m; return m; });
 
 interface DragState {
   panX: number;
@@ -18,10 +21,11 @@ export function useCanvasDrag({ onUpdate }: UseCanvasDragOptions) {
   const lastPointer = useRef({ x: 0, y: 0 });
   const velocity = useRef({ x: 0, y: 0 });
   const lastTime = useRef(0);
-  const tweenRef = useRef<gsap.core.Tween | null>(null);
+  const tweenRef = useRef<ReturnType<GsapModule["default"]["to"]> | null>(null);
   const onPointerDown = useCallback((e: React.PointerEvent) => {
     if ((e.target as HTMLElement).closest("[data-press-item]")) return;
 
+    loadGsap();
     dragging.current = true;
     lastPointer.current = { x: e.clientX, y: e.clientY };
     velocity.current = { x: 0, y: 0 };
@@ -70,16 +74,18 @@ export function useCanvasDrag({ onUpdate }: UseCanvasDragOptions) {
       };
 
       const proxy = { x: state.current.panX, y: state.current.panY };
-      tweenRef.current = gsap.to(proxy, {
-        x: target.x,
-        y: target.y,
-        duration: Math.min(speed / 800, 2.5),
-        ease: "power3.out",
-        onUpdate: () => {
-          state.current.panX = proxy.x;
-          state.current.panY = proxy.y;
-          onUpdate(proxy.x, proxy.y);
-        },
+      loadGsap().then(({ default: gsap }) => {
+        tweenRef.current = gsap.to(proxy, {
+          x: target.x,
+          y: target.y,
+          duration: Math.min(speed / 800, 2.5),
+          ease: "power3.out",
+          onUpdate: () => {
+            state.current.panX = proxy.x;
+            state.current.panY = proxy.y;
+            onUpdate(proxy.x, proxy.y);
+          },
+        });
       });
     }
   }, [onUpdate]);

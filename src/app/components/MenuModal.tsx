@@ -93,12 +93,23 @@ export const MenuModal = memo(function MenuModal({
                 /* ── Picker view ── */
                 <motion.div
                   key="picker"
-                  className="flex flex-col items-center gap-2"
+                  className="relative flex flex-col items-center gap-2"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.25 }}
                 >
+                  {/* Mirror illustration — bottom right corner */}
+                  <motion.img
+                    src="/mirror.svg"
+                    alt=""
+                    aria-hidden
+                    className="fixed bottom-8 right-8 md:bottom-12 md:right-12 w-[160px] md:w-[280px] pointer-events-none select-none"
+                    initial={{ opacity: 0, y: 20, rotate: 15 }}
+                    animate={{ opacity: 0.35, y: 0, rotate: 10 }}
+                    transition={{ duration: 1.2, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  />
+
                   {MENU_OPTIONS.map((option, i) => (
                     <motion.button
                       key={option.key}

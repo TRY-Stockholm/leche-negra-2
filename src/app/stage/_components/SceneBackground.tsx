@@ -54,8 +54,10 @@ export const SceneBackground = forwardRef<SceneBackgroundHandle, SceneBackground
     const panToMusician = useCallback(
       (stemId: string) => {
         if (!isMobile || !svgRef.current) return;
-        const inst = instruments.find((i) => i.id === stemId);
-        if (!inst) return;
+
+        // Use the actual SVG bounding box of the musician group
+        const layers = musicianGroupsRef.current.get(stemId);
+        if (!layers || layers.length === 0) return;
 
         const svg = svgRef.current;
         const vb = svg.viewBox.baseVal;
@@ -64,8 +66,13 @@ export const SceneBackground = forwardRef<SceneBackgroundHandle, SceneBackground
         const fullWidth = vh * svgAR;
         const vw = window.innerWidth;
 
-        const musicianPixelX = (inst.position.x / 100) * fullWidth;
-        const targetPan = -(musicianPixelX - vw / 2);
+        const bbox = layers[0].getBBox();
+        const centerXInViewBox = bbox.x + bbox.width / 2;
+        const musicianPixelX = (centerXInViewBox / vb.width) * fullWidth;
+        // SVG is initially offset by -overflow/2, so panX=0 shows the SVG center.
+        // Calculate how far the musician is from the SVG center, then negate to pan there.
+        const svgCenterPixelX = fullWidth / 2;
+        const targetPan = -(musicianPixelX - svgCenterPixelX);
         const clamped = Math.max(-panMax, Math.min(panMax, targetPan));
         animate(panX, clamped, { type: "spring", stiffness: 100, damping: 20 });
       },
