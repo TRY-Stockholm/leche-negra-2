@@ -27,17 +27,17 @@ export const TAPES: Record<string, TapeConfig> = {
     accent: "#c9a96e",
     reelColor: "#d4b87a",
     glow: "rgba(201,169,110,0.5)",
-    track: "/music/lofi-jazz.mp3",
+    track: "https://pub-545dc348d7ee4051b8248b68f02e7685.r2.dev/music/lofi-jazz.mp3",
   },
   midday: {
     id: "midday",
-    label: "SUIYUE",
+    label: "SMALL STEP",
     sublabel: "Side A — Midi",
-    shell: "#2a1f14",
-    accent: "#b8774a",
-    reelColor: "#c98a5a",
-    glow: "rgba(184,119,74,0.45)",
-    track: "/music/small-step.mp3",
+    shell: "#1a2a18",
+    accent: "#4ca85c",
+    reelColor: "#5cdb6e",
+    glow: "rgba(76,201,92,0.5)",
+    track: "https://pub-545dc348d7ee4051b8248b68f02e7685.r2.dev/music/small-step.mp3",
   },
   evening: {
     id: "evening",
@@ -47,7 +47,7 @@ export const TAPES: Record<string, TapeConfig> = {
     accent: "#8b2236",
     reelColor: "#a33048",
     glow: "rgba(139,34,54,0.45)",
-    track: "/music/arabesque.mp3",
+    track: "https://pub-545dc348d7ee4051b8248b68f02e7685.r2.dev/music/arabesque.mp3",
   },
   night: {
     id: "night",
@@ -57,7 +57,7 @@ export const TAPES: Record<string, TapeConfig> = {
     accent: "#6b4a3a",
     reelColor: "#7a5a48",
     glow: "rgba(107,74,58,0.4)",
-    track: "/music/silicon.mp3",
+    track: "https://pub-545dc348d7ee4051b8248b68f02e7685.r2.dev/music/silicon.mp3",
   },
 };
 

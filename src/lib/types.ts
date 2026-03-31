@@ -23,6 +23,7 @@ export interface SiteSettings {
   email: string | null;
   openingHours: string | null;
   bookingUrl: string | null;
+  showMenus: boolean | null;
 }
 
 export interface SocialLink {

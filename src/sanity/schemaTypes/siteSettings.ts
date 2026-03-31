@@ -35,6 +35,13 @@ export const siteSettings = defineType({
       title: 'Opening Hours',
     }),
     defineField({
+      name: 'showMenus',
+      type: 'boolean',
+      title: 'Show Menus',
+      description: 'Toggle menus and booking on/off. When off, a countdown is shown instead.',
+      initialValue: false,
+    }),
+    defineField({
       name: 'bookingUrl',
       type: 'url',
       title: 'Booking URL',

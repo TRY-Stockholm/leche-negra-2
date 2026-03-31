@@ -10,6 +10,7 @@ import type {
   CMSMenu,
 } from "@/lib/types";
 import { menuThemeMap, isLightTheme } from "@/lib/constants";
+import { OpeningCountdown } from "./OpeningCountdown";
 import { NeonLogo } from "./NeonLogo";
 import { EasterEggScene } from "./EasterEggScene";
 import { pickNextEgg, type EasterEgg, type SceneConfig } from "./scenes";
@@ -61,6 +62,7 @@ export default function HomePage({
 }
 
 function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
+  const showMenus = siteSettings?.showMenus ?? false;
   const router = useRouter();
   const weather = useWeather();
   const { loadedTapeId } = useTapeDeck();
@@ -159,6 +161,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
             weather={weather}
             bookingUrl={siteSettings?.bookingUrl}
             onMenuClick={handleNavMenuClick}
+            showMenus={showMenus}
           />
           <MenuModal
             open={menuModalOpen}
@@ -184,6 +187,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
           </div>
 
           {/* Menu section — full-width bottom grid */}
+          {showMenus ? (
           <div className="col-span-12 self-end row-start-4 pb-6 lg:pb-8">
             <div className="grid grid-cols-2 md:flex gap-y-6 gap-x-3 lg:gap-12">
               {[
@@ -247,6 +251,9 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
               bookingUrl={siteSettings?.bookingUrl}
             />
           </div>
+          ) : (
+            <OpeningCountdown />
+          )}
 
           {/* Ambient sensual illustrations */}
           <AmbientIllustrations activeMenu={openMenu} activeTheme={activeTheme} />

@@ -14,7 +14,6 @@ import { GodRayLayer } from "./GodRayLayer";
 import { BokehLayer } from "./BokehLayer";
 import { ParticleCanvas } from "./ParticleCanvas";
 import { InstrumentToolbar } from "./InstrumentToolbar";
-import { VolumeControl } from "./VolumeControl";
 
 const PRELOADER_MIN_MS = 2000;
 
@@ -29,7 +28,6 @@ export function StageScene() {
   const [activeInstruments, setActiveInstruments] = useState<Set<string>>(new Set());
   const [isAudioUnlocked, setIsAudioUnlocked] = useState(false);
   const [phase, setPhase] = useState<"preloader" | "scene">("preloader");
-  const [volume, setVolume] = useState(0.8);
 
   // Initialize audio engine, reveal scene after loading (audio unlocks on first interaction)
   useEffect(() => {
@@ -115,16 +113,6 @@ export function StageScene() {
     },
     [isMobile, isAudioUnlocked],
   );
-
-  const handleVolumeChange = useCallback((value: number) => {
-    setVolume(value);
-    engineRef.current?.setVolume(value);
-  }, []);
-
-  const handleMuteAll = useCallback(() => {
-    engineRef.current?.muteAll();
-    setActiveInstruments(new Set());
-  }, []);
 
   const activeCount = activeInstruments.size;
 
@@ -247,15 +235,6 @@ export function StageScene() {
 
         <BokehLayer activeCount={activeCount} />
       </div>
-
-      {/* Volume control */}
-      {isAudioUnlocked && (
-        <VolumeControl
-          volume={volume}
-          onVolumeChange={handleVolumeChange}
-          onMuteAll={handleMuteAll}
-        />
-      )}
 
       {/* Close button */}
       <button

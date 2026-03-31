@@ -6,7 +6,8 @@ export const SITE_SETTINGS_QUERY = defineQuery(
     addressMapUrl,
     email,
     openingHours,
-    bookingUrl
+    bookingUrl,
+    showMenus
   }`
 )
 

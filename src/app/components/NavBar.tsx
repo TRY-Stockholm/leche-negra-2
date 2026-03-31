@@ -1,13 +1,13 @@
 import { useState, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { weatherPoem } from "@/lib/constants";
-
 const WAITERAID_HASH = "ddd34bd1ef6c76ba44556cd74fbb9fd3";
 
 interface NavBarProps {
   weather: { temp: number; code: number } | null;
   bookingUrl?: string | null;
   onMenuClick?: () => void;
+  showMenus?: boolean;
 }
 
 function useNightCountdown() {
@@ -43,7 +43,7 @@ const NAV_LINKS = [
   },
 ] as const;
 
-export const NavBar = memo(function NavBar({ weather, onMenuClick }: NavBarProps) {
+export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus }: NavBarProps) {
   const countdown = useNightCountdown();
   const [open, setOpen] = useState(false);
 
@@ -101,18 +101,22 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick }: NavBarProps
           </button>
 
           {/* Desktop links */}
+          {showMenus && (
           <button
             className="waiteraid-widget hidden md:inline nav-bracket text-muted-foreground hover:text-accent transition-colors duration-200 cursor-pointer"
             data-hash={WAITERAID_HASH}
           >
             Book a Table
           </button>
+          )}
+          {showMenus && (
           <button
             onClick={onMenuClick}
             className="hidden md:inline nav-bracket text-muted-foreground hover:text-accent transition-colors duration-200 cursor-pointer"
           >
             Menus
           </button>
+          )}
           {NAV_LINKS.map((link) => (
             <a
               key={link.href}
@@ -141,13 +145,15 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick }: NavBarProps
             {countdown && <span>{countdown}</span>}
           </div>
 
-          {/* Book a Table — mobile only, always visible */}
+          {/* Book a Table — mobile only */}
+          {showMenus && (
           <button
             className="waiteraid-widget md:hidden nav-bracket text-muted-foreground hover:text-accent transition-colors duration-200 cursor-pointer"
             data-hash={WAITERAID_HASH}
           >
             Book a Table
           </button>
+          )}
         </div>
       </nav>
 
@@ -163,8 +169,9 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick }: NavBarProps
           >
             <div className="flex flex-col items-center justify-center h-full gap-2 px-8">
               {/* Nav links */}
+              {showMenus && (
               <motion.button
-                className="waiteraid-widget font-display italic text-[2rem] text-accent-foreground hover:text-accent transition-colors duration-200 py-2 cursor-pointer"
+                className="waiteraid-widget font-display italic text-[2rem] text-foreground hover:text-accent transition-colors duration-200 py-2 cursor-pointer"
                 data-hash={WAITERAID_HASH}
                 onClick={() => setOpen(false)}
                 initial={{ opacity: 0, y: 20 }}
@@ -178,12 +185,14 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick }: NavBarProps
               >
                 Book a Table
               </motion.button>
+              )}
+              {showMenus && (
               <motion.button
                 onClick={() => {
                   setOpen(false);
                   onMenuClick?.();
                 }}
-                className="font-display italic text-[2rem] text-accent-foreground hover:text-accent transition-colors duration-200 py-2 cursor-pointer"
+                className="font-display italic text-[2rem] text-foreground hover:text-accent transition-colors duration-200 py-2 cursor-pointer"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
@@ -195,6 +204,7 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick }: NavBarProps
               >
                 Menus
               </motion.button>
+              )}
               {NAV_LINKS.map((link, i) => (
                 <motion.a
                   key={link.href}
@@ -203,13 +213,13 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick }: NavBarProps
                   {...("external" in link
                     ? { target: "_blank", rel: "noopener noreferrer" }
                     : {})}
-                  className="font-display italic text-[2rem] text-accent-foreground hover:text-accent transition-colors duration-200 py-2"
+                  className="font-display italic text-[2rem] text-foreground hover:text-accent transition-colors duration-200 py-2"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{
                     duration: 0.35,
-                    delay: 0.08 + (i + 2) * 0.06,
+                    delay: 0.08 + (i + (showMenus ? 2 : 0)) * 0.06,
                     ease: [0.25, 0.46, 0.45, 0.94],
                   }}
                 >
