@@ -38,19 +38,16 @@ export function useSpeakeasyDrag({
   });
 
   const startYRef = useRef(0);
-  const lastYRef = useRef(0);
   const currentOffsetRef = useRef(0);
   const rafRef = useRef<number>(0);
   const containerRef = useRef<HTMLElement | null>(null);
+  const footerRef = useRef<HTMLElement | null>(null);
   const timeoutRefs = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const isDraggingRef = useRef(false);
   const isTransitioningRef = useRef(false);
-  /** Whether we've committed to the speakeasy drag (past the intent threshold) */
   const committedRef = useRef(false);
-  /** Whether this gesture was decided (committed or rejected) */
-  const decidedRef = useRef(false);
-  // Px of sustained upward movement before we commit to the drag
+
   const INTENT_THRESHOLD = 40;
 
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
@@ -122,13 +119,11 @@ export function useSpeakeasyDrag({
 
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
-      // Only handle mouse — touch is handled separately
       if (e.pointerType === "touch") return;
       if (isTransitioningRef.current) return;
       startYRef.current = e.clientY;
       currentOffsetRef.current = 0;
       committedRef.current = false;
-      decidedRef.current = false;
       isDraggingRef.current = true;
     },
     [],
@@ -208,62 +203,36 @@ export function useSpeakeasyDrag({
     [snapBack],
   );
 
-  // ── Touch (mobile) handlers ──
-  // We use native touch events so we can selectively call preventDefault
-  // only after committing to the drag. This lets the browser scroll normally
-  // for any gesture that isn't a clear upward pull.
+  // ── Touch (mobile) ──
+  // Purely passive — never blocks scroll. Just tracks upward swipes
+  // on the footer and triggers the speakeasy when threshold is reached.
 
   useEffect(() => {
-    const el = containerRef.current;
+    const el = footerRef.current;
     if (!el) return;
 
     const handleTouchStart = (e: TouchEvent) => {
       if (isTransitioningRef.current) return;
-      const touch = e.touches[0];
-      startYRef.current = touch.clientY;
-      lastYRef.current = touch.clientY;
+      startYRef.current = e.touches[0].clientY;
       currentOffsetRef.current = 0;
       committedRef.current = false;
-      decidedRef.current = false;
       isDraggingRef.current = true;
     };
 
     const handleTouchMove = (e: TouchEvent) => {
       if (!isDraggingRef.current || isTransitioningRef.current) return;
 
-      const touch = e.touches[0];
-      const rawDelta = startYRef.current - touch.clientY;
-      lastYRef.current = touch.clientY;
+      const rawDelta = startYRef.current - e.touches[0].clientY;
 
-      if (!decidedRef.current) {
-        // User swiping down — let the browser scroll normally
-        if (rawDelta < -10) {
-          decidedRef.current = true;
-          isDraggingRef.current = false;
-          return;
-        }
-        // Not enough upward movement yet — let the browser handle it
-        if (rawDelta < INTENT_THRESHOLD) return;
-        // Commit to speakeasy drag
-        decidedRef.current = true;
+      // Only care about upward movement
+      if (rawDelta < INTENT_THRESHOLD) return;
+
+      if (!committedRef.current) {
         committedRef.current = true;
         setState((s) => ({ ...s, isDragging: true }));
       }
 
-      if (!committedRef.current) return;
-
-      // Prevent scroll — we own this gesture now
-      e.preventDefault();
-
-      if (rawDelta <= 0) {
-        currentOffsetRef.current = 0;
-        if (containerRef.current) {
-          containerRef.current.style.setProperty("--speakeasy-progress", "0");
-        }
-        setState((s) => ({ ...s, offsetY: 0, progress: 0 }));
-        return;
-      }
-
+      // Update glow progress passively (visual feedback without blocking scroll)
       const dampened = applyResistance(rawDelta);
       currentOffsetRef.current = dampened;
       const progress = dampened / maxDrag;
@@ -274,7 +243,6 @@ export function useSpeakeasyDrag({
         if (containerRef.current) {
           containerRef.current.style.setProperty("--speakeasy-progress", String(glowProgress));
         }
-        setState((s) => ({ ...s, offsetY: dampened, progress: glowProgress }));
       });
     };
 
@@ -303,9 +271,8 @@ export function useSpeakeasyDrag({
       snapBack();
     };
 
-    // passive: false so we can call preventDefault on touchmove
     el.addEventListener("touchstart", handleTouchStart, { passive: true });
-    el.addEventListener("touchmove", handleTouchMove, { passive: false });
+    el.addEventListener("touchmove", handleTouchMove, { passive: true });
     el.addEventListener("touchend", handleTouchEnd, { passive: true });
     el.addEventListener("touchcancel", handleTouchCancel, { passive: true });
 
@@ -328,6 +295,7 @@ export function useSpeakeasyDrag({
   return {
     state,
     containerRef,
+    footerRef,
     handlers: {
       onPointerDown,
       onPointerMove,

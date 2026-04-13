@@ -73,7 +73,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
   const [scene, setScene] = useState<SceneConfig | null>(null);
   const eggIndexRef = useRef(0);
 
-  const { state: dragState, containerRef, handlers: dragHandlers, nudge } = useSpeakeasyDrag({
+  const { state: dragState, containerRef, footerRef, handlers: dragHandlers, nudge } = useSpeakeasyDrag({
     maxDrag: 300,
     threshold: 0.4,
     resistance: 0.55,
@@ -302,7 +302,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
           siteSettings={siteSettings}
           socialLinks={socialLinks}
           dragHandlers={dragHandlers}
-          dragRef={containerRef}
+          dragRef={footerRef}
           isDragging={dragState.isDragging}
           onDragHint={nudge}
         />
