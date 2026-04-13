@@ -38,17 +38,20 @@ export function useSpeakeasyDrag({
   });
 
   const startYRef = useRef(0);
+  const lastYRef = useRef(0);
   const currentOffsetRef = useRef(0);
   const rafRef = useRef<number>(0);
   const containerRef = useRef<HTMLElement | null>(null);
   const timeoutRefs = useRef<ReturnType<typeof setTimeout>[]>([]);
 
-  // Mirror boolean state in refs for reliable reads inside pointer handlers
   const isDraggingRef = useRef(false);
   const isTransitioningRef = useRef(false);
   /** Whether we've committed to the speakeasy drag (past the intent threshold) */
   const committedRef = useRef(false);
-  const INTENT_THRESHOLD = 12; // px of upward movement before we capture
+  /** Whether this gesture was decided (committed or rejected) */
+  const decidedRef = useRef(false);
+  // Px of sustained upward movement before we commit to the drag
+  const INTENT_THRESHOLD = 40;
 
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
@@ -60,7 +63,6 @@ export function useSpeakeasyDrag({
     return () => mql.removeEventListener("change", handler);
   }, []);
 
-  /** Helper to track timeouts for cleanup */
   const safeTimeout = useCallback((fn: () => void, ms: number) => {
     const id = setTimeout(fn, ms);
     timeoutRefs.current.push(id);
@@ -72,13 +74,10 @@ export function useSpeakeasyDrag({
     (rawDelta: number) => {
       const normalized = Math.min(rawDelta / maxDrag, 1);
 
-      // Before threshold: heavy resistance (power curve with high exponent)
-      // Past threshold: lighter resistance (latch releasing feel)
       if (normalized <= threshold) {
         const dampened = Math.pow(normalized / threshold, resistance) * threshold;
         return dampened * maxDrag;
       } else {
-        // Continuous at threshold boundary (base = threshold when normalized = threshold)
         const base = threshold;
         const extra = normalized - threshold;
         const lighterResistance = 0.85;
@@ -89,67 +88,6 @@ export function useSpeakeasyDrag({
     [maxDrag, resistance, threshold],
   );
 
-  const onPointerDown = useCallback(
-    (e: React.PointerEvent) => {
-      if (isTransitioningRef.current) return;
-      startYRef.current = e.clientY;
-      currentOffsetRef.current = 0;
-      committedRef.current = false;
-      isDraggingRef.current = true;
-    },
-    [],
-  );
-
-  const onPointerMove = useCallback(
-    (e: React.PointerEvent) => {
-      if (!isDraggingRef.current || isTransitioningRef.current) return;
-
-      const rawDelta = startYRef.current - e.clientY;
-
-      // Not yet committed: check if upward movement exceeds intent threshold
-      if (!committedRef.current) {
-        if (rawDelta < INTENT_THRESHOLD) {
-          // Not enough upward movement (or downward) — let browser scroll
-          return;
-        }
-        // Commit to speakeasy drag: capture pointer and prevent scroll
-        committedRef.current = true;
-        try { (e.target as HTMLElement).setPointerCapture(e.pointerId); } catch {}
-        setState((s) => ({ ...s, isDragging: true }));
-      }
-
-      // Only allow upward drag
-      if (rawDelta <= 0) {
-        currentOffsetRef.current = 0;
-        if (containerRef.current) {
-          containerRef.current.style.setProperty("--speakeasy-progress", "0");
-        }
-        setState((s) => ({ ...s, offsetY: 0, progress: 0 }));
-        return;
-      }
-
-      const dampened = applyResistance(rawDelta);
-      currentOffsetRef.current = dampened;
-
-      const progress = dampened / maxDrag;
-      const glowProgress = Math.min(progress / threshold, 1);
-
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => {
-        // Update CSS custom property on container for glow (avoids React re-renders)
-        if (containerRef.current) {
-          containerRef.current.style.setProperty("--speakeasy-progress", String(glowProgress));
-        }
-        setState((s) => ({
-          ...s,
-          offsetY: dampened,
-          progress: glowProgress,
-        }));
-      });
-    },
-    [applyResistance, maxDrag, threshold],
-  );
-
   const triggerTransition = useCallback(() => {
     isDraggingRef.current = false;
     isTransitioningRef.current = true;
@@ -158,21 +96,16 @@ export function useSpeakeasyDrag({
       containerRef.current.style.setProperty("--speakeasy-progress", "1");
     }
 
-    // Heartbeat during the iris close — a gut-level "am I supposed to be here?"
     if (!prefersReducedMotion) {
       playHeartbeat();
     }
 
-    // After the footer flies up + glow fills screen, navigate
     safeTimeout(() => {
       router.push("/speakeasy");
     }, prefersReducedMotion ? 100 : 1600);
   }, [router, prefersReducedMotion, safeTimeout]);
 
-  const snapBack = useCallback((e?: React.PointerEvent) => {
-    if (e) {
-      try { (e.target as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
-    }
+  const snapBack = useCallback(() => {
     isDraggingRef.current = false;
     if (containerRef.current) {
       containerRef.current.style.setProperty("--speakeasy-progress", "0");
@@ -185,24 +118,78 @@ export function useSpeakeasyDrag({
     });
   }, []);
 
+  // ── Mouse (desktop) handlers via pointer events ──
+
+  const onPointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      // Only handle mouse — touch is handled separately
+      if (e.pointerType === "touch") return;
+      if (isTransitioningRef.current) return;
+      startYRef.current = e.clientY;
+      currentOffsetRef.current = 0;
+      committedRef.current = false;
+      decidedRef.current = false;
+      isDraggingRef.current = true;
+    },
+    [],
+  );
+
+  const onPointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (e.pointerType === "touch") return;
+      if (!isDraggingRef.current || isTransitioningRef.current) return;
+
+      const rawDelta = startYRef.current - e.clientY;
+
+      if (!committedRef.current) {
+        if (rawDelta < INTENT_THRESHOLD) return;
+        committedRef.current = true;
+        try { (e.target as HTMLElement).setPointerCapture(e.pointerId); } catch {}
+        setState((s) => ({ ...s, isDragging: true }));
+      }
+
+      if (rawDelta <= 0) {
+        currentOffsetRef.current = 0;
+        if (containerRef.current) {
+          containerRef.current.style.setProperty("--speakeasy-progress", "0");
+        }
+        setState((s) => ({ ...s, offsetY: 0, progress: 0 }));
+        return;
+      }
+
+      const dampened = applyResistance(rawDelta);
+      currentOffsetRef.current = dampened;
+      const progress = dampened / maxDrag;
+      const glowProgress = Math.min(progress / threshold, 1);
+
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => {
+        if (containerRef.current) {
+          containerRef.current.style.setProperty("--speakeasy-progress", String(glowProgress));
+        }
+        setState((s) => ({ ...s, offsetY: dampened, progress: glowProgress }));
+      });
+    },
+    [applyResistance, maxDrag, threshold],
+  );
+
   const onPointerUp = useCallback(
     (e: React.PointerEvent) => {
+      if (e.pointerType === "touch") return;
       if (!isDraggingRef.current) return;
 
-      // If we never committed, just clean up — browser handled the scroll
       if (!committedRef.current) {
         isDraggingRef.current = false;
         return;
       }
 
       const progress = currentOffsetRef.current / maxDrag;
-
       if (progress >= threshold) {
-        // Past threshold — trigger exit
         try { (e.target as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
         triggerTransition();
       } else {
-        snapBack(e);
+        try { (e.target as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
+        snapBack();
       }
     },
     [maxDrag, threshold, triggerTransition, snapBack],
@@ -210,15 +197,125 @@ export function useSpeakeasyDrag({
 
   const onPointerCancel = useCallback(
     (e: React.PointerEvent) => {
+      if (e.pointerType === "touch") return;
       if (!isDraggingRef.current) return;
       if (!committedRef.current) {
         isDraggingRef.current = false;
         return;
       }
-      snapBack(e);
+      snapBack();
     },
     [snapBack],
   );
+
+  // ── Touch (mobile) handlers ──
+  // We use native touch events so we can selectively call preventDefault
+  // only after committing to the drag. This lets the browser scroll normally
+  // for any gesture that isn't a clear upward pull.
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (isTransitioningRef.current) return;
+      const touch = e.touches[0];
+      startYRef.current = touch.clientY;
+      lastYRef.current = touch.clientY;
+      currentOffsetRef.current = 0;
+      committedRef.current = false;
+      decidedRef.current = false;
+      isDraggingRef.current = true;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isDraggingRef.current || isTransitioningRef.current) return;
+
+      const touch = e.touches[0];
+      const rawDelta = startYRef.current - touch.clientY;
+      lastYRef.current = touch.clientY;
+
+      if (!decidedRef.current) {
+        // User swiping down — let the browser scroll normally
+        if (rawDelta < -10) {
+          decidedRef.current = true;
+          isDraggingRef.current = false;
+          return;
+        }
+        // Not enough upward movement yet — let the browser handle it
+        if (rawDelta < INTENT_THRESHOLD) return;
+        // Commit to speakeasy drag
+        decidedRef.current = true;
+        committedRef.current = true;
+        setState((s) => ({ ...s, isDragging: true }));
+      }
+
+      if (!committedRef.current) return;
+
+      // Prevent scroll — we own this gesture now
+      e.preventDefault();
+
+      if (rawDelta <= 0) {
+        currentOffsetRef.current = 0;
+        if (containerRef.current) {
+          containerRef.current.style.setProperty("--speakeasy-progress", "0");
+        }
+        setState((s) => ({ ...s, offsetY: 0, progress: 0 }));
+        return;
+      }
+
+      const dampened = applyResistance(rawDelta);
+      currentOffsetRef.current = dampened;
+      const progress = dampened / maxDrag;
+      const glowProgress = Math.min(progress / threshold, 1);
+
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => {
+        if (containerRef.current) {
+          containerRef.current.style.setProperty("--speakeasy-progress", String(glowProgress));
+        }
+        setState((s) => ({ ...s, offsetY: dampened, progress: glowProgress }));
+      });
+    };
+
+    const handleTouchEnd = () => {
+      if (!isDraggingRef.current) return;
+
+      if (!committedRef.current) {
+        isDraggingRef.current = false;
+        return;
+      }
+
+      const progress = currentOffsetRef.current / maxDrag;
+      if (progress >= threshold) {
+        triggerTransition();
+      } else {
+        snapBack();
+      }
+    };
+
+    const handleTouchCancel = () => {
+      if (!isDraggingRef.current) return;
+      if (!committedRef.current) {
+        isDraggingRef.current = false;
+        return;
+      }
+      snapBack();
+    };
+
+    // passive: false so we can call preventDefault on touchmove
+    el.addEventListener("touchstart", handleTouchStart, { passive: true });
+    el.addEventListener("touchmove", handleTouchMove, { passive: false });
+    el.addEventListener("touchend", handleTouchEnd, { passive: true });
+    el.addEventListener("touchcancel", handleTouchCancel, { passive: true });
+
+    return () => {
+      el.removeEventListener("touchstart", handleTouchStart);
+      el.removeEventListener("touchmove", handleTouchMove);
+      el.removeEventListener("touchend", handleTouchEnd);
+      el.removeEventListener("touchcancel", handleTouchCancel);
+    };
+  }, [applyResistance, maxDrag, threshold, triggerTransition, snapBack]);
 
   // Cleanup rAF and timeouts on unmount
   useEffect(() => {

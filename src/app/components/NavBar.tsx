@@ -8,6 +8,7 @@ interface NavBarProps {
   onMenuClick?: () => void;
   showMenus?: boolean;
   backHref?: string;
+  addressMapUrl?: string | null;
 }
 
 function useNightCountdown() {
@@ -34,16 +35,17 @@ function useNightCountdown() {
   return label;
 }
 
-const NAV_LINKS = [
-  { href: "/press", label: "Press" },
-  {
-    href: "https://maps.google.com/?q=Engelbrektsgatan+3,+Stockholm",
-    label: "Find Us",
-    external: true,
-  },
-] as const;
+const DEFAULT_MAP_URL = "https://maps.google.com/?q=Engelbrektsgatan+3,+Stockholm";
 
-export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus, backHref }: NavBarProps) {
+export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus, backHref, addressMapUrl }: NavBarProps) {
+  const NAV_LINKS = [
+    { href: "/press", label: "Press" },
+    {
+      href: addressMapUrl ?? DEFAULT_MAP_URL,
+      label: "Find Us",
+      external: true,
+    },
+  ] as const;
   const countdown = useNightCountdown();
   const [open, setOpen] = useState(false);
 
@@ -64,17 +66,6 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus, ba
       <nav className="squiggly-border-b flex items-center justify-between px-5 md:px-10 py-3 md:py-6 text-xs tracking-[0.08em] uppercase font-medium relative z-50">
         {/* Left side */}
         <div className="flex items-center gap-3 sm:gap-4 text-[0.6875rem] tracking-[0.04em]">
-          {/* Back link — shown on sub-pages like the speakeasy */}
-          {backHref && (
-            <a
-              href={backHref}
-              className="nav-bracket text-muted-foreground hover:text-accent transition-colors duration-200"
-              aria-label="Back"
-            >
-              &larr;
-            </a>
-          )}
-
           {/* Hamburger toggle — mobile only */}
           <button
             onClick={() => setOpen((v) => !v)}
@@ -112,6 +103,15 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus, ba
           </button>
 
           {/* Desktop links */}
+          {backHref && (
+            <a
+              href={backHref}
+              className="hidden md:inline nav-bracket text-muted-foreground hover:text-accent transition-colors duration-200"
+              aria-label="Back"
+            >
+              &larr; Back
+            </a>
+          )}
           {showMenus && (
           <button
             className="waiteraid-widget hidden md:inline nav-bracket text-muted-foreground hover:text-accent transition-colors duration-200 cursor-pointer"
@@ -179,6 +179,24 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus, ba
             transition={{ duration: 0.3 }}
           >
             <div className="flex flex-col items-center justify-center h-full gap-2 px-8">
+              {/* Back link — shown on sub-pages like the speakeasy */}
+              {backHref && (
+                <motion.a
+                  href={backHref}
+                  onClick={() => setOpen(false)}
+                  className="font-display italic text-[2rem] text-foreground hover:text-accent transition-colors duration-200 py-2"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{
+                    duration: 0.35,
+                    delay: 0.08,
+                    ease: [0.25, 0.46, 0.45, 0.94],
+                  }}
+                >
+                  &larr; Back
+                </motion.a>
+              )}
               {/* Nav links */}
               {showMenus && (
               <motion.button
@@ -230,7 +248,7 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus, ba
                   exit={{ opacity: 0, y: -10 }}
                   transition={{
                     duration: 0.35,
-                    delay: 0.08 + (i + (showMenus ? 2 : 0)) * 0.06,
+                    delay: 0.08 + (i + (showMenus ? 2 : 0) + (backHref ? 1 : 0)) * 0.06,
                     ease: [0.25, 0.46, 0.45, 0.94],
                   }}
                 >

@@ -106,7 +106,7 @@ export function FooterContent({
           </a>
           <a
             href={`mailto:${siteSettings?.email ?? "hola@lechenegra.se"}`}
-            className="flex items-center gap-2 text-[0.75rem] tracking-[0.06em] uppercase font-body hover:text-accent transition-colors duration-200"
+            className="flex items-center gap-2 text-[0.75rem] tracking-[0.06em] uppercase font-body pointer-events-auto hover:text-foreground transition-colors duration-300"
           >
             <MailIcon />
             <span>{siteSettings?.email ?? "hola@lechenegra.se"}</span>
@@ -115,22 +115,27 @@ export function FooterContent({
 
         <div className="flex flex-col md:flex-row items-start md:items-end gap-3 md:gap-6">
           <nav className="flex gap-4 pointer-events-auto">
-            {["Book a Table", "Menus", "Press", "Find Us"].map((link) =>
-              link === "Book a Table" ? (
-                <button
-                  key={link}
-                  className="waiteraid-widget text-[0.6875rem] font-body font-medium tracking-[0.06em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300 cursor-pointer py-1"
-                  data-hash={BOOKING_WIDGET_HASH}
-                >
-                  {link}
-                </button>
-              ) : (
+            {[
+              { label: "Press", href: "/press" },
+              { label: "Find Us", href: siteSettings?.addressMapUrl ?? "https://maps.google.com/?q=Engelbrektsgatan+3,+Stockholm", external: true },
+            ].map((link) =>
+              link.external ? (
                 <a
-                  key={link}
-                  href="#"
+                  key={link.label}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-[0.6875rem] font-body font-medium tracking-[0.06em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300 py-1"
                 >
-                  {link}
+                  {link.label}
+                </a>
+              ) : (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className="text-[0.6875rem] font-body font-medium tracking-[0.06em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300 py-1"
+                >
+                  {link.label}
                 </a>
               ),
             )}

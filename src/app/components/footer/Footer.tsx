@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, memo } from "react";
+import { useEffect, useState, useCallback, memo, type MutableRefObject } from "react";
 import { FooterContent } from "./FooterContent";
 import type { SiteSettings, SocialLink } from "@/lib/types";
 
@@ -12,6 +12,8 @@ interface FooterProps {
   socialLinks?: SocialLink[];
   /** Pointer handlers from the drag hook — spread onto the footer element */
   dragHandlers?: Record<string, (e: React.PointerEvent) => void>;
+  /** Ref from the drag hook — touch listeners bind to this element */
+  dragRef?: MutableRefObject<HTMLElement | null>;
   /** Whether the user is actively dragging */
   isDragging?: boolean;
   /** Nudge hint callback for the trigger text */
@@ -22,6 +24,7 @@ export const Footer = memo(function Footer({
   siteSettings,
   socialLinks,
   dragHandlers,
+  dragRef,
   isDragging,
   onDragHint,
 }: FooterProps) {
@@ -38,7 +41,10 @@ export const Footer = memo(function Footer({
 
   return (
     <footer
-      className="relative theme-night bg-background border-t border-border/30 touch-none"
+      ref={useCallback((node: HTMLElement | null) => {
+        if (dragRef) dragRef.current = node;
+      }, [dragRef])}
+      className="relative theme-night bg-background border-t border-border/30"
       style={{
         height,
         cursor: isDragging ? "grabbing" : undefined,

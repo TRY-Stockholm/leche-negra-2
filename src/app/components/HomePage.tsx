@@ -162,6 +162,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
             bookingUrl={siteSettings?.bookingUrl}
             onMenuClick={handleNavMenuClick}
             showMenus={showMenus}
+            addressMapUrl={siteSettings?.addressMapUrl}
           />
           <MenuModal
             open={menuModalOpen}
@@ -301,6 +302,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
           siteSettings={siteSettings}
           socialLinks={socialLinks}
           dragHandlers={dragHandlers}
+          dragRef={containerRef}
           isDragging={dragState.isDragging}
           onDragHint={nudge}
         />
