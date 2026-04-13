@@ -13,7 +13,11 @@ export function useWeather() {
   useEffect(() => {
     fetch("/api/weather")
       .then((r) => r.json())
-      .then((data) => setWeather(data))
+      .then((data) => {
+        if (data.temp != null && data.code != null) {
+          setWeather(data);
+        }
+      })
       .catch(() => {});
   }, []);
 

@@ -7,7 +7,8 @@ export const SITE_SETTINGS_QUERY = defineQuery(
     email,
     openingHours,
     bookingUrl,
-    showMenus
+    showMenus,
+    speakeasyMood
   }`
 )
 

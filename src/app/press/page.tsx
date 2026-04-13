@@ -4,7 +4,7 @@ import { PressPage as PressPageClient } from "./_components/PressPage";
 export const revalidate = 60;
 
 export const metadata = {
-  title: "Press — Leche Negra",
+  title: "Press",
   description: "Press images and editorial quotes.",
 };
 

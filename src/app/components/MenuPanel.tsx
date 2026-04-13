@@ -4,7 +4,7 @@ import { useRef, memo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import type { MenuKey, CMSMenu } from "@/lib/types";
 import { menus } from "@/data/menus";
-import { EASE_OUT_EXPO } from "@/lib/constants";
+import { EASE_OUT_EXPO, BOOKING_WIDGET_HASH } from "@/lib/constants";
 
 const MENU_KEY_TO_TITLE: Record<MenuKey, string> = {
   breakfast: "Breakfast",
@@ -96,7 +96,7 @@ export const MenuPanel = memo(function MenuPanel({
               >
                 <button
                   className="waiteraid-widget inline-flex items-center justify-center border border-foreground px-8 py-4 font-display text-[clamp(0.875rem,1.5vw,1.0625rem)] font-medium tracking-[0.04em] uppercase hover:bg-foreground hover:text-background transition-colors duration-300 cursor-pointer"
-                  data-hash="ddd34bd1ef6c76ba44556cd74fbb9fd3"
+                  data-hash={BOOKING_WIDGET_HASH}
                 >
                   Book a Table
                 </button>

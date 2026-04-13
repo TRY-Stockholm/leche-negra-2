@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { StageScene } from "./_components/StageScene";
 
 export const metadata: Metadata = {
-  title: "The Stage — Leche Negra",
+  title: "The Stage",
   description: "Step downstairs. Compose your own soundscape.",
 };
 

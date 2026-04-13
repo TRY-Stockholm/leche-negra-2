@@ -11,7 +11,6 @@ export class StageAudioEngine {
   private analyserData: Uint8Array<ArrayBuffer> | null = null;
   private isInitialized = false;
   private _isUnlocked = false;
-
   get isUnlocked(): boolean {
     return this._isUnlocked;
   }
@@ -28,7 +27,7 @@ export class StageAudioEngine {
     this.analyser = ctx.createAnalyser();
     this.analyser.fftSize = 256;
     this.analyser.smoothingTimeConstant = 0.85;
-    this.analyserData = new Uint8Array(this.analyser.frequencyBinCount);
+    this.analyserData = new Uint8Array(this.analyser.frequencyBinCount) as Uint8Array<ArrayBuffer>;
     this.masterGain.connect(this.analyser as unknown as AudioNode);
 
     instruments.forEach((inst) => {
@@ -44,7 +43,13 @@ export class StageAudioEngine {
       this.gains.set(inst.id, gain);
     });
 
-    await Tone.loaded();
+    // Wait for audio buffers, but don't block forever — players
+    // continue loading in the background and play when ready
+    await Promise.race([
+      Tone.loaded(),
+      new Promise<void>((resolve) => setTimeout(resolve, 15000)),
+    ]);
+
     this.isInitialized = true;
   }
 

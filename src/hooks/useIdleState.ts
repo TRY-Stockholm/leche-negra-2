@@ -12,7 +12,7 @@ export function useIdleState(enabled = true): boolean {
     if (!enabled) return;
 
     function resetTimer() {
-      if (isIdle) setIsIdle(false);
+      setIsIdle(false);
       clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => setIsIdle(true), IDLE_THRESHOLD_MS);
     }
@@ -26,7 +26,8 @@ export function useIdleState(enabled = true): boolean {
       window.removeEventListener("mousemove", resetTimer);
       window.removeEventListener("touchstart", resetTimer);
     };
-  }, [enabled, isIdle]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled]);
 
   return isIdle;
 }

@@ -6,7 +6,7 @@ import { SpeakeasyScene } from "./_components/SpeakeasyScene";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "411 — Leche Negra",
+  title: "Noctuaires",
   description: "Behind the painting.",
 };
 

@@ -1,23 +1,20 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { motion, useReducedMotion } from "motion/react";
+import { useState, useEffect, useRef } from "react";
+import { useReducedMotion } from "motion/react";
 import { NavBar } from "@/app/components/NavBar";
-import { NeonLogo } from "@/app/components/NeonLogo";
 import { useWeather } from "@/hooks/useWeather";
 import { useIdleState } from "@/hooks/useIdleState";
 import { useSpeakeasyAmbience } from "@/hooks/useSpeakeasyAmbience";
 import { SpeakeasyBackground } from "./SpeakeasyBackground";
 import { SpeakeasyBotanicals } from "./SpeakeasyBotanicals";
-import { SpeakeasyDetails } from "./SpeakeasyDetails";
 import { SpeakeasyLightPool } from "./SpeakeasyLightPool";
 import { SpeakeasySmoke } from "./SpeakeasySmoke";
 import { SpeakeasyWhispers } from "./SpeakeasyWhispers";
-import { SpeakeasyReveal } from "./SpeakeasyReveal";
 import { useMousePosition } from "@/hooks/useMousePosition";
 import { useCanHover } from "@/hooks/useCanHover";
 import { MenuModal } from "@/app/components/MenuModal";
+import { NoctuairesHero } from "@/app/components/noctuaires/NoctuairesHero";
 import type { SiteSettings, CMSMenu } from "@/lib/types";
 
 interface SpeakeasySceneProps {
@@ -28,18 +25,16 @@ interface SpeakeasySceneProps {
 
 /**
  * Arrival phases:
- * -1 — Preloader ("be quiet"). Waiting for user gesture.
+ * -1 — Preloader ("be curious"). Waiting for user gesture.
  *  0 — Total darkness (800ms). Black + grain only.
  *  1 — Ember glow fades in from below (2s transition).
- *  2 — Logo stutters on like a neon tube warming up (~1.2s).
- *  3 — Content reveals begin (staggered, slow).
+ *  2 — Logo materializes via GSAP timeline (~2.5s).
+ *  3 — Ambient layers fully active.
  */
 
 export function SpeakeasyScene({ menuPdfUrl, siteSettings, cmsMenus }: SpeakeasySceneProps) {
-  const router = useRouter();
   const weather = useWeather();
   const prefersReducedMotion = useReducedMotion();
-  const [isExiting, setIsExiting] = useState(false);
   const [menuModalOpen, setMenuModalOpen] = useState(false);
   const [phase, setPhase] = useState(prefersReducedMotion ? 3 : -1);
   const [showPatience, setShowPatience] = useState(false);
@@ -48,7 +43,7 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings, cmsMenus }: Speakeasy
   const { x: mouseX, y: mouseY } = useMousePosition();
   const canHover = useCanHover();
   const isIdle = useIdleState(!prefersReducedMotion && phase >= 3);
-  const { startAmbience, toggleMute, isMuted } = useSpeakeasyAmbience(!prefersReducedMotion, isIdle);
+  const { startAmbience } = useSpeakeasyAmbience(!prefersReducedMotion, isIdle);
 
   // Preloader shows for 2.5s, then phase sequence begins
   useEffect(() => {
@@ -72,13 +67,6 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings, cmsMenus }: Speakeasy
     return () => clearTimeout(t);
   }, [prefersReducedMotion, phase]);
 
-  const handleExit = useCallback(() => {
-    setIsExiting(true);
-    setTimeout(() => {
-      router.push("/");
-    }, 600);
-  }, [router]);
-
   return (
     <div
       data-scene="speakeasy"
@@ -90,15 +78,6 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings, cmsMenus }: Speakeasy
       <SpeakeasyLightPool visible={phase >= 1} />
       <SpeakeasySmoke visible={phase >= 2} />
       <SpeakeasyWhispers mouseX={mouseX} mouseY={mouseY} visible={phase >= 3} />
-
-      {/* Exit fade overlay */}
-      <motion.div
-        className="pointer-events-none fixed inset-0 z-[10000]"
-        style={{ backgroundColor: "var(--background)" }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isExiting ? 1 : 0 }}
-        transition={{ duration: 0.5, ease: "easeInOut" }}
-      />
 
       {/* Preloader — timed, then fades out */}
       {!prefersReducedMotion && (
@@ -126,80 +105,16 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings, cmsMenus }: Speakeasy
 
       {/* Content layer */}
       <div className="relative z-10 h-full bg-transparent">
-        <NavBar weather={weather} bookingUrl={siteSettings?.bookingUrl} onMenuClick={() => setMenuModalOpen(true)} />
+        <NavBar weather={weather} bookingUrl={siteSettings?.bookingUrl} onMenuClick={() => setMenuModalOpen(true)} backHref="/" />
         <MenuModal open={menuModalOpen} onClose={() => setMenuModalOpen(false)} cmsMenus={cmsMenus} />
 
-        {/* Main Content — 12-column grid mirroring homepage */}
-        <div className="flex flex-col gap-x-4 px-5 md:px-10 h-[calc(100%-65px)] md:grid md:grid-cols-12 md:grid-rows-[auto_1fr_auto]">
-          {/* 411 Logo — stutters on at phase 2, click to exit */}
-          <div className="shrink-0 pt-8 md:col-span-5 md:pt-16">
-            <div className="max-w-[52%]">
-              <button
-                onClick={handleExit}
-                aria-label="Return to homepage"
-                className="cursor-pointer"
-                style={{
-                  willChange: "opacity",
-                  opacity: phase < 2 ? 0 : undefined,
-                  animation: phase === 2 ? "speakeasy-neon-stutter 1.2s ease-out forwards" : undefined,
-                }}
-              >
-                <NeonLogo
-                  isOff={false}
-                  src="/411-logo-neon.svg"
-                  label="411"
-                />
-              </button>
-            </div>
-          </div>
-
-          {/* Bottom section — always in DOM, opacity-controlled */}
-          <div
-            className="mt-auto overflow-y-auto pb-4 lg:pb-8 md:col-span-12 md:self-end md:row-start-3"
-            style={{
-              opacity: phase >= 3 ? 1 : 0,
-              transition: "opacity 1.2s ease-in-out",
-            }}
-          >
-            <SpeakeasyReveal delay={0} duration={1.2}>
-              <span className="block mb-2 font-body text-[0.6875rem] font-medium tracking-[0.04em] uppercase text-muted-foreground">
-                behind the painting
-              </span>
-            </SpeakeasyReveal>
-
-            {/* Tagline — hero text */}
-            <SpeakeasyReveal delay={0.4} duration={1.2}>
-              <p
-                className="font-display italic text-[clamp(2.5rem,8vw,5.5rem)] font-medium leading-[0.95] text-foreground mb-6"
-                style={{
-                  textShadow:
-                    "0 0 30px color-mix(in srgb, var(--foreground) 20%, transparent), 0 0 60px color-mix(in srgb, var(--foreground) 8%, transparent)",
-                }}
-              >
-                what the walls<br />remember
-              </p>
-            </SpeakeasyReveal>
-
-            {/* Patience reward */}
-            <div
-              style={{
-                opacity: showPatience ? 1 : 0,
-                transition: "opacity 3s ease-in-out",
-              }}
-            >
-              {showPatience && (
-                <p className="font-display italic text-[clamp(0.875rem,2vw,1.125rem)] text-muted-foreground mb-6" style={{ opacity: 0.6 }}>
-                  you&apos;re still here. good.
-                </p>
-              )}
-            </div>
-
-            {/* Action row */}
-            <SpeakeasyDetails menuPdfUrl={menuPdfUrl} isMuted={isMuted} onToggleMute={toggleMute} />
-          </div>
-        </div>
+        <NoctuairesHero
+          phase={phase}
+          menuPdfUrl={menuPdfUrl}
+          showPatience={showPatience}
+          mood={siteSettings?.speakeasyMood ?? undefined}
+        />
       </div>
-
     </div>
   );
 }

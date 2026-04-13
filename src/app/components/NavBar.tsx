@@ -1,13 +1,13 @@
 import { useState, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { weatherPoem } from "@/lib/constants";
-const WAITERAID_HASH = "ddd34bd1ef6c76ba44556cd74fbb9fd3";
+import { weatherPoem, BOOKING_WIDGET_HASH } from "@/lib/constants";
 
 interface NavBarProps {
   weather: { temp: number; code: number } | null;
   bookingUrl?: string | null;
   onMenuClick?: () => void;
   showMenus?: boolean;
+  backHref?: string;
 }
 
 function useNightCountdown() {
@@ -23,8 +23,8 @@ function useNightCountdown() {
       const diff = night.getTime() - now.getTime();
       const h = Math.floor(diff / 3_600_000);
       const m = Math.floor((diff % 3_600_000) / 60_000);
-      if (h > 0) return `${h}h ${m}m til night`;
-      return `${m}m til night`;
+      if (h > 0) return `${h}h ${m}m til midnight`;
+      return `${m}m til midnight`;
     };
     setLabel(compute());
     const id = setInterval(() => setLabel(compute()), 30_000);
@@ -43,7 +43,7 @@ const NAV_LINKS = [
   },
 ] as const;
 
-export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus }: NavBarProps) {
+export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus, backHref }: NavBarProps) {
   const countdown = useNightCountdown();
   const [open, setOpen] = useState(false);
 
@@ -64,6 +64,17 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus }: 
       <nav className="squiggly-border-b flex items-center justify-between px-5 md:px-10 py-3 md:py-6 text-xs tracking-[0.08em] uppercase font-medium relative z-50">
         {/* Left side */}
         <div className="flex items-center gap-3 sm:gap-4 text-[0.6875rem] tracking-[0.04em]">
+          {/* Back link — shown on sub-pages like the speakeasy */}
+          {backHref && (
+            <a
+              href={backHref}
+              className="nav-bracket text-muted-foreground hover:text-accent transition-colors duration-200"
+              aria-label="Back"
+            >
+              &larr;
+            </a>
+          )}
+
           {/* Hamburger toggle — mobile only */}
           <button
             onClick={() => setOpen((v) => !v)}
@@ -104,7 +115,7 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus }: 
           {showMenus && (
           <button
             className="waiteraid-widget hidden md:inline nav-bracket text-muted-foreground hover:text-accent transition-colors duration-200 cursor-pointer"
-            data-hash={WAITERAID_HASH}
+            data-hash={BOOKING_WIDGET_HASH}
           >
             Book a Table
           </button>
@@ -149,7 +160,7 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus }: 
           {showMenus && (
           <button
             className="waiteraid-widget md:hidden nav-bracket text-muted-foreground hover:text-accent transition-colors duration-200 cursor-pointer"
-            data-hash={WAITERAID_HASH}
+            data-hash={BOOKING_WIDGET_HASH}
           >
             Book a Table
           </button>
@@ -172,7 +183,7 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus }: 
               {showMenus && (
               <motion.button
                 className="waiteraid-widget font-display italic text-[2rem] text-foreground hover:text-accent transition-colors duration-200 py-2 cursor-pointer"
-                data-hash={WAITERAID_HASH}
+                data-hash={BOOKING_WIDGET_HASH}
                 onClick={() => setOpen(false)}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

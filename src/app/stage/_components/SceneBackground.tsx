@@ -41,6 +41,7 @@ export const SceneBackground = forwardRef<SceneBackgroundHandle, SceneBackground
     const svgRef = useRef<SVGSVGElement | null>(null);
     const [panMax, setPanMax] = useState(0);
     const [svgLoaded, setSvgLoaded] = useState(false);
+    const [svgError, setSvgError] = useState(false);
 
     const panX = useMotionValue(0);
 
@@ -86,7 +87,10 @@ export const SceneBackground = forwardRef<SceneBackgroundHandle, SceneBackground
       if (!container) return;
 
       fetch("/images/lecheFINAL.svg")
-        .then((r) => r.text())
+        .then((r) => {
+          if (!r.ok) throw new Error(`SVG fetch failed: ${r.status}`);
+          return r.text();
+        })
         .then((text) => {
           container.innerHTML = text;
           const svg = container.querySelector("svg");
@@ -185,7 +189,7 @@ export const SceneBackground = forwardRef<SceneBackgroundHandle, SceneBackground
           setSvgLoaded(true);
         })
         .catch(() => {
-          // SVG failed to load — scene will show the dark background only
+          setSvgError(true);
         });
     }, []);
 
@@ -265,6 +269,11 @@ export const SceneBackground = forwardRef<SceneBackgroundHandle, SceneBackground
         style={{ backgroundColor: "var(--background, #460b08)" }}
         aria-hidden="true"
       >
+        {svgError && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <p className="text-muted-foreground/40 text-sm">Scene unavailable</p>
+          </div>
+        )}
         {isMobile ? (
           <motion.div
             className="absolute inset-0"

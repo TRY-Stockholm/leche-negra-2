@@ -874,6 +874,42 @@
   animation-delay: 0.6s;
 }
 
+/* ── Squiggle hover underline ── */
+.squiggle-hover {
+  position: relative;
+}
+
+.squiggle-hover::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: var(--foreground);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='4' viewBox='0 0 20 4'%3E%3Cpath d='M0 2 Q5 0 10 2 Q15 4 20 2' fill='none' stroke='white' stroke-width='1.5'/%3E%3C/svg%3E");
+  mask-repeat: repeat-x;
+  mask-size: 20px 4px;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='4' viewBox='0 0 20 4'%3E%3Cpath d='M0 2 Q5 0 10 2 Q15 4 20 2' fill='none' stroke='white' stroke-width='1.5'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: repeat-x;
+  -webkit-mask-size: 20px 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  animation: squiggle-crawl 2s linear infinite;
+  animation-play-state: paused;
+  margin-top: 4px;
+}
+
+.squiggle-hover:hover::after {
+  opacity: 1;
+  animation-play-state: running;
+}
+
+@keyframes squiggle-crawl {
+  0% { mask-position: 0 0; -webkit-mask-position: 0 0; }
+  100% { mask-position: 20px 0; -webkit-mask-position: 20px 0; }
+}
+
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .neon-logo {

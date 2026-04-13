@@ -132,7 +132,7 @@ export function OpeningCountdown() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4, ease: EASE_OUT_EXPO }}
         >
-          Wednesday, April 8
+          {OPENING_DATE.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
         </motion.p>
       </motion.div>
     </div>

@@ -4,3 +4,6 @@ dist
 *.local
 .next
 .vercel
+.env
+.env.local
+.env.production

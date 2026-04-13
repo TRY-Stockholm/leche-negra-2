@@ -1,6 +1,7 @@
 "use client";
 
 import type { SiteSettings, SocialLink } from "@/lib/types";
+import { BOOKING_WIDGET_HASH } from "@/lib/constants";
 
 function InstagramIcon() {
   return (
@@ -103,10 +104,13 @@ export function FooterContent({
             <MapPinIcon />
             <span>{siteSettings?.address ?? "Engelbrektsgatan 3, Stockholm"}</span>
           </a>
-          <div className="flex items-center gap-2 text-[0.75rem] tracking-[0.06em] uppercase font-body">
+          <a
+            href={`mailto:${siteSettings?.email ?? "hola@lechenegra.se"}`}
+            className="flex items-center gap-2 text-[0.75rem] tracking-[0.06em] uppercase font-body hover:text-accent transition-colors duration-200"
+          >
             <MailIcon />
             <span>{siteSettings?.email ?? "hola@lechenegra.se"}</span>
-          </div>
+          </a>
         </div>
 
         <div className="flex flex-col md:flex-row items-start md:items-end gap-3 md:gap-6">
@@ -116,7 +120,7 @@ export function FooterContent({
                 <button
                   key={link}
                   className="waiteraid-widget text-[0.6875rem] font-body font-medium tracking-[0.06em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-300 cursor-pointer py-1"
-                  data-hash="ddd34bd1ef6c76ba44556cd74fbb9fd3"
+                  data-hash={BOOKING_WIDGET_HASH}
                 >
                   {link}
                 </button>

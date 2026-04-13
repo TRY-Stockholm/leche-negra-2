@@ -25,6 +25,13 @@ export function PressLightbox({
   useEffect(() => {
     if (!overlayRef.current) return;
 
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (prefersReducedMotion) {
+      overlayRef.current.style.opacity = "1";
+      return;
+    }
+
     import("gsap").then(({ default: gsap }) => {
       gsap.fromTo(
         overlayRef.current,
@@ -74,6 +81,13 @@ export function PressLightbox({
       onClose();
       return;
     }
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) {
+      onClose();
+      return;
+    }
+
     import("gsap").then(({ default: gsap }) => {
       gsap.to(overlayRef.current, {
         opacity: 0,

@@ -14,6 +14,8 @@ export const menuThemeMap: Record<MenuKey, Theme> = {
   drinks: "night",
 };
 
+export const BOOKING_WIDGET_HASH = "ddd34bd1ef6c76ba44556cd74fbb9fd3";
+
 export const EASE_OUT_EXPO = [0.22, 1, 0.36, 1] as const;
 
 export function isLightTheme(theme: Theme | null): boolean {

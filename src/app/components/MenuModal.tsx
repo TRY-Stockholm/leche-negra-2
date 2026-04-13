@@ -19,7 +19,7 @@ const MENU_KEY_TO_TITLE: Record<MenuKey, string> = {
   drinks: "Drinks",
 };
 
-const WAITERAID_HASH = "ddd34bd1ef6c76ba44556cd74fbb9fd3";
+import { BOOKING_WIDGET_HASH } from "@/lib/constants";
 
 interface MenuModalProps {
   open: boolean;
@@ -182,7 +182,7 @@ export const MenuModal = memo(function MenuModal({
                   >
                     <button
                       className="waiteraid-widget inline-flex items-center justify-center border border-foreground px-8 py-4 font-display text-[clamp(0.875rem,1.5vw,1.0625rem)] font-medium tracking-[0.04em] uppercase hover:bg-foreground hover:text-background transition-colors duration-300 cursor-pointer"
-                      data-hash={WAITERAID_HASH}
+                      data-hash={BOOKING_WIDGET_HASH}
                     >
                       Book a Table
                     </button>

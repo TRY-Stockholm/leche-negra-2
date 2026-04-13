@@ -4,7 +4,8 @@ import { siteSettings } from './siteSettings'
 import { socialLink } from './socialLink'
 import { menu } from './menu'
 import { pressQuote } from './pressQuote'
+import { membershipRequest } from './membershipRequest'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [pressImage, siteSettings, socialLink, menu, pressQuote],
+  types: [pressImage, siteSettings, socialLink, menu, pressQuote, membershipRequest],
 }

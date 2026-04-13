@@ -50,6 +50,21 @@ export const siteSettings = defineType({
           scheme: ['http', 'https'],
         }),
     }),
+    defineField({
+      name: 'speakeasyMood',
+      type: 'string',
+      title: 'Speakeasy Mood',
+      description: 'A short atmospheric status shown on the speakeasy page. e.g. "the room is quiet tonight", "standing room only", "come early".',
+      options: {
+        list: [
+          { title: 'The room is quiet tonight', value: 'the room is quiet tonight' },
+          { title: 'A few seats left', value: 'a few seats left' },
+          { title: 'Standing room only', value: 'standing room only' },
+          { title: 'The room is full', value: 'the room is full' },
+          { title: 'Closed tonight', value: 'closed tonight' },
+        ],
+      },
+    }),
   ],
   preview: {
     prepare() {
