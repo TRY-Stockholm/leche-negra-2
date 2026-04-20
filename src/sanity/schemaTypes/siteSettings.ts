@@ -38,8 +38,15 @@ export const siteSettings = defineType({
       name: 'showMenus',
       type: 'boolean',
       title: 'Show Menus',
-      description: 'Toggle menus and booking on/off. When off, a countdown is shown instead.',
+      description: 'Toggle menus on/off. When off, a countdown is shown instead.',
       initialValue: false,
+    }),
+    defineField({
+      name: 'showBooking',
+      type: 'boolean',
+      title: 'Show Booking Links',
+      description: 'Toggle "Book a Table" links (nav, etc.) on/off independently of menus.',
+      initialValue: true,
     }),
     defineField({
       name: 'bookingUrl',

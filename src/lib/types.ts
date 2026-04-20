@@ -24,6 +24,7 @@ export interface SiteSettings {
   openingHours: string | null;
   bookingUrl: string | null;
   showMenus: boolean | null;
+  showBooking: boolean | null;
   speakeasyMood: string | null;
 }
 

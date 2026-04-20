@@ -7,6 +7,7 @@ interface NavBarProps {
   bookingUrl?: string | null;
   onMenuClick?: () => void;
   showMenus?: boolean;
+  showBooking?: boolean;
   backHref?: string;
   addressMapUrl?: string | null;
 }
@@ -37,7 +38,7 @@ function useNightCountdown() {
 
 const DEFAULT_MAP_URL = "https://maps.google.com/?q=Engelbrektsgatan+3,+Stockholm";
 
-export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus, backHref, addressMapUrl }: NavBarProps) {
+export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus, showBooking, backHref, addressMapUrl }: NavBarProps) {
   const NAV_LINKS = [
     { href: "/press", label: "Press" },
     {
@@ -112,7 +113,7 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus, ba
               &larr; Back
             </a>
           )}
-          {showMenus && (
+          {showBooking && (
           <button
             className="waiteraid-widget hidden md:inline nav-bracket text-muted-foreground hover:text-accent transition-colors duration-200 cursor-pointer"
             data-hash={BOOKING_WIDGET_HASH}
@@ -157,7 +158,7 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus, ba
           </div>
 
           {/* Book a Table — mobile only */}
-          {showMenus && (
+          {showBooking && (
           <button
             className="waiteraid-widget md:hidden nav-bracket text-muted-foreground hover:text-accent transition-colors duration-200 cursor-pointer"
             data-hash={BOOKING_WIDGET_HASH}
@@ -198,7 +199,7 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus, ba
                 </motion.a>
               )}
               {/* Nav links */}
-              {showMenus && (
+              {showBooking && (
               <motion.button
                 className="waiteraid-widget font-display italic text-[2rem] text-foreground hover:text-accent transition-colors duration-200 py-2 cursor-pointer"
                 data-hash={BOOKING_WIDGET_HASH}
@@ -248,7 +249,7 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus, ba
                   exit={{ opacity: 0, y: -10 }}
                   transition={{
                     duration: 0.35,
-                    delay: 0.08 + (i + (showMenus ? 2 : 0) + (backHref ? 1 : 0)) * 0.06,
+                    delay: 0.08 + (i + (showBooking ? 1 : 0) + (showMenus ? 1 : 0) + (backHref ? 1 : 0)) * 0.06,
                     ease: [0.25, 0.46, 0.45, 0.94],
                   }}
                 >

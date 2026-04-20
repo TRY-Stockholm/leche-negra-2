@@ -63,6 +63,7 @@ export default function HomePage({
 
 function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
   const showMenus = siteSettings?.showMenus ?? false;
+  const showBooking = siteSettings?.showBooking ?? true;
   const router = useRouter();
   const weather = useWeather();
   const { loadedTapeId } = useTapeDeck();
@@ -162,6 +163,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
             bookingUrl={siteSettings?.bookingUrl}
             onMenuClick={handleNavMenuClick}
             showMenus={showMenus}
+            showBooking={showBooking}
             addressMapUrl={siteSettings?.addressMapUrl}
           />
           <MenuModal

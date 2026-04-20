@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import "@/styles/index.css";
-import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { playfairDisplay } from "./fonts";
 import { LazyCustomCursor } from "./components/LazyCustomCursor";
+import { WaiterAidScript } from "./components/WaiterAidScript";
 
 export const metadata: Metadata = {
   title: {
@@ -85,7 +85,7 @@ export default function RootLayout({
         <LazyCustomCursor />
         {children}
         <Analytics />
-        <Script src="https://www.bokabord.se/widget.min.js" strategy="lazyOnload" />
+        <WaiterAidScript />
       </body>
     </html>
   );

@@ -105,7 +105,7 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings, cmsMenus }: Speakeasy
 
       {/* Content layer */}
       <div className="relative z-10 h-full bg-transparent">
-        <NavBar weather={weather} bookingUrl={siteSettings?.bookingUrl} onMenuClick={() => setMenuModalOpen(true)} backHref="/" addressMapUrl={siteSettings?.addressMapUrl} />
+        <NavBar weather={weather} bookingUrl={siteSettings?.bookingUrl} onMenuClick={() => setMenuModalOpen(true)} showBooking={siteSettings?.showBooking ?? true} backHref="/" addressMapUrl={siteSettings?.addressMapUrl} />
         <MenuModal open={menuModalOpen} onClose={() => setMenuModalOpen(false)} cmsMenus={cmsMenus} />
 
         <NoctuairesHero
