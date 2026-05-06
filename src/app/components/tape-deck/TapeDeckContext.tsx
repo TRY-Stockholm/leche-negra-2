@@ -25,7 +25,7 @@ export function useTapeDeck() {
   return ctx
 }
 
-const SNAP_DISTANCE = 120
+const SNAP_DISTANCE = 160
 
 function getProximity(
   a: { x: number; y: number },
@@ -84,16 +84,31 @@ export function TapeDeckProvider({ children }: { children: ReactNode }) {
 
   // Audio helpers
   const startAudio = useCallback((track: string) => {
-    if (!audioRef.current) { audioRef.current = new Audio(); audioRef.current.loop = true }
+    if (!audioRef.current) {
+      const a = new Audio()
+      a.loop = true
+      audioRef.current = a
+    }
     audioRef.current.src = track
-    audioRef.current.play()
+    audioRef.current.play().catch(() => {})
   }, [])
 
   const stopAudio = useCallback(() => {
-    if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0 }
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.currentTime = 0
+    }
   }, [])
 
-  useEffect(() => () => { if (audioRef.current) { audioRef.current.pause(); audioRef.current = null } }, [])
+  useEffect(
+    () => () => {
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current = null
+      }
+    },
+    [],
+  )
 
   // Tape drag — called on every drag frame by CassetteTape
   const handleTapeDrag = useCallback((id: string, screenCenter: { x: number; y: number }) => {

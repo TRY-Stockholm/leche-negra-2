@@ -84,18 +84,19 @@ export const NavBar = memo(function NavBar({ weather, onMenuClick, showMenus, sh
               strokeLinecap="round"
             >
               <motion.line
-                x1="2" x2="14"
+                x1="2" x2="14" y1="4" y2="4"
                 animate={open ? { y1: 8, y2: 8, rotate: 45 } : { y1: 4, y2: 4, rotate: 0 }}
                 transition={{ duration: 0.3 }}
                 style={{ transformOrigin: "center" }}
               />
               <motion.line
                 x1="2" y1="8" x2="14" y2="8"
+                initial={{ opacity: 1 }}
                 animate={{ opacity: open ? 0 : 1 }}
                 transition={{ duration: 0.15 }}
               />
               <motion.line
-                x1="2" x2="14"
+                x1="2" x2="14" y1="12" y2="12"
                 animate={open ? { y1: 8, y2: 8, rotate: -45 } : { y1: 12, y2: 12, rotate: 0 }}
                 transition={{ duration: 0.3 }}
                 style={{ transformOrigin: "center" }}

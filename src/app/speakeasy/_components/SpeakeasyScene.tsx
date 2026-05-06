@@ -70,7 +70,7 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings, cmsMenus }: Speakeasy
   return (
     <div
       data-scene="speakeasy"
-      className="relative h-dvh overflow-hidden bg-background text-foreground font-body"
+      className="relative h-dvh overflow-hidden bg-background text-foreground font-body no-select"
       style={{ isolation: "isolate" }}
     >
       <SpeakeasyBackground phase={phase} isIdle={isIdle} />

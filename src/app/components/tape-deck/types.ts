@@ -27,7 +27,7 @@ export const TAPES: Record<string, TapeConfig> = {
     accent: "#c9a96e",
     reelColor: "#d4b87a",
     glow: "rgba(201,169,110,0.5)",
-    track: "https://pub-545dc348d7ee4051b8248b68f02e7685.r2.dev/music/lofi-jazz.mp3",
+    track: "https://pub-545dc348d7ee4051b8248b68f02e7685.r2.dev/music/leche1.m4a",
   },
   midday: {
     id: "midday",
@@ -47,7 +47,7 @@ export const TAPES: Record<string, TapeConfig> = {
     accent: "#8b2236",
     reelColor: "#a33048",
     glow: "rgba(139,34,54,0.45)",
-    track: "https://pub-545dc348d7ee4051b8248b68f02e7685.r2.dev/music/arabesque.mp3",
+    track: "https://pub-545dc348d7ee4051b8248b68f02e7685.r2.dev/music/leche2.m4a",
   },
   night: {
     id: "night",
@@ -57,7 +57,7 @@ export const TAPES: Record<string, TapeConfig> = {
     accent: "#6b4a3a",
     reelColor: "#7a5a48",
     glow: "rgba(107,74,58,0.4)",
-    track: "https://pub-545dc348d7ee4051b8248b68f02e7685.r2.dev/music/silicon.mp3",
+    track: "https://pub-545dc348d7ee4051b8248b68f02e7685.r2.dev/music/leche3.m4a",
   },
 };
 

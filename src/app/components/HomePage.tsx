@@ -32,13 +32,6 @@ import { BlackoutOverlay } from "./footer/BlackoutOverlay";
 import { useSpeakeasyDrag } from "@/hooks/useSpeakeasyDrag";
 import { AmbientIllustrations } from "./AmbientIllustrations";
 
-const TAPE_THEME_MAP: Record<string, Theme> = {
-  morning: "morning",
-  midday: "lunch",
-  evening: "dinner",
-  night: "night",
-};
-
 interface HomePageProps {
   siteSettings: SiteSettings | null;
   socialLinks: SocialLink[];
@@ -80,18 +73,10 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
     resistance: 0.55,
   });
 
-  // When a tape is loaded, override the theme
-  useEffect(() => {
-    if (loadedTapeId) {
-      const mapped = TAPE_THEME_MAP[loadedTapeId];
-      if (mapped) setHoverTheme(mapped);
-    } else {
-      // Tape ejected — clear override only if no menu is open
-      if (!openMenu) setHoverTheme(null);
-    }
-  }, [loadedTapeId, openMenu]);
-
+  // Hover-driven theme overrides only happen via menus now; tape changes are
+  // handled separately as a subtle red-hue shift, not a full theme swap.
   const activeTheme = hoverTheme;
+  const tapeMood = loadedTapeId ?? null;
 
   const handleMenuClick = useCallback(
     (menu: MenuKey) => {
@@ -130,7 +115,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
   return (
     <div
       ref={containerRef as React.RefObject<HTMLDivElement>}
-      className={`bg-background text-foreground font-body ${activeTheme ? `theme-${activeTheme}` : ""}`}
+      className={`bg-background text-foreground font-body transition-colors duration-700 ${activeTheme ? `theme-${activeTheme}` : ""} ${tapeMood ? `tape-${tapeMood}` : ""}`}
       style={{ isolation: "isolate" }}
     >
       {/* Glow layer — full viewport, behind everything */}
@@ -175,8 +160,8 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
           {/* Main Content — 12-column grid */}
           <div className="grid grid-cols-12 lg:grid-rows-[auto_1fr_auto] gap-x-4 px-5 md:px-10 min-h-[calc(100svh-48px)] lg:min-h-[calc(100vh-65px)]">
           {/* Logo */}
-          <div className="col-span-12 row-start-1 self-start pt-8 md:col-span-5 md:pt-16">
-            <div className="relative">
+          <div className="col-span-12 row-start-1 self-start pt-8 md:col-span-5 md:pt-16 select-none">
+            <div className="relative no-select">
               <NeonLogo
                 isOff={isLightTheme(activeTheme)}
                 onLongPressComplete={handleLongPressComplete}
@@ -266,26 +251,28 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
             <CassettePlayer />
           </div>
 
-          {/* Cassette tapes — scattered */}
+          {/* Vinyl records — scattered around the gramophone like a record crate mid-browse.
+              Asymmetric on purpose: one bridges the heading to the player, one peeks from
+              the corner, one anchors the lower-right, one tucks beside the gramophone's base. */}
           <CassetteTape
             id="morning"
-            className="col-span-3 row-start-2 self-center pb-8 md:pb-0 md:col-start-7 md:col-span-2 md:row-start-2 md:self-start md:mt-8"
-            style={{ rotate: "-5deg" }}
+            className="col-span-3 row-start-2 self-center pb-8 md:pb-0 md:col-start-5 md:col-span-2 md:row-start-2 md:self-center md:translate-y-6"
+            style={{ rotate: "-9deg" }}
           />
           <CassetteTape
             id="midday"
-            className="col-span-3 col-start-4 row-start-2 self-center pb-8 md:pb-0 md:col-start-11 md:col-span-2 md:row-start-1 md:self-center"
-            style={{ rotate: "3deg" }}
+            className="col-span-3 col-start-4 row-start-2 self-center pb-8 md:pb-0 md:col-start-12 md:col-span-1 md:row-start-1 md:self-start md:mt-2 md:-translate-x-3"
+            style={{ rotate: "14deg" }}
           />
           <CassetteTape
             id="evening"
-            className="col-span-3 col-start-7 row-start-2 self-center pb-8 md:pb-0 md:col-start-9 md:col-span-2 md:row-start-2 md:self-start md:mt-12"
-            style={{ rotate: "7deg" }}
+            className="col-span-3 col-start-7 row-start-2 self-center pb-8 md:pb-0 md:col-start-7 md:col-span-2 md:row-start-3 md:self-end md:mb-2 md:translate-x-2"
+            style={{ rotate: "-4deg" }}
           />
           <CassetteTape
             id="night"
-            className="col-span-3 col-start-10 row-start-2 self-center pb-8 md:pb-0 md:col-start-11 md:col-span-2 md:row-start-2 md:self-start md:mt-4"
-            style={{ rotate: "-3deg" }}
+            className="col-span-3 col-start-10 row-start-2 self-center pb-8 md:pb-0 md:col-start-12 md:col-span-1 md:row-start-3 md:self-end md:mb-6 md:-translate-x-2"
+            style={{ rotate: "8deg" }}
           />
         </div>
 

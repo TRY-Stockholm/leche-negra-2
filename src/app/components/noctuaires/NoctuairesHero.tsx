@@ -158,7 +158,7 @@ export function NoctuairesHero({
   return (
     <div
       ref={containerRef}
-      className="relative flex flex-col items-center h-[calc(100dvh-65px)] px-5 md:px-10 overflow-visible"
+      className="relative flex flex-col items-center h-[calc(100dvh-65px)] px-5 md:px-10 overflow-visible no-select"
     >
       {/* ── Logo — centered, pushed down into the space ── */}
       <div className="relative shrink-0 w-[clamp(100px,14vw,160px)] mt-auto overflow-visible">

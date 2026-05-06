@@ -5,9 +5,9 @@ import type { TapeConfig } from './types'
 import { useTapeDeck } from './TapeDeckContext'
 import { useCanHover } from '@/hooks/useCanHover'
 
-// ─── Cassette Tape SVG ─────────────────────────────────────────
+// ─── Vinyl Disc SVG ────────────────────────────────────────────
 
-let tapeContentCache: string | null = null
+let vinylContentCache: string | null = null
 
 const WOBBLE_ROTATIONS: Record<string, number[]> = {
   morning: [0, -12, 10, -6, 0],
@@ -24,34 +24,36 @@ const WOBBLE_DELAYS: Record<string, number> = {
 }
 
 export const CassetteTapeSVG = memo(function CassetteTapeSVG({ tape, className, style }: { tape: TapeConfig; className?: string; style?: React.CSSProperties }) {
-  const [svgContent, setSvgContent] = useState(tapeContentCache)
+  const [svgContent, setSvgContent] = useState(vinylContentCache)
 
   useEffect(() => {
-    if (tapeContentCache) { setSvgContent(tapeContentCache); return }
-    fetch('/cassete-non-angled.svg')
+    if (vinylContentCache) { setSvgContent(vinylContentCache); return }
+    fetch('/VINYL.svg')
       .then(r => r.text())
       .then(text => {
         const match = text.match(/<svg[^>]*>([\s\S]*)<\/svg>/)
         if (match) {
-          tapeContentCache = match[1]
+          vinylContentCache = match[1]
           setSvgContent(match[1])
         }
       })
   }, [])
 
-  // Replace #fff with the tape's accent color
-  const colored = useMemo(
-    () => svgContent?.replaceAll('fill="#fff"', `fill="${tape.accent}"`) ?? null,
-    [svgContent, tape.accent],
-  )
-
   return (
     <svg
-      viewBox="0 0 316.19 190.17"
-      className={className ?? 'w-full max-w-[130px]'}
-      fill={tape.shell}
-      style={style ?? { filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.6))' }}
-      dangerouslySetInnerHTML={colored ? { __html: colored } : undefined}
+      viewBox="0 0 704.48 704.46"
+      className={className ?? 'w-full max-w-[120px]'}
+      fill="currentColor"
+      stroke="currentColor"
+      strokeWidth={6}
+      strokeLinejoin="round"
+      style={
+        style ?? {
+          color: 'var(--foreground)',
+          filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))',
+        }
+      }
+      dangerouslySetInnerHTML={svgContent ? { __html: svgContent } : undefined}
     />
   )
 })
@@ -121,12 +123,13 @@ export const CassetteTape = memo(function CassetteTape({
         <div className="absolute -inset-4" />
         {isNearDeck && tape && (
           <motion.div
-            className="absolute -inset-1 rounded pointer-events-none"
-            animate={{ opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 0.8, repeat: Infinity }}
+            className="absolute -inset-2 rounded-full pointer-events-none"
+            animate={{ opacity: [0.5, 0.9, 0.5], scale: [0.97, 1.03, 0.97] }}
+            transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
             style={{
-              border: `1px solid ${tape.accent}`,
-              boxShadow: `0 0 8px ${tape.glow}`,
+              border: "1.5px solid rgba(228,49,34,0.85)",
+              boxShadow:
+                "0 0 18px 2px rgba(228,49,34,0.55), inset 0 0 14px rgba(228,49,34,0.3)",
             }}
           />
         )}

@@ -143,6 +143,73 @@
   --ring: #c9a96e;
 }
 
+/* Tape-mood variants — keep the page red, just shift the hue subtly per song */
+.tape-morning {
+  --background: #4a0d05;
+  --foreground: #ec4926;
+  --muted-foreground: #ec4926;
+  --border: #ec4926;
+  --primary: #ec4926;
+  --accent: #ec4926;
+}
+
+.tape-midday {
+  --background: #4a0a0a;
+  --foreground: #f23a2a;
+  --muted-foreground: #f23a2a;
+  --border: #f23a2a;
+  --primary: #f23a2a;
+  --accent: #f23a2a;
+}
+
+.tape-evening {
+  --background: #460b08;
+  --foreground: #e43122;
+  --muted-foreground: #e43122;
+  --border: #e43122;
+  --primary: #e43122;
+  --accent: #e43122;
+}
+
+.tape-night {
+  --background: #3c0808;
+  --foreground: #d12a1c;
+  --muted-foreground: #d12a1c;
+  --border: #d12a1c;
+  --primary: #d12a1c;
+  --accent: #d12a1c;
+}
+
+/* Selection — themed red highlight everywhere instead of the OS default blue */
+::selection {
+  background-color: rgba(228, 49, 34, 0.45);
+  color: var(--foreground);
+}
+::-moz-selection {
+  background-color: rgba(228, 49, 34, 0.45);
+  color: var(--foreground);
+}
+
+/* Decorative graphics shouldn't be selectable / draggable on long-press.
+   Body text and form inputs stay selectable. */
+img,
+svg,
+video,
+canvas {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+}
+
+/* Logo / hero text and any element that tags itself "no-select" */
+.no-select,
+.no-select * {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
 /* 411 Speakeasy — inherits active theme colorway */
 
 @theme inline {
