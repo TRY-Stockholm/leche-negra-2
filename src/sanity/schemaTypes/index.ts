@@ -5,7 +5,8 @@ import { socialLink } from './socialLink'
 import { menu } from './menu'
 import { pressQuote } from './pressQuote'
 import { membershipRequest } from './membershipRequest'
+import { speakeasyPage } from './speakeasyPage'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [pressImage, siteSettings, socialLink, menu, pressQuote, membershipRequest],
+  types: [pressImage, siteSettings, socialLink, menu, pressQuote, membershipRequest, speakeasyPage],
 }

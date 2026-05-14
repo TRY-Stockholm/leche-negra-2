@@ -27,6 +27,15 @@ export const SPEAKEASY_MENU_QUERY = defineQuery(
   }`
 )
 
+export const SPEAKEASY_PAGE_QUERY = defineQuery(
+  `*[_type == "speakeasyPage"][0] {
+    eyebrow,
+    tagline,
+    aboutBody,
+    "pdfUrl": pdf.asset->url
+  }`
+)
+
 export const MENUS_QUERY = defineQuery(
   `*[_type == "menu"] | order(order asc, _createdAt asc) {
     _id,

@@ -1,6 +1,6 @@
 import type { StructureResolver } from 'sanity/structure'
 
-const HIDDEN_TYPES = ['siteSettings', 'membershipRequest']
+const HIDDEN_TYPES = ['siteSettings', 'speakeasyPage', 'membershipRequest']
 
 export const structure: StructureResolver = (S) =>
   S.list()
@@ -13,6 +13,16 @@ export const structure: StructureResolver = (S) =>
             .schemaType('siteSettings')
             .documentId('siteSettings')
             .title('Site Settings'),
+        ),
+
+      S.listItem()
+        .title('Speakeasy Page')
+        .icon(() => '🌙')
+        .child(
+          S.document()
+            .schemaType('speakeasyPage')
+            .documentId('speakeasyPage')
+            .title('Speakeasy Page'),
         ),
 
       S.divider(),

@@ -15,11 +15,12 @@ import { useMousePosition } from "@/hooks/useMousePosition";
 import { useCanHover } from "@/hooks/useCanHover";
 import { MenuModal } from "@/app/components/MenuModal";
 import { NoctuairesHero } from "@/app/components/noctuaires/NoctuairesHero";
-import type { SiteSettings, CMSMenu } from "@/lib/types";
+import type { SiteSettings, CMSMenu, SpeakeasyPage } from "@/lib/types";
 
 interface SpeakeasySceneProps {
   menuPdfUrl?: string;
   siteSettings: SiteSettings | null;
+  speakeasyPage?: SpeakeasyPage | null;
   cmsMenus?: CMSMenu[];
 }
 
@@ -32,7 +33,7 @@ interface SpeakeasySceneProps {
  *  3 — Ambient layers fully active.
  */
 
-export function SpeakeasyScene({ menuPdfUrl, siteSettings, cmsMenus }: SpeakeasySceneProps) {
+export function SpeakeasyScene({ menuPdfUrl, siteSettings, speakeasyPage, cmsMenus }: SpeakeasySceneProps) {
   const weather = useWeather();
   const prefersReducedMotion = useReducedMotion();
   const [menuModalOpen, setMenuModalOpen] = useState(false);
@@ -113,6 +114,9 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings, cmsMenus }: Speakeasy
           menuPdfUrl={menuPdfUrl}
           showPatience={showPatience}
           mood={siteSettings?.speakeasyMood ?? undefined}
+          eyebrow={speakeasyPage?.eyebrow ?? undefined}
+          tagline={speakeasyPage?.tagline ?? undefined}
+          aboutBody={speakeasyPage?.aboutBody ?? undefined}
         />
       </div>
     </div>

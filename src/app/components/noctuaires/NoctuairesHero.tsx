@@ -15,14 +15,28 @@ interface NoctuairesHeroProps {
   menuPdfUrl?: string;
   showPatience: boolean;
   mood?: string;
+  eyebrow?: string;
+  tagline?: string;
+  aboutBody?: string;
 }
+
+const DEFAULT_EYEBROW = "after hours";
+const DEFAULT_TAGLINE = "what the walls\nremember";
+const DEFAULT_ABOUT_BODY =
+  "Some rooms ask to be found.\nThe pour is longer down here.\nThe menu changes when it feels like it.\nIf you're reading this, you're already inside.";
 
 export function NoctuairesHero({
   phase,
   menuPdfUrl,
   showPatience,
   mood,
+  eyebrow,
+  tagline,
+  aboutBody,
 }: NoctuairesHeroProps) {
+  const eyebrowText = eyebrow?.trim() || DEFAULT_EYEBROW;
+  const taglineText = tagline?.trim() || DEFAULT_TAGLINE;
+  const aboutText = aboutBody?.trim() || DEFAULT_ABOUT_BODY;
   const containerRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
@@ -184,22 +198,20 @@ export function NoctuairesHero({
         {/* ── Label ── */}
         <div className="noctuaires-text-reveal">
           <span className="block mb-2 font-body text-[0.6875rem] font-medium tracking-[0.04em] uppercase text-muted-foreground">
-            behind the painting
+            {eyebrowText}
           </span>
         </div>
 
         {/* ── Tagline ── */}
         <div className="noctuaires-text-reveal">
           <p
-            className="font-display italic text-[clamp(2.5rem,8vw,5.5rem)] font-medium leading-[0.95] text-foreground mb-6"
+            className="font-display italic text-[clamp(2.5rem,8vw,5.5rem)] font-medium leading-[0.95] text-foreground mb-6 whitespace-pre-line"
             style={{
               textShadow:
                 "0 0 30px color-mix(in srgb, var(--foreground) 20%, transparent), 0 0 60px color-mix(in srgb, var(--foreground) 8%, transparent)",
             }}
           >
-            what the walls
-            <br />
-            remember
+            {taglineText}
           </p>
         </div>
 
@@ -231,7 +243,7 @@ export function NoctuairesHero({
 
         {/* ── About the room ── */}
         <div className="noctuaires-text-reveal w-full">
-          <AboutTheRoom />
+          <AboutTheRoom body={aboutText} />
         </div>
 
         {/* ── Action row ── */}
@@ -246,14 +258,16 @@ export function NoctuairesHero({
               </button>
             </div>
 
-            <a
-              href={menuPdfUrl ?? "#"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="py-2 font-body text-[0.6875rem] font-medium tracking-[0.06em] uppercase text-muted-foreground transition-opacity duration-300 hover:opacity-80"
-            >
-              see cocktails <span aria-hidden="true">&rarr;</span>
-            </a>
+            {menuPdfUrl && (
+              <a
+                href={menuPdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-2 font-body text-[0.6875rem] font-medium tracking-[0.06em] uppercase text-muted-foreground transition-opacity duration-300 hover:opacity-80"
+              >
+                see cocktails <span aria-hidden="true">&rarr;</span>
+              </a>
+            )}
           </div>
         </div>
       </div>
@@ -266,7 +280,7 @@ export function NoctuairesHero({
   );
 }
 
-function AboutTheRoom() {
+function AboutTheRoom({ body }: { body: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
@@ -309,13 +323,9 @@ function AboutTheRoom() {
             <div className="overflow-hidden">
               <div className="font-display italic text-[clamp(0.875rem,2vw,1.0625rem)] leading-[1.65] text-muted-foreground mt-6 max-w-[520px]">
                 {prefersReducedMotion ? (
-                  <p>
-                    Past the painting, down the stairs — a smaller room with a
-                    longer pour. The menu changes when it feels like it. Most
-                    people find this place by accident. You&apos;re here now.
-                  </p>
+                  <p className="whitespace-pre-line">{body}</p>
                 ) : (
-                  <TypewriterText text="Past the painting, down the stairs — a smaller room with a longer pour. The menu changes when it feels like it. Most people find this place by accident. You're here now." />
+                  <TypewriterText text={body} />
                 )}
               </div>
             </div>
@@ -349,6 +359,7 @@ function TypewriterText({ text }: { text: string }) {
       if (char === "\u2014" || char === "\u2013")
         delay = 220 + Math.random() * 80;
       if (char === " ") delay = 25 + Math.random() * 15;
+      if (char === "\n") delay = 320 + Math.random() * 120;
 
       timerRef.current = setTimeout(type, delay);
     }
@@ -358,7 +369,7 @@ function TypewriterText({ text }: { text: string }) {
   }, [text]);
 
   return (
-    <p>
+    <p className="whitespace-pre-line">
       {displayed}
       {showCursor && (
         <span

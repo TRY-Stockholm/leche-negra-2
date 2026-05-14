@@ -41,3 +41,10 @@ export interface CMSMenu {
   intro: string | null;
   pdfUrl: string | null;
 }
+
+export interface SpeakeasyPage {
+  eyebrow: string | null;
+  tagline: string | null;
+  aboutBody: string | null;
+  pdfUrl: string | null;
+}
