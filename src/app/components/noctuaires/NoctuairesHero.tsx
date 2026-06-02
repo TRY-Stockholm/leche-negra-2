@@ -248,14 +248,22 @@ export function NoctuairesHero({
 
         {/* ── Action row ── */}
         <div className="noctuaires-text-reveal">
-          <div className="flex items-baseline justify-between gap-4">
-            <div className="flex items-baseline gap-4">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+            <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
               <button
                 onClick={() => setDrawerOpen(true)}
                 className="squiggle-hover cursor-pointer py-2 font-body text-[0.6875rem] font-medium tracking-[0.06em] uppercase text-muted-foreground transition-opacity duration-300 hover:opacity-100"
               >
                 request membership
               </button>
+
+              {/* Second experiment — down to the orchestra (/stage) */}
+              <a
+                href="/stage"
+                className="py-2 font-body text-[0.6875rem] font-medium tracking-[0.06em] uppercase text-muted-foreground transition-opacity duration-300 hover:opacity-80"
+              >
+                the orchestra <span aria-hidden="true">&rarr;</span>
+              </a>
             </div>
 
             {menuPdfUrl && (

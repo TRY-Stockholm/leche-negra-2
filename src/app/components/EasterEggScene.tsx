@@ -109,10 +109,14 @@ export function EasterEggScene({
   scene,
   active,
   onDismiss,
+  onComplete,
 }: {
   scene: SceneConfig;
   active: boolean;
+  /** Called when the ritual is escaped early (ESC). */
   onDismiss: () => void;
+  /** Called when the video plays through to the end. Falls back to onDismiss. */
+  onComplete?: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const paintingRef = useRef<HTMLDivElement>(null);
@@ -180,6 +184,8 @@ export function EasterEggScene({
 
   const onDismissRef = useRef(onDismiss);
   onDismissRef.current = onDismiss;
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   const ignite = useCallback(() => {
     const vid = videoRef.current;
@@ -188,7 +194,9 @@ export function EasterEggScene({
     vid.play().catch(() => {});
     setShowVideo(true);
     const handleEnded = () => {
-      onDismissRef.current();
+      // The ritual played through — hand off to the next room if we can,
+      // otherwise just close back to the landing.
+      (onCompleteRef.current ?? onDismissRef.current)();
       vid.removeEventListener("ended", handleEnded);
     };
     vid.addEventListener("ended", handleEnded);

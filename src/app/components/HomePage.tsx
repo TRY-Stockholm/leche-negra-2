@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type {
   Theme,
@@ -13,7 +13,7 @@ import { menuThemeMap, isLightTheme } from "@/lib/constants";
 import { OpeningCountdown } from "./OpeningCountdown";
 import { NeonLogo } from "./NeonLogo";
 import { EasterEggScene } from "./EasterEggScene";
-import { pickNextEgg, type EasterEgg, type SceneConfig } from "./scenes";
+import { PRIMARY_SCENE, type SceneConfig } from "./scenes";
 import { useWeather } from "@/hooks/useWeather";
 import { MenuPanel } from "./MenuPanel";
 import { MenuModal } from "./MenuModal";
@@ -65,7 +65,6 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
   const [menuModalOpen, setMenuModalOpen] = useState(false);
   const [easterEgg, setEasterEgg] = useState(false);
   const [scene, setScene] = useState<SceneConfig | null>(null);
-  const eggIndexRef = useRef(0);
 
   const { state: dragState, containerRef, footerRef, handlers: dragHandlers, nudge } = useSpeakeasyDrag({
     maxDrag: 300,
@@ -101,16 +100,12 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
     setMenuModalOpen(true);
   }, []);
 
+  // Holding the logo opens the floral-combustion ritual; when its video plays
+  // through, the user is delivered into the speakeasy (see onComplete below).
   const handleLongPressComplete = useCallback(() => {
-    const egg = pickNextEgg(eggIndexRef.current);
-    eggIndexRef.current++;
-    if (egg.type === "scene") {
-      setScene(egg.config);
-      setEasterEgg(true);
-    } else {
-      router.push("/stage");
-    }
-  }, [router]);
+    setScene(PRIMARY_SCENE);
+    setEasterEgg(true);
+  }, []);
 
   return (
     <div
@@ -256,22 +251,22 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
               the corner, one anchors the lower-right, one tucks beside the gramophone's base. */}
           <CassetteTape
             id="morning"
-            className="col-span-3 row-start-2 self-center pb-8 md:pb-0 md:col-start-5 md:col-span-2 md:row-start-2 md:self-center md:translate-y-6"
+            className="col-span-3 row-start-2 self-center pb-8 translate-y-5 translate-x-2 md:translate-y-6 md:translate-x-0 md:pb-0 md:col-start-5 md:col-span-2 md:row-start-2 md:self-center"
             style={{ rotate: "-9deg" }}
           />
           <CassetteTape
             id="midday"
-            className="col-span-3 col-start-4 row-start-2 self-center pb-8 md:pb-0 md:col-start-12 md:col-span-1 md:row-start-1 md:self-start md:mt-2 md:-translate-x-3"
+            className="col-span-3 col-start-4 row-start-2 self-center pb-8 -translate-y-4 -translate-x-1 md:translate-y-0 md:pb-0 md:col-start-12 md:col-span-1 md:row-start-1 md:self-start md:mt-2 md:-translate-x-3"
             style={{ rotate: "14deg" }}
           />
           <CassetteTape
             id="evening"
-            className="col-span-3 col-start-7 row-start-2 self-center pb-8 md:pb-0 md:col-start-7 md:col-span-2 md:row-start-3 md:self-end md:mb-2 md:translate-x-2"
+            className="col-span-3 col-start-7 row-start-2 self-center pb-8 translate-y-7 translate-x-2 md:translate-y-0 md:pb-0 md:col-start-7 md:col-span-2 md:row-start-3 md:self-end md:mb-2 md:translate-x-2"
             style={{ rotate: "-4deg" }}
           />
           <CassetteTape
             id="night"
-            className="col-span-3 col-start-10 row-start-2 self-center pb-8 md:pb-0 md:col-start-12 md:col-span-1 md:row-start-3 md:self-end md:mb-6 md:-translate-x-2"
+            className="col-span-3 col-start-10 row-start-2 self-center pb-8 -translate-y-2 -translate-x-2 md:translate-y-0 md:pb-0 md:col-start-12 md:col-span-1 md:row-start-3 md:self-end md:mb-6 md:-translate-x-2"
             style={{ rotate: "8deg" }}
           />
         </div>
@@ -283,6 +278,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
               scene={scene}
               active={easterEgg}
               onDismiss={() => setEasterEgg(false)}
+              onComplete={() => router.push("/speakeasy")}
             />
           )}
         </div>

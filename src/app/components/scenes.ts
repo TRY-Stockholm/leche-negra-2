@@ -60,15 +60,5 @@ export const SCENES: SceneConfig[] = [
   // },
 ];
 
-export type EasterEgg =
-  | { type: "scene"; config: SceneConfig }
-  | { type: "stage" };
-
-export const EASTER_EGGS: EasterEgg[] = [
-  { type: "scene", config: SCENES[0] },
-  { type: "stage" },
-];
-
-export function pickNextEgg(index: number): EasterEgg {
-  return EASTER_EGGS[index % EASTER_EGGS.length];
-}
+/** The floral-combustion ritual shown when the logo is held. */
+export const PRIMARY_SCENE: SceneConfig = SCENES[0];
