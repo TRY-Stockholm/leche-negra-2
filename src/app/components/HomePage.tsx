@@ -26,10 +26,6 @@ import {
 } from "./tape-deck";
 import { Ticker } from "./Ticker";
 import { Footer } from "./footer";
-import { motion } from "motion/react";
-import { SpeakeasyGlow } from "./footer/SpeakeasyGlow";
-import { BlackoutOverlay } from "./footer/BlackoutOverlay";
-import { useSpeakeasyDrag } from "@/hooks/useSpeakeasyDrag";
 import { AmbientIllustrations } from "./AmbientIllustrations";
 
 interface HomePageProps {
@@ -65,12 +61,6 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
   const [menuModalOpen, setMenuModalOpen] = useState(false);
   const [easterEgg, setEasterEgg] = useState(false);
   const [scene, setScene] = useState<SceneConfig | null>(null);
-
-  const { state: dragState, containerRef, footerRef, handlers: dragHandlers, nudge } = useSpeakeasyDrag({
-    maxDrag: 300,
-    threshold: 0.4,
-    resistance: 0.55,
-  });
 
   // Hover-driven theme overrides only happen via menus now; tape changes are
   // handled separately as a subtle red-hue shift, not a full theme swap.
@@ -109,31 +99,10 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
 
   return (
     <div
-      ref={containerRef as React.RefObject<HTMLDivElement>}
       className={`bg-background text-foreground font-body transition-colors duration-700 ${activeTheme ? `theme-${activeTheme}` : ""} ${tapeMood ? `tape-${tapeMood}` : ""}`}
       style={{ isolation: "isolate" }}
     >
-      {/* Glow layer — full viewport, behind everything */}
-      <SpeakeasyGlow />
-
-      {/* The "panel" — entire page moves as one rigid piece */}
-      <motion.div
-        style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
-        animate={{
-          y: dragState.isTransitioning
-            ? -window.innerHeight - 200
-            : dragState.isDragging
-              ? -dragState.offsetY
-              : 0,
-        }}
-        transition={
-          dragState.isTransitioning
-            ? { duration: 0.5, ease: [0.16, 1, 0.3, 1] }
-            : dragState.isDragging
-              ? { duration: 0 }
-              : { type: "spring", stiffness: 200, damping: 25 }
-        }
-      >
+      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
         <div
           className="relative z-10 flex-1 bg-background"
           style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}
@@ -153,7 +122,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
           />
 
           {/* Main Content — 12-column grid */}
-          <div className="grid grid-cols-12 lg:grid-rows-[auto_1fr_auto] gap-x-4 px-5 md:px-10 min-h-[calc(100svh-48px)] lg:min-h-[calc(100vh-65px)]">
+          <div className="grid grid-cols-12 lg:grid-rows-[auto_1fr_auto] gap-x-4 px-5 md:px-10 min-h-[calc(100svh-84px)] lg:min-h-[calc(100vh-65px)]">
           {/* Logo */}
           <div className="col-span-12 row-start-1 self-start pt-8 md:col-span-5 md:pt-16 select-none">
             <div className="relative no-select">
@@ -286,15 +255,8 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
         <Footer
           siteSettings={siteSettings}
           socialLinks={socialLinks}
-          dragHandlers={dragHandlers}
-          dragRef={footerRef}
-          isDragging={dragState.isDragging}
-          onDragHint={nudge}
         />
-      </motion.div>
-
-      {/* Blackout during transition — outside the moving panel */}
-      <BlackoutOverlay active={dragState.isTransitioning} />
+      </div>
     </div>
   );
 }

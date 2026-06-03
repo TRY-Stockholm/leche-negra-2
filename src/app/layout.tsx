@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { playfairDisplay } from "./fonts";
 import { LazyCustomCursor } from "./components/LazyCustomCursor";
 import { WaiterAidScript } from "./components/WaiterAidScript";
+import { AudioUnlockMount } from "./components/AudioUnlockMount";
 
 export const metadata: Metadata = {
   title: {
@@ -82,6 +83,7 @@ export default function RootLayout({
         />
       </head>
       <body className="overflow-x-hidden">
+        <AudioUnlockMount />
         <LazyCustomCursor />
         {children}
         <Analytics />

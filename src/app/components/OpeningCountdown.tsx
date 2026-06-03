@@ -21,15 +21,6 @@ export function OpeningCountdown() {
         transition={{ duration: 0.8, ease: EASE_OUT_EXPO }}
       >
         <motion.p
-          className="font-body text-[0.6875rem] font-medium tracking-[0.04em] uppercase text-muted-foreground mb-2 lg:mb-0"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.05, ease: EASE_OUT_EXPO }}
-        >
-          Opening for reservations
-        </motion.p>
-
-        <motion.p
           className="font-display italic text-[clamp(2rem,5vw,4rem)] text-accent leading-tight"
           style={{ textShadow: NEON_GLOW }}
           initial={{ opacity: 0, y: 20 }}

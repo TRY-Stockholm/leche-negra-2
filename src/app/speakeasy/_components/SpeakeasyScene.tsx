@@ -26,7 +26,7 @@ interface SpeakeasySceneProps {
 
 /**
  * Arrival phases:
- * -1 — Preloader ("be curious"). Waiting for user gesture.
+ * -1 — Preloader ("Welcome down"). Waiting for user gesture.
  *  0 — Total darkness (800ms). Black + grain only.
  *  1 — Ember glow fades in from below (2s transition).
  *  2 — Logo materializes via GSAP timeline (~2.5s).
@@ -44,7 +44,7 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings, speakeasyPage, cmsMen
   const { x: mouseX, y: mouseY } = useMousePosition();
   const canHover = useCanHover();
   const isIdle = useIdleState(!prefersReducedMotion && phase >= 3);
-  const { startAmbience } = useSpeakeasyAmbience(!prefersReducedMotion, isIdle);
+  const { startAmbience, needsGesture } = useSpeakeasyAmbience(!prefersReducedMotion, isIdle);
 
   // Preloader shows for 2.5s, then phase sequence begins
   useEffect(() => {
@@ -99,13 +99,13 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings, speakeasyPage, cmsMen
               transition: "opacity 1.5s ease-out 0.3s",
             }}
           >
-            Be curious
+            Welcome down
           </p>
         </div>
       )}
 
       {/* Content layer */}
-      <div className="relative z-10 h-full bg-transparent">
+      <div className="relative z-10 h-full bg-transparent flex flex-col">
         <NavBar weather={weather} bookingUrl={siteSettings?.bookingUrl} onMenuClick={() => setMenuModalOpen(true)} showBooking={siteSettings?.showBooking ?? true} backHref="/" addressMapUrl={siteSettings?.addressMapUrl} />
         <MenuModal open={menuModalOpen} onClose={() => setMenuModalOpen(false)} cmsMenus={cmsMenus} />
 
@@ -119,6 +119,26 @@ export function SpeakeasyScene({ menuPdfUrl, siteSettings, speakeasyPage, cmsMen
           aboutBody={speakeasyPage?.aboutBody ?? undefined}
         />
       </div>
+
+      {/* "Tap for sound" cue — only when iOS hasn't unlocked audio yet (deep-link
+          with no prior gesture). Fades out the instant the user interacts. */}
+      {!prefersReducedMotion && preloaderDismissed && (
+        <div
+          className="pointer-events-none fixed inset-x-0 bottom-10 z-[60] flex justify-center"
+          style={{
+            opacity: needsGesture ? 0.55 : 0,
+            transition: "opacity 1s ease-out",
+          }}
+          aria-hidden="true"
+        >
+          <p
+            className="font-display italic text-[clamp(0.85rem,3vw,1.15rem)] select-none"
+            style={{ color: "#e43122" }}
+          >
+            tap for sound
+          </p>
+        </div>
+      )}
     </div>
   );
 }

@@ -172,7 +172,7 @@ export function NoctuairesHero({
   return (
     <div
       ref={containerRef}
-      className="relative flex flex-col items-center h-[calc(100dvh-65px)] px-5 md:px-10 overflow-visible no-select"
+      className="relative flex flex-col items-center flex-1 min-h-0 px-5 md:px-10 overflow-visible no-select"
     >
       {/* ── Logo — centered, pushed down into the space ── */}
       <div className="relative shrink-0 w-[clamp(100px,14vw,160px)] mt-auto overflow-visible">
@@ -194,7 +194,7 @@ export function NoctuairesHero({
       </div>
 
       {/* ── Text content — anchored bottom-left ── */}
-      <div className="mt-auto pb-6 md:pb-10 self-start w-full">
+      <div className="mt-auto pb-10 md:pb-10 self-start w-full">
         {/* ── Label ── */}
         <div className="noctuaires-text-reveal">
           <span className="block mb-2 font-body text-[0.6875rem] font-medium tracking-[0.04em] uppercase text-muted-foreground">
