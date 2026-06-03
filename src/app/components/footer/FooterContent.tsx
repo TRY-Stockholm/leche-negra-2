@@ -1,7 +1,6 @@
 "use client";
 
 import type { SiteSettings, SocialLink } from "@/lib/types";
-import { BOOKING_WIDGET_HASH } from "@/lib/constants";
 
 function InstagramIcon() {
   return (
@@ -32,29 +31,20 @@ function MailIcon() {
 }
 
 interface FooterContentProps {
-  onDragHint: () => void;
   siteSettings?: SiteSettings | null;
   socialLinks?: SocialLink[];
-  isDragging?: boolean;
 }
 
 export function FooterContent({
-  onDragHint,
   siteSettings,
   socialLinks,
-  isDragging,
 }: FooterContentProps) {
   return (
     <div className="absolute inset-0 z-20 pointer-events-none flex flex-col justify-between px-5 py-6 md:px-10 md:py-10">
       {/* Top row */}
       <div className="flex items-start justify-between">
-        {/* Trigger text — top left */}
-        <div
-          className="pointer-events-auto leading-snug text-foreground/60 hover:text-foreground transition-colors duration-500 text-left select-none"
-          style={{ cursor: isDragging ? "grabbing" : "grab" }}
-          onMouseEnter={onDragHint}
-          onTouchStart={onDragHint}
-        >
+        {/* Flavor text — top left */}
+        <div className="leading-snug text-foreground/60 text-left select-none">
           <span className="font-display text-[clamp(1rem,2vw,1.5rem)] italic">
             there's a room downstairs.
           </span>
@@ -113,7 +103,7 @@ export function FooterContent({
           </a>
         </div>
 
-        <div className="flex flex-col md:flex-row items-start md:items-end gap-3 md:gap-6">
+        <div className="flex flex-col md:flex-row items-start md:items-baseline gap-3 md:gap-6">
           <nav className="flex gap-4 pointer-events-auto">
             {[
               { label: "Press", href: "/press" },

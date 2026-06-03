@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type {
   Theme,
@@ -13,7 +13,7 @@ import { menuThemeMap, isLightTheme } from "@/lib/constants";
 import { OpeningCountdown } from "./OpeningCountdown";
 import { NeonLogo } from "./NeonLogo";
 import { EasterEggScene } from "./EasterEggScene";
-import { pickNextEgg, type EasterEgg, type SceneConfig } from "./scenes";
+import { PRIMARY_SCENE, type SceneConfig } from "./scenes";
 import { useWeather } from "@/hooks/useWeather";
 import { MenuPanel } from "./MenuPanel";
 import { MenuModal } from "./MenuModal";
@@ -26,10 +26,6 @@ import {
 } from "./tape-deck";
 import { Ticker } from "./Ticker";
 import { Footer } from "./footer";
-import { motion } from "motion/react";
-import { SpeakeasyGlow } from "./footer/SpeakeasyGlow";
-import { BlackoutOverlay } from "./footer/BlackoutOverlay";
-import { useSpeakeasyDrag } from "@/hooks/useSpeakeasyDrag";
 import { AmbientIllustrations } from "./AmbientIllustrations";
 
 interface HomePageProps {
@@ -65,13 +61,6 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
   const [menuModalOpen, setMenuModalOpen] = useState(false);
   const [easterEgg, setEasterEgg] = useState(false);
   const [scene, setScene] = useState<SceneConfig | null>(null);
-  const eggIndexRef = useRef(0);
-
-  const { state: dragState, containerRef, footerRef, handlers: dragHandlers, nudge } = useSpeakeasyDrag({
-    maxDrag: 300,
-    threshold: 0.4,
-    resistance: 0.55,
-  });
 
   // Hover-driven theme overrides only happen via menus now; tape changes are
   // handled separately as a subtle red-hue shift, not a full theme swap.
@@ -101,44 +90,19 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
     setMenuModalOpen(true);
   }, []);
 
+  // Holding the logo opens the floral-combustion ritual; when its video plays
+  // through, the user is delivered into the speakeasy (see onComplete below).
   const handleLongPressComplete = useCallback(() => {
-    const egg = pickNextEgg(eggIndexRef.current);
-    eggIndexRef.current++;
-    if (egg.type === "scene") {
-      setScene(egg.config);
-      setEasterEgg(true);
-    } else {
-      router.push("/stage");
-    }
-  }, [router]);
+    setScene(PRIMARY_SCENE);
+    setEasterEgg(true);
+  }, []);
 
   return (
     <div
-      ref={containerRef as React.RefObject<HTMLDivElement>}
       className={`bg-background text-foreground font-body transition-colors duration-700 ${activeTheme ? `theme-${activeTheme}` : ""} ${tapeMood ? `tape-${tapeMood}` : ""}`}
       style={{ isolation: "isolate" }}
     >
-      {/* Glow layer — full viewport, behind everything */}
-      <SpeakeasyGlow />
-
-      {/* The "panel" — entire page moves as one rigid piece */}
-      <motion.div
-        style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
-        animate={{
-          y: dragState.isTransitioning
-            ? -window.innerHeight - 200
-            : dragState.isDragging
-              ? -dragState.offsetY
-              : 0,
-        }}
-        transition={
-          dragState.isTransitioning
-            ? { duration: 0.5, ease: [0.16, 1, 0.3, 1] }
-            : dragState.isDragging
-              ? { duration: 0 }
-              : { type: "spring", stiffness: 200, damping: 25 }
-        }
-      >
+      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
         <div
           className="relative z-10 flex-1 bg-background"
           style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}
@@ -158,7 +122,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
           />
 
           {/* Main Content — 12-column grid */}
-          <div className="grid grid-cols-12 lg:grid-rows-[auto_1fr_auto] gap-x-4 px-5 md:px-10 min-h-[calc(100svh-48px)] lg:min-h-[calc(100vh-65px)]">
+          <div className="grid grid-cols-12 lg:grid-rows-[auto_1fr_auto] gap-x-4 px-5 md:px-10 min-h-[calc(100svh-84px)] lg:min-h-[calc(100vh-65px)]">
           {/* Logo */}
           <div className="col-span-12 row-start-1 self-start pt-8 md:col-span-5 md:pt-16 select-none">
             <div className="relative no-select">
@@ -256,22 +220,22 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
               the corner, one anchors the lower-right, one tucks beside the gramophone's base. */}
           <CassetteTape
             id="morning"
-            className="col-span-3 row-start-2 self-center pb-8 md:pb-0 md:col-start-5 md:col-span-2 md:row-start-2 md:self-center md:translate-y-6"
+            className="col-span-3 row-start-2 self-center pb-8 translate-y-5 translate-x-2 md:translate-y-6 md:translate-x-0 md:pb-0 md:col-start-5 md:col-span-2 md:row-start-2 md:self-center"
             style={{ rotate: "-9deg" }}
           />
           <CassetteTape
             id="midday"
-            className="col-span-3 col-start-4 row-start-2 self-center pb-8 md:pb-0 md:col-start-12 md:col-span-1 md:row-start-1 md:self-start md:mt-2 md:-translate-x-3"
+            className="col-span-3 col-start-4 row-start-2 self-center pb-8 -translate-y-4 -translate-x-1 md:translate-y-0 md:pb-0 md:col-start-12 md:col-span-1 md:row-start-1 md:self-start md:mt-2 md:-translate-x-3"
             style={{ rotate: "14deg" }}
           />
           <CassetteTape
             id="evening"
-            className="col-span-3 col-start-7 row-start-2 self-center pb-8 md:pb-0 md:col-start-7 md:col-span-2 md:row-start-3 md:self-end md:mb-2 md:translate-x-2"
+            className="col-span-3 col-start-7 row-start-2 self-center pb-8 translate-y-7 translate-x-2 md:translate-y-0 md:pb-0 md:col-start-7 md:col-span-2 md:row-start-3 md:self-end md:mb-2 md:translate-x-2"
             style={{ rotate: "-4deg" }}
           />
           <CassetteTape
             id="night"
-            className="col-span-3 col-start-10 row-start-2 self-center pb-8 md:pb-0 md:col-start-12 md:col-span-1 md:row-start-3 md:self-end md:mb-6 md:-translate-x-2"
+            className="col-span-3 col-start-10 row-start-2 self-center pb-8 -translate-y-2 -translate-x-2 md:translate-y-0 md:pb-0 md:col-start-12 md:col-span-1 md:row-start-3 md:self-end md:mb-6 md:-translate-x-2"
             style={{ rotate: "8deg" }}
           />
         </div>
@@ -283,6 +247,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
               scene={scene}
               active={easterEgg}
               onDismiss={() => setEasterEgg(false)}
+              onComplete={() => router.push("/speakeasy")}
             />
           )}
         </div>
@@ -290,15 +255,8 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
         <Footer
           siteSettings={siteSettings}
           socialLinks={socialLinks}
-          dragHandlers={dragHandlers}
-          dragRef={footerRef}
-          isDragging={dragState.isDragging}
-          onDragHint={nudge}
         />
-      </motion.div>
-
-      {/* Blackout during transition — outside the moving panel */}
-      <BlackoutOverlay active={dragState.isTransitioning} />
+      </div>
     </div>
   );
 }

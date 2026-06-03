@@ -1,3 +1,5 @@
+import { getSharedAudioContext, resumeShared } from "./audio-unlock";
+
 /**
  * Play a classic two-note doorbell — DING (high) then DONG (lower).
  *
@@ -7,12 +9,10 @@
  * Avon/Westminster house chime.
  */
 export function playBell(): void {
-  let ctx: AudioContext;
-  try {
-    ctx = new AudioContext();
-  } catch {
-    return;
-  }
+  const ctx = getSharedAudioContext();
+  if (!ctx) return;
+  // Runs from a click — resume the shared context (and defeat the mute switch).
+  resumeShared();
 
   const master = ctx.createGain();
   master.gain.value = 0.5;
@@ -30,14 +30,7 @@ export function playBell(): void {
   // Strike the "ding" immediately, the "dong" half a second later.
   strikeChime(ctx, filter, start, 659.25);        // E5 — DING
   strikeChime(ctx, filter, start + 0.55, 523.25); // C5 — DONG
-
-  setTimeout(() => {
-    try {
-      ctx.close();
-    } catch {
-      /* noop */
-    }
-  }, 5000);
+  // Oscillators stop themselves; never close the shared context.
 }
 
 function strikeChime(

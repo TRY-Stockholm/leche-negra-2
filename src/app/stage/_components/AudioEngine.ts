@@ -1,4 +1,5 @@
 import type { InstrumentConfig } from "./types";
+import { getSharedAudioContext, onUnlock } from "@/lib/audio-unlock";
 
 type ToneModule = typeof import("tone");
 
@@ -11,6 +12,7 @@ export class StageAudioEngine {
   private analyserData: Uint8Array<ArrayBuffer> | null = null;
   private isInitialized = false;
   private _isUnlocked = false;
+  private unregisterUnlock: (() => void) | null = null;
   get isUnlocked(): boolean {
     return this._isUnlocked;
   }
@@ -20,6 +22,19 @@ export class StageAudioEngine {
 
     const Tone = await import("tone");
     this.Tone = Tone;
+
+    // Share the app-wide AudioContext so a single iOS unlock (from any route)
+    // resumes the orchestra too. Guard against re-setting on remount.
+    const shared = getSharedAudioContext();
+    if (shared && Tone.getContext().rawContext !== shared) {
+      Tone.setContext(shared);
+    }
+
+    // Resume Tone whenever the global unlock fires (e.g. user arrived already
+    // unlocked from the homepage flow), so the first instrument tap is instant.
+    this.unregisterUnlock = onUnlock(() => {
+      this.Tone?.start().catch(() => {});
+    });
 
     this.masterGain = new Tone.Gain(0.8).toDestination();
 
@@ -113,6 +128,8 @@ export class StageAudioEngine {
   }
 
   dispose(): void {
+    this.unregisterUnlock?.();
+    this.unregisterUnlock = null;
     this.players.forEach((player) => {
       player.stop();
       player.dispose();

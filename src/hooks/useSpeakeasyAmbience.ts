@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback, useState } from "react";
+import { getSharedAudioContext, resumeShared, onUnlock } from "@/lib/audio-unlock";
 
 const HUM_FREQ_ACTIVE = 55;
 const HUM_FREQ_IDLE = 42;
@@ -35,18 +36,18 @@ export function useSpeakeasyAmbience(enabled: boolean, isIdle: boolean) {
   const nodesRef = useRef<AmbienceNodes | null>(null);
   const startedRef = useRef(false);
   const breatheRef = useRef<ReturnType<typeof setInterval>>(undefined);
+  const unlockOffRef = useRef<(() => void) | null>(null);
   const [isMuted, setIsMuted] = useState(false);
+  // True when ambience was built but iOS hasn't unlocked audio yet (deep-link
+  // with no prior gesture). Drives the "tap for sound" cue.
+  const [needsGesture, setNeedsGesture] = useState(false);
 
   const startAmbience = useCallback(() => {
     if (startedRef.current || !enabled) return;
     startedRef.current = true;
 
-    let ctx: AudioContext;
-    try {
-      ctx = new AudioContext();
-    } catch {
-      return;
-    }
+    const ctx = getSharedAudioContext();
+    if (!ctx) return;
     const master = ctx.createGain();
     master.gain.setValueAtTime(0, ctx.currentTime);
     master.gain.linearRampToValueAtTime(1, ctx.currentTime + FADE_IN_SECONDS);
@@ -90,6 +91,25 @@ export function useSpeakeasyAmbience(enabled: boolean, isIdle: boolean) {
         0.5
       );
     }, 100);
+
+    // Resume now (works when this fires within/after a gesture). On a deep-link
+    // the context is still suspended — arm a one-shot that swells ambience in
+    // on the user's first interaction and clears the cue.
+    resumeShared();
+    if (ctx.state !== "running") {
+      setNeedsGesture(true);
+      unlockOffRef.current = onUnlock(() => {
+        unlockOffRef.current?.();
+        unlockOffRef.current = null;
+        setNeedsGesture(false);
+        const n = nodesRef.current;
+        if (!n) return;
+        const t = n.ctx.currentTime;
+        n.master.gain.cancelScheduledValues(t);
+        n.master.gain.setValueAtTime(0, t);
+        n.master.gain.linearRampToValueAtTime(1, t + FADE_IN_SECONDS);
+      });
+    }
   }, [enabled]);
 
   const toggleMute = useCallback(() => {
@@ -124,15 +144,18 @@ export function useSpeakeasyAmbience(enabled: boolean, isIdle: boolean) {
   useEffect(() => {
     return () => {
       clearInterval(breatheRef.current);
+      unlockOffRef.current?.();
+      unlockOffRef.current = null;
       if (nodesRef.current) {
         nodesRef.current.hum.stop();
         nodesRef.current.noiseSource.stop();
-        nodesRef.current.ctx.close();
+        // Tear down this scene's nodes, but never close the shared, app-wide context.
+        nodesRef.current.master.disconnect();
         nodesRef.current = null;
       }
       startedRef.current = false;
     };
   }, []);
 
-  return { startAmbience, toggleMute, isMuted };
+  return { startAmbience, toggleMute, isMuted, needsGesture };
 }

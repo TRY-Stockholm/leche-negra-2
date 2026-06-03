@@ -129,7 +129,7 @@ export const CassettePlayer = memo(function CassettePlayer({
       onDragEnd={updateDeckPos}
       whileDrag={draggable ? { scale: 1.03 } : undefined}
       whileHover={canHover ? { scale: 1.01 } : undefined}
-      className={`${draggable ? "cursor-grab active:cursor-grabbing touch-none" : ""} w-[78%] max-w-[280px] md:w-[55%] md:max-w-[360px] ${className ?? ""}`}
+      className={`${draggable ? "cursor-grab active:cursor-grabbing touch-none" : ""} w-[58%] max-w-[210px] md:w-[55%] md:max-w-[360px] ${className ?? ""}`}
       style={{
         x: dragX,
         y: dragY,
