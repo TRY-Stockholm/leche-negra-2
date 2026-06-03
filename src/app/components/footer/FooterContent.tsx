@@ -46,7 +46,7 @@ export function FooterContent({
   hint,
 }: FooterContentProps) {
   return (
-    <div className="absolute inset-0 z-20 pointer-events-none flex flex-col justify-between px-5 py-6 md:px-10 md:py-10">
+    <div className="absolute inset-0 z-20 pointer-events-none flex flex-col justify-between px-5 py-6 md:px-10 md:py-10 pb-[max(1.5rem,env(safe-area-inset-bottom))] md:pb-[max(2.5rem,env(safe-area-inset-bottom))]">
       {/* Top row */}
       <div className="flex items-start justify-between">
         {/* Flavor text — top left. On desktop it's the grab handle for the

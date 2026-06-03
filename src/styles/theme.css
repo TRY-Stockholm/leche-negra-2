@@ -319,6 +319,20 @@ canvas {
 
   html {
     font-size: var(--font-size);
+    color-scheme: dark;
+  }
+
+  /* Remove the 300ms tap delay / double-tap zoom on controls (still allows
+     panning + pinch-zoom). Draggable surfaces set their own touch-action. */
+  button,
+  a,
+  [role="button"],
+  input,
+  select,
+  textarea,
+  label,
+  summary {
+    touch-action: manipulation;
   }
 
   h1 {

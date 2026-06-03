@@ -1,5 +1,5 @@
-import { useCallback, useRef, useState, useEffect, memo, useMemo } from 'react'
-import { motion } from 'motion/react'
+import { useCallback, useRef, useState, useEffect, memo } from 'react'
+import { motion, useDragControls } from 'motion/react'
 import { TAPES } from './types'
 import type { TapeConfig } from './types'
 import { useTapeDeck } from './TapeDeckContext'
@@ -72,10 +72,26 @@ export const CassetteTape = memo(function CassetteTape({
   const tape = TAPES[id]
   const { loadedTapeId, nearDeckId, handleTapeDrag, handleTapeDragEnd } = useTapeDeck()
   const canHover = useCanHover()
+  const dragControls = useDragControls()
 
   const isLoaded = loadedTapeId === id
   const isNearDeck = nearDeckId === id
   const elRef = useRef<HTMLDivElement>(null)
+
+  // Touch arming: a disc must be pressed-and-held to "lift" before it drags, so a
+  // normal swipe over it scrolls the page instead of getting trapped. Because the
+  // disc keeps `touch-action: none` (needed for free, any-direction dragging onto
+  // the gramophone below it), the page can't scroll natively from a touch that
+  // starts here — so during the pre-lift phase we forward the finger to the page.
+  const [lifted, setLifted] = useState(false)
+  const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const startPt = useRef({ x: 0, y: 0 })
+  const lastY = useRef(0)
+  const liftedRef = useRef(false)
+  const scrollingRef = useRef(false)
+
+  const LIFT_MS = 250
+  const MOVE_SLOP = 8
 
   // Wobble on mount for touch devices — hints tapes are interactive
   const wobbleRotation = WOBBLE_ROTATIONS[id] ?? [0, -3, 2, 0]
@@ -91,34 +107,99 @@ export const CassetteTape = memo(function CassetteTape({
     handleTapeDragEnd(id)
   }, [id, handleTapeDragEnd])
 
-  if (isLoaded) return null
+  const clearPress = useCallback(() => {
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current)
+      pressTimer.current = null
+    }
+  }, [])
 
-  const wobbleProps = {
-    animate: { rotate: wobbleRotation },
-    transition: {
-      rotate: {
-        duration: 0.6,
-        ease: "easeInOut" as const,
-        delay: wobbleDelay,
-      },
+  const onPointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      // Desktop / any hover-capable pointer: drag immediately, same as before.
+      if (canHover || e.pointerType === 'mouse') {
+        dragControls.start(e)
+        return
+      }
+      // Touch: arm a press-and-hold. Movement before it fires means "scroll".
+      // Keep the native event — the React synthetic one is nulled after dispatch,
+      // but we start the drag from the deferred timeout below.
+      const native = e.nativeEvent
+      startPt.current = { x: e.clientX, y: e.clientY }
+      lastY.current = e.clientY
+      liftedRef.current = false
+      scrollingRef.current = false
+      clearPress()
+      pressTimer.current = setTimeout(() => {
+        liftedRef.current = true
+        setLifted(true)
+        if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(8)
+        dragControls.start(native)
+      }, LIFT_MS)
     },
-  }
+    [canHover, dragControls, clearPress],
+  )
+
+  const onPointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      // Once lifted, framer-motion owns the gesture.
+      if (liftedRef.current || canHover) return
+
+      const dyStep = e.clientY - lastY.current
+      lastY.current = e.clientY
+
+      if (!scrollingRef.current) {
+        const movedX = Math.abs(e.clientX - startPt.current.x)
+        const movedY = Math.abs(e.clientY - startPt.current.y)
+        if (movedX > MOVE_SLOP || movedY > MOVE_SLOP) {
+          // Moved before the hold completed → it's a scroll, not a pickup.
+          scrollingRef.current = true
+          clearPress()
+        }
+      }
+
+      // Forward the swipe to the page (no native scroll while touch-action: none).
+      if (scrollingRef.current) window.scrollBy(0, -dyStep)
+    },
+    [canHover, clearPress],
+  )
+
+  const endPress = useCallback(() => {
+    clearPress()
+    scrollingRef.current = false
+    if (liftedRef.current) {
+      liftedRef.current = false
+      setLifted(false)
+    }
+  }, [clearPress])
+
+  useEffect(() => () => clearPress(), [clearPress])
+
+  if (isLoaded) return null
 
   return (
     <div className={className} style={style}>
       <motion.div
         ref={elRef}
         drag
+        dragListener={false}
+        dragControls={dragControls}
         dragElastic={0.08}
         dragMomentum={false}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endPress}
+        onPointerCancel={endPress}
         onDrag={onDrag}
-        onDragEnd={onDragEnd}
-        whileDrag={{ scale: 1.08, zIndex: 50 }}
+        onDragEnd={() => { onDragEnd(); endPress() }}
         whileHover={canHover ? { scale: 1.04 } : undefined}
-        whileTap={{ scale: 1.06 }}
-        {...wobbleProps}
+        animate={{ rotate: wobbleRotation, scale: lifted ? 1.1 : 1 }}
+        transition={{
+          rotate: { duration: 0.6, ease: 'easeInOut', delay: wobbleDelay },
+          scale: { duration: 0.18, ease: 'easeOut' },
+        }}
         className="cursor-grab active:cursor-grabbing touch-none relative w-fit"
-        style={{ zIndex: 12 }}
+        style={{ zIndex: lifted ? 50 : 12 }}
       >
         <div className="absolute -inset-4" />
         {isNearDeck && tape && (
