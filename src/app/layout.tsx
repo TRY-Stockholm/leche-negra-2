@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "@/styles/index.css";
 import { Analytics } from "@vercel/analytics/next";
 import { playfairDisplay } from "./fonts";
@@ -38,6 +38,15 @@ export const metadata: Metadata = {
       "A restaurant in Stockholm. Breakfast, lunch, dinner, and drinks on Engelbrektsgatan 3.",
     images: ["/og-image.png"],
   },
+};
+
+export const viewport: Viewport = {
+  // Match the deep-red base background so the notch/home-indicator safe areas and
+  // the iOS overscroll gutter blend into the page instead of flashing white.
+  themeColor: "#460b08",
+  colorScheme: "dark",
+  // Let the page bleed into the safe areas; edges opt back in via env(safe-area-*).
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

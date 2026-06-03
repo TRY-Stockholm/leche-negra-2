@@ -26,7 +26,11 @@ import {
 } from "./tape-deck";
 import { Ticker } from "./Ticker";
 import { Footer } from "./footer";
+import { SpeakeasyGlow } from "./footer/SpeakeasyGlow";
+import { BlackoutOverlay } from "./footer/BlackoutOverlay";
 import { AmbientIllustrations } from "./AmbientIllustrations";
+import { useOverscrollEntry } from "@/hooks/useOverscrollEntry";
+import { motion } from "motion/react";
 
 interface HomePageProps {
   siteSettings: SiteSettings | null;
@@ -61,6 +65,9 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
   const [menuModalOpen, setMenuModalOpen] = useState(false);
   const [easterEgg, setEasterEgg] = useState(false);
   const [scene, setScene] = useState<SceneConfig | null>(null);
+
+  // Speakeasy entry: desktop drags the footer, touch overscrolls past the bottom.
+  const { state: entry, atBottom, containerRef, pointerHandlers } = useOverscrollEntry();
 
   // Hover-driven theme overrides only happen via menus now; tape changes are
   // handled separately as a subtle red-hue shift, not a full theme swap.
@@ -99,10 +106,31 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
 
   return (
     <div
+      ref={containerRef as React.RefObject<HTMLDivElement>}
       className={`bg-background text-foreground font-body transition-colors duration-700 ${activeTheme ? `theme-${activeTheme}` : ""} ${tapeMood ? `tape-${tapeMood}` : ""}`}
       style={{ isolation: "isolate" }}
     >
-      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      {/* Full-viewport warm glow — sits behind the page, revealed as it lifts. */}
+      <SpeakeasyGlow />
+
+      {/* The "panel" — the whole page lifts as one rigid slab off the hidden room. */}
+      <motion.div
+        style={{ minHeight: "100dvh", display: "flex", flexDirection: "column" }}
+        animate={{
+          y: entry.isTransitioning
+            ? -window.innerHeight - 200
+            : entry.isDragging
+              ? -entry.offsetY
+              : 0,
+        }}
+        transition={
+          entry.isTransitioning
+            ? { duration: 0.5, ease: [0.16, 1, 0.3, 1] }
+            : entry.isDragging
+              ? { duration: 0 }
+              : { type: "spring", stiffness: 200, damping: 25 }
+        }
+      >
         <div
           className="relative z-10 flex-1 bg-background"
           style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}
@@ -122,7 +150,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
           />
 
           {/* Main Content — 12-column grid */}
-          <div className="grid grid-cols-12 lg:grid-rows-[auto_1fr_auto] gap-x-4 px-5 md:px-10 min-h-[calc(100svh-84px)] lg:min-h-[calc(100vh-65px)]">
+          <div className="grid grid-cols-12 lg:grid-rows-[auto_1fr_auto] gap-x-4 px-5 md:px-10 min-h-[calc(100dvh-84px)] lg:min-h-[calc(100dvh-65px)]">
           {/* Logo */}
           <div className="col-span-12 row-start-1 self-start pt-8 md:col-span-5 md:pt-16 select-none">
             <div className="relative no-select">
@@ -255,8 +283,14 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
         <Footer
           siteSettings={siteSettings}
           socialLinks={socialLinks}
+          pointerHandlers={pointerHandlers}
+          isDragging={entry.isDragging}
+          hint={atBottom}
         />
-      </div>
+      </motion.div>
+
+      {/* Iris blackout during the commit transition — outside the lifting panel. */}
+      <BlackoutOverlay active={entry.isTransitioning} />
     </div>
   );
 }
