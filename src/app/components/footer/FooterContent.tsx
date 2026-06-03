@@ -33,23 +33,35 @@ function MailIcon() {
 interface FooterContentProps {
   siteSettings?: SiteSettings | null;
   socialLinks?: SocialLink[];
+  /** Whether the page is actively being lifted (desktop drag). */
+  isDragging?: boolean;
+  /** Whether the visitor has reached the bottom — breathes the "find it." line. */
+  hint?: boolean;
 }
 
 export function FooterContent({
   siteSettings,
   socialLinks,
+  isDragging,
+  hint,
 }: FooterContentProps) {
   return (
     <div className="absolute inset-0 z-20 pointer-events-none flex flex-col justify-between px-5 py-6 md:px-10 md:py-10">
       {/* Top row */}
       <div className="flex items-start justify-between">
-        {/* Flavor text — top left */}
-        <div className="leading-snug text-foreground/60 text-left select-none">
+        {/* Flavor text — top left. On desktop it's the grab handle for the
+            page-lift; on touch the whole bottom edge pulls up via overscroll. */}
+        <div
+          className="leading-snug text-foreground/60 text-left select-none"
+          style={{ cursor: isDragging ? "grabbing" : "grab" }}
+        >
           <span className="font-display text-[clamp(1rem,2vw,1.5rem)] italic">
             there's a room downstairs.
           </span>
           <br />
-          <span className="font-display text-[clamp(1rem,2vw,1.5rem)] font-bold not-italic">
+          <span
+            className={`font-display text-[clamp(1rem,2vw,1.5rem)] font-bold not-italic${hint ? " speakeasy-hint" : ""}`}
+          >
             find it.
           </span>
         </div>

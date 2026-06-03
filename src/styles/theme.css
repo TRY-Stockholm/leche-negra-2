@@ -839,6 +839,29 @@ canvas {
   50% { opacity: 0.18; }
 }
 
+/* Faint breathing glow on the "find it." line once the visitor reaches the
+   bottom — the only hint that the page can be pulled up into the speakeasy. */
+@keyframes speakeasy-hint-breathe {
+  0%, 100% {
+    opacity: 0.6;
+    text-shadow: 0 0 0 transparent;
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 12px rgba(210, 140, 60, 0.45), 0 0 28px rgba(195, 120, 50, 0.2);
+  }
+}
+
+.speakeasy-hint {
+  animation: speakeasy-hint-breathe 3.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .speakeasy-hint {
+    animation: none;
+  }
+}
+
 @keyframes speakeasy-drift {
   0%, 100% { transform: translate(0, 0) rotate(0deg); }
   25% { transform: translate(3px, -5px) rotate(0.3deg); }
