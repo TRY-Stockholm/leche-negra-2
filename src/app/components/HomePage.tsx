@@ -115,7 +115,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
 
       {/* The "panel" — the whole page lifts as one rigid slab off the hidden room. */}
       <motion.div
-        style={{ minHeight: "100svh", display: "flex", flexDirection: "column" }}
+        style={{ minHeight: "100dvh", display: "flex", flexDirection: "column" }}
         animate={{
           y: entry.isTransitioning
             ? -window.innerHeight - 200
@@ -150,7 +150,7 @@ function PageContent({ siteSettings, socialLinks, menus }: HomePageProps) {
           />
 
           {/* Main Content — 12-column grid */}
-          <div className="grid grid-cols-12 lg:grid-rows-[auto_1fr_auto] gap-x-4 px-5 md:px-10 min-h-[calc(100svh-84px)] lg:min-h-[calc(100svh-65px)]">
+          <div className="grid grid-cols-12 lg:grid-rows-[auto_1fr_auto] gap-x-4 px-5 md:px-10 min-h-[calc(100dvh-84px)] lg:min-h-[calc(100dvh-65px)]">
           {/* Logo */}
           <div className="col-span-12 row-start-1 self-start pt-8 md:col-span-5 md:pt-16 select-none">
             <div className="relative no-select">
